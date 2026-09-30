@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tech-First Platform Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --bg:#F2F4F1;--surface:#FFFFFF;--ink:#18211D;--muted:#5B6660;--line:#CFD6D1;
+  --accent:#1E7A52;--warn:#B4532A;--code-bg:#E7ECE8;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714;--surface:#18201C;--ink:#E4EBE6;--muted:#9AA79F;--line:#2F3B35;
+  --accent:#4FC18A;--warn:#E38356;--code-bg:#1D2621;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111714;--surface:#18201C;--ink:#E4EBE6;--muted:#9AA79F;--line:#2F3B35;
+  --accent:#4FC18A;--warn:#E38356;--code-bg:#1D2621;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;padding-inline:20px;padding-block:40px 72px}
+article{max-width:720px;margin:0 auto;display:grid;gap:18px}
+.eyebrow{font:500 12px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1,h2{font-family:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(28px,5vw,40px);font-weight:700;margin-bottom:6px}
+h2{font-size:24px;font-weight:600;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+p,ul,ol{margin:0}
+ul,ol{padding-left:22px;display:grid;gap:8px}
+li::marker{color:var(--accent)}
+ul ul{margin-top:8px}
+strong{font-weight:600}
+code{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:16px 18px;overflow-x:auto;font:13.5px/1.55 "IBM Plex Mono",ui-monospace,Menlo,monospace}
+pre code{background:none;padding:0;font-size:inherit}
+.head{display:grid;gap:10px}
+.update{display:grid;gap:14px;margin-top:34px;padding:22px 24px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px}
+.update h2{margin-top:0;padding-top:0;border-top:0}
+.jump{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}
+.jump span{color:var(--muted)}
+.rule{border-left:3px solid var(--warn);padding:8px 0 8px 14px}
+.jump a{color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
+.jump a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<article>
+<div class="head">
+  <div class="eyebrow">Brainstorm · tech track · Sept 2026</div>
+  <h1>Tech-first plan: practice, duels, contests</h1>
+  <nav class="jump"><span>Decided since:</span> <a href="#research">Research panel</a> <a href="#plans">Free, Pro, Organization</a> <a href="#creation">Problem creation</a> <a href="#ninjathons">Ninjathons</a> <a href="#profiles">Profiles</a> <a href="#security">Security</a> <a href="#app">App structure &amp; guardrail</a> <a href="#play">Play modes</a> <a href="#territory">Territory</a> <a href="#conquest">World Conquest</a> <a href="#leaderboard">Leaderboard</a> <a href="#profile-screens">Profile screens</a> <a href="#library">Problem library</a> <a href="#later">Later</a></nav>
+</div>
+
+<p>Good choice. Tech gives you one grader type (code runs against tests) to get right before adding others. Here's how I'd shape it.</p>
+
+<h2>Features, in build order</h2>
+<ol>
+  <li><strong>Problem library and solo practice</strong>: problem view, editor, results, research panel</li>
+  <li><strong>Duels and multiplayer battles</strong>: the Conquistador part, and your most distinctive feature</li>
+  <li><strong>Contests</strong>: scheduled, ranked, many people solving the same set</li>
+  <li><strong>Learning paths</strong>: "Learn Rust through 40 problems," with the AI coach</li>
+  <li><strong>Hackathons</strong>: teams, repos, and judges, which is a different beast from auto-graded problems</li>
+</ol>
+<p>Duels should come before contests. Contests need a crowd, but a duel only needs two friends and a link. That's also how the platform spreads.</p>
+
+<h2>Duels, Conquistador-style</h2>
+<p>The Conquistador loop works for code: short rounds, visible stakes, and conquering territory from your opponents. Some formats to consider:</p>
+<ul>
+  <li><strong>1v1 race</strong>: same problem, first to pass all hidden tests wins. The simplest mode, so build it first.</li>
+  <li><strong>Territory map</strong>: 3 players on a map, each region holds a problem, and whoever solves it first claims it. You can attack an opponent's region by solving a harder problem there. This mode is your identity.</li>
+  <li><strong>Battle royale</strong>: 8 to 20 players, several rounds, and the slowest drop out each round.</li>
+  <li><strong>Twist modes</strong> (CodinGame's Clash of Code proves these work): shortest code wins, or "reverse" mode where you only see input/output examples and have to infer the problem.</li>
+  <li><strong>Challenge a friend</strong>: send a link and you're in a lobby.</li>
+</ul>
+<p>Technically, Convex fits duels well:</p>
+<ul>
+  <li><strong>Server-authoritative match state</strong>: lobby, countdown, active, finished. The server owns the clock, not the client.</li>
+  <li><strong>Problem hidden until start</strong>: it's revealed only when the match goes active. Draw it from a pool neither player has solved before.</li>
+  <li><strong>Live opponent progress</strong>: show things like "Opponent: 7/12 tests passing, 3 submissions" through Convex subscriptions, but never their code.</li>
+  <li><strong>Matchmaking</strong>: a queue table plus a scheduled function that pairs people by rating band and widens the band over time.</li>
+  <li><strong>Ratings</strong>: Glicko-2, with separate ratings for duels and contests.</li>
+</ul>
+
+<h2>The code runner</h2>
+<p>This is where the real engineering is.</p>
+<p><strong>Judging model.</strong> You have two options:</p>
+<ul>
+  <li><strong>stdin/stdout</strong> (Codeforces style): the program reads input and prints output. Works in any language with no extra effort per language.</li>
+  <li><strong>Function signature</strong> (LeetCode style): the user fills in <code>twoSum(nums, target)</code>. This is nicer for users, but you need a generated test harness for every language on every problem.</li>
+</ul>
+<p>My recommendation is to start with stdin/stdout, store test cases as language-agnostic JSON, and add function-signature problems later with a harness generator.</p>
+<p><strong>Sandbox.</strong> Judge0 self-hosted is the fastest path, since it supports dozens of languages. Run it on its own VM, separate from everything else. The non-negotiables:</p>
+<ul>
+  <li>No network access</li>
+  <li>CPU, memory, and time limits</li>
+  <li>Output size cap</li>
+  <li>A fresh sandbox for every run</li>
+</ul>
+<p>Check your host's cgroup setup before committing to Judge0, because it's picky about host configuration.</p>
+<p><strong>Run vs Submit.</strong></p>
+<ul>
+  <li><strong>Run</strong> checks only the sample tests and should feel instant.</li>
+  <li><strong>Submit</strong> checks all hidden tests.</li>
+</ul>
+<p>Rate-limit both. In a duel, people will spam Run.</p>
+<p><strong>Latency.</strong> Duels depend on it. Keep warm runners, compile once and then run all tests, and queue with priority (duel submissions ahead of practice).</p>
+
+<h2>Architecture</h2>
+<pre><code>Next.js (Monaco editor, research panel)
+   │  Clerk auth
+   ▼
+Convex ── queries/subscriptions: problems, matches, leaderboards, presence
+   │  action: submit(code, lang, problemId)
+   ▼
+Runner service (Judge0 on isolated VM)
+   │  webhook with results
+   ▼
+Convex mutation → updates submission → UI updates live for both players</code></pre>
+
+<h2>Core tables</h2>
+<ul>
+  <li><strong>users</strong>: Clerk id, ratings per mode</li>
+  <li><strong>problems</strong>: statement, difficulty, tags, author, status (beta or approved)</li>
+  <li><strong>testCases</strong>: problem, input, expected output, sample or hidden</li>
+  <li><strong>submissions</strong>: user, problem, language, code, verdict, runtime, memory, integrity signals, match (optional)</li>
+  <li><strong>matches</strong>: mode, state, participants, problem set, start and end times, map state for territory mode</li>
+  <li><strong>matchEvents</strong>: submitted, solved, captured region; drives the live feed</li>
+  <li><strong>contests</strong>: holds problem sets, schedule, and registrations; can come later</li>
+</ul>
+
+<h2>Anti-cheat for duels</h2>
+<p>Duels are harder to cheat in than solo practice:</p>
+<ul>
+  <li>The time window is short.</li>
+  <li>The problem is unseen until the match starts.</li>
+  <li>Both solutions can be compared automatically afterwards: similarity between opponents, and similarity to known public solutions.</li>
+</ul>
+<p>Add the tab-leave and paste signals from before and show a trust indicator. Flag suspicious games for review rather than punishing automatically.</p>
+
+<h2>Languages</h2>
+<p>Launch with 4 or 5: Python, JavaScript/TypeScript, Java, C++, and C#. Learning paths per language later are mostly a content problem, not a technical one.</p>
+
+<p style="margin-top:14px">Two questions that shape the next step:</p>
+<ul>
+  <li><strong>Judging model</strong>: stdin/stdout for the MVP, or is the LeetCode-style function experience important to you from day one?</li>
+  <li><strong>Duel formats</strong>: should the territory map be in the first version, or do we ship the 1v1 race first and add the map once matches work?</li>
+</ul>
+
+<section class="update" id="research">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Research panel: a hosted docs library</h2>
+  <p>Decided after the brainstorm above: no embedded Google, no iframes, and no web search API in the MVP. The research panel becomes a docs library the platform hosts itself.</p>
+  <p><strong>Why not Google or iframes.</strong></p>
+  <ul>
+    <li>Google.com refuses to load inside another site's iframe.</li>
+    <li>Google's Custom Search JSON API is closed to new customers and ends for existing ones on January 1, 2027. New Programmable Search engines are limited to 50 chosen domains.</li>
+    <li>Many docs sites also block iframes, and a site can change that at any time.</li>
+    <li>Inside an iframe you can't see which page someone reads, and you can't stop links leading to other sites. Per-page tracking and "official docs only" rules would be impossible.</li>
+  </ul>
+  <p><strong>How the docs library works.</strong></p>
+  <ul>
+    <li>A scraper job, reusing DevDocs' open-source scrapers, imports doc sets with open licenses (MDN, Python docs, cppreference, Rust docs and similar) with a source and license line on each page.</li>
+    <li>Docs are pinned to the same language version the runner uses. The job runs again only when a runner language is upgraded, roughly once a year per language.</li>
+    <li>Pages live in a Convex <code>docPages</code> table with a search index. The panel searches and reads them through Convex queries.</li>
+    <li>Every page opened is logged as a <code>docViews</code> row, so results can show "solved using 3 doc pages".</li>
+  </ul>
+  <p><strong>Docs policy per mode</strong>, enforced by the query on the server:</p>
+  <ul>
+    <li><strong>Practice</strong>: all doc sets, plus a logged "open in new tab" button for anything else.</li>
+    <li><strong>Duels</strong>: official references only, or no docs. Still open.</li>
+    <li><strong>Hard-mode contests</strong>: no docs, with a separate no-docs leaderboard.</li>
+    <li><strong>AI coach (later)</strong>: hints point to exact doc sections instead of giving code.</li>
+    <li><strong>Desktop app (later)</strong>: its own web view can show any site, including Google, and log every URL, so full browsing becomes possible there.</li>
+  </ul>
+</section>
+
+<section class="update" id="plans">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Free, Pro and Organization</h2>
+  <p>The rule: never sell an advantage in competition. Charge for teaching, for things that cost money to run, and for things organizations need.</p>
+  <p><strong>Free</strong></p>
+  <ul>
+    <li>Every exercise in the library, in any language</li>
+    <li>Ranked duels, matchmaking, contests, ratings and all leaderboards (global, per language, per country, friends)</li>
+    <li>The docs library in every mode</li>
+    <li>Basic stats and rating history</li>
+    <li>A basic profile, free themes, and themes earned by playing</li>
+    <li>A few AI hints per day</li>
+    <li>Joining ninjathons</li>
+  </ul>
+  <p><strong>Pro</strong></p>
+  <ul>
+    <li>Courses and tutorials: lessons, structure, progress tracking, the course's AI coach, certificates. The first module of each course stays free as a preview.</li>
+    <li>Unlimited AI coach</li>
+    <li>Deep analytics: weak topics, speed versus your rating band, duel replays</li>
+    <li>Creating problems</li>
+    <li>Creating small private ninjathons</li>
+    <li>Full profile customization</li>
+  </ul>
+  <p><strong>Organization</strong></p>
+  <ul>
+    <li>Public, branded ninjathons and hiring challenges</li>
+    <li>Candidate reports with similarity checks</li>
+    <li>Classes, assignments and class leaderboards for universities and bootcamps</li>
+    <li>Priced per event or per seat</li>
+  </ul>
+  <p><strong>Never paid:</strong> rating, extra ranked games, leaderboard placement, extra Run attempts in a duel, ads in the editor or duel view.</p>
+  <p><strong>Changed from earlier:</strong> premium problem sets are dropped, because every exercise is free. Interview prep becomes a course instead. Courses only point to exercises in the public library, so free users can still solve those exercises; they pay for the teaching around them.</p>
+  <p><strong>Launch timing:</strong> launch fully free, add Pro once people hit the free AI limit, and run one company-hosted ninjathon early as a pilot.</p>
+</section>
+
+<section class="update" id="creation">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Problem creation and review</h2>
+  <ul>
+    <li><strong>Paid feature:</strong> Pro users create problems. Top-ranked players can also be invited into a creator program. Creators can earn a revenue share on premium courses later.</li>
+    <li><strong>Seed the library yourself</strong> at launch, a few hundred problems, since paid creation means fewer community problems.</li>
+    <li><strong>Language-agnostic by default:</strong> statement, test cases and a reference solution in any language; everyone can solve it in any supported language. Creators can restrict languages when needed.</li>
+    <li><strong>Validation:</strong> the reference solution must pass every test in the runner, ideally with a second solution in another language. Time limits get a per-language multiplier.</li>
+    <li><strong>Language-specific problems</strong> (Rust lifetimes, a JavaScript debounce) come later with the function-signature harness.</li>
+    <li><strong>Beta review:</strong> only users who solved it vote on difficulty and quality. Approval needs enough solves, good ratings and a reviewer sign-off.</li>
+    <li><strong>Difficulty after approval</strong> is recalculated from real results: solve rate, attempts, time taken, and solver versus non-solver ratings.</li>
+    <li><strong>Comments:</strong> issue reports open to everyone; discussion unlocks only after solving; comments closed during duels and contests; flagging and reputation limits for moderation.</li>
+    <li><strong>Ranked use:</strong> community problems start in practice. Ranked duels use approved problems; contests use fresh, unseen problems.</li>
+  </ul>
+</section>
+
+<section class="update" id="ninjathons">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Ninjathons</h2>
+  <ul>
+    <li><strong>Creating is paid:</strong> Pro for small private events with a participant limit, Organization for public branded events with judges, sponsors, prizes and candidate reports.</li>
+    <li><strong>Entry is chosen by the organizer:</strong> free (usually sponsor-funded), paid (platform keeps a percentage), or invite-only.</li>
+    <li><strong>Launch with free-entry ninjathons</strong> created by paying organizers; add paid entry when organizers ask for it.</li>
+    <li><strong>Paid entry needs:</strong> organizer payouts through Stripe Connect, a refund policy, and legal advice on paid entry combined with prizes, which some countries regulate.</li>
+    <li><strong>Data:</strong> an <code>events</code> table (entry type, price, currency, organizer) and a <code>registrations</code> table whose payment status only the payment webhook can confirm.</li>
+  </ul>
+</section>
+
+<section class="update" id="profiles">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Profiles</h2>
+  <ul>
+    <li><strong>Free:</strong> avatar, name, bio, country, links, favorite languages, pinned solutions and badges, a few free themes, plus themes unlocked by achievements.</li>
+    <li><strong>Pro:</strong> the full template library, custom colors, fonts, banner and background, rearranging and hiding sections, extra sections such as a portfolio, and a custom profile URL.</li>
+    <li><strong>How it's built:</strong> templates plus validated theme values stored as data. No user CSS or HTML, a contrast check on colors, and uploaded images checked before going public.</li>
+    <li><strong>Fixed stats block:</strong> rating, rank, solved count and duel record are always rendered by the platform and can't be restyled or hidden.</li>
+  </ul>
+</section>
+
+<section class="update" id="security">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Security</h2>
+  <ul>
+    <li><strong>Runner:</strong> separate VM, fresh sandbox per run, no network, unprivileged user, read-only filesystem, limits on CPU, memory, processes, time and output, and alerts on load spikes. Results only via a signed webhook.</li>
+    <li><strong>Convex:</strong> every public function checks the caller. Hidden tests are read only by internal functions. Duel problems stay hidden until the match is active. Opponent progress returns counts, never code. Ratings and verdicts change only in internal mutations. The server clock decides all timing.</li>
+    <li><strong>Rankings:</strong> provisional ratings for new accounts, verified login for ranked play, detection of repeated one-sided pairings, rate limits on Run and Submit.</li>
+    <li><strong>User content:</strong> sanitized markdown; new problems stay in practice until approved.</li>
+    <li><strong>Payments:</strong> an <code>entitlements</code> table written only by the payment webhook; every paid feature checks it on the server.</li>
+    <li><strong>AI coach:</strong> server-side quotas and hints only, guarded against prompts asking for full solutions.</li>
+    <li><strong>GDPR:</strong> disclose tracking, collect only what you use, delete raw behavior events after a set period (for example 90 days), keep aggregated trust scores, support account deletion.</li>
+  </ul>
+</section>
+
+<section class="update" id="app">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>One Next.js app, and the Convex guardrail</h2>
+  <p><strong>One app with three route groups:</strong></p>
+  <ul>
+    <li><strong>(marketing)</strong>: home, features, pricing, blog. Statically generated with metadata, Open Graph images, sitemap and structured data.</li>
+    <li><strong>(public)</strong>: problem pages, public profiles, leaderboards, contest results. Server-rendered for search engines, and the same page becomes the solving view for signed-in users. This is where most SEO traffic will come from, and the main reason to keep one app.</li>
+    <li><strong>(app)</strong>: dashboard, duels, solving, courses, settings. Behind sign-in, client-heavy, live Convex subscriptions.</li>
+    <li>Split into a monorepo only when a marketing team needs its own CMS and deploys, or build times hurt. Keep shared components in their own folder from the start.</li>
+  </ul>
+  <p class="rule"><strong>Guardrail: every check happens in Convex, before the data leaves the server.</strong> Next.js decides what to show; Convex decides what to send. Middleware and route protection are for redirects and user experience only, never for security.</p>
+  <ul>
+    <li>All public Convex functions are built from wrappers (<code>userQuery</code>, <code>proQuery</code>, <code>proMutation</code>) that check identity and <code>entitlements</code> first. A lint rule blocks raw <code>query</code> and <code>mutation</code> outside <code>convex/lib</code>.</li>
+    <li>Actions call an internal query that runs the same check before calling the runner or the AI coach.</li>
+    <li>No Pro content in pages: course pages are never statically generated with lesson text, and locked content is never sent blurred or hidden. Public course pages show the title, outline and free preview module.</li>
+    <li>Only the payment webhook writes <code>entitlements</code>.</li>
+    <li>Every Pro function has a test that calls it as a free user and expects it to fail.</li>
+    <li>Not fully preventable: paying users copying text or sharing accounts. Limit concurrent sessions and accept the rest.</li>
+  </ul>
+</section>
+
+<section class="update" id="play">
+  <div class="eyebrow">Update · 26–27 Sept 2026</div>
+  <h2>Play modes: find a match or challenge someone</h2>
+  <ul>
+    <li><strong>Navigation:</strong> "Play modes" in the sidebar is a dropdown listing 1v1 race, Territory, Battle royale, Twist modes, Weekly contests, Ninjathons and Create problems (Pro). No second sidebar.</li>
+    <li><strong>Mode page layout:</strong> title and description, rule tiles, two large choice cards, the panel for the chosen card, "How it works" in four steps, and a "Who can do what" table (Free, Pro, Organization).</li>
+    <li><strong>Two ways into every match mode:</strong>
+      <ul>
+        <li><strong>Find a match (ranked):</strong> pick a language, get matched by duel rating. The rating range widens the longer you wait.</li>
+        <li><strong>Challenge someone (unranked):</strong> invite players by username, pick from friends and recent opponents, or copy an invite link. Set difficulty, language and time limit. Start unlocks once enough players accept.</li>
+      </ul>
+    </li>
+    <li><strong>Challenges never change ratings,</strong> so friends can't trade wins to boost each other.</li>
+    <li><strong>Incoming challenges</strong> appear at the top of the page with Accept and Decline, including the settings and when the invite expires.</li>
+    <li><strong>Live signals</strong> build confidence that a match will happen: players online per mode, expected wait, friends online.</li>
+    <li><strong>Button hierarchy:</strong> the two choice cards have equal weight. The black primary button is kept for the action that completes the flow inside the panel (Find a match, Send invite, Start).</li>
+    <li><strong>Username invites</strong> show clear errors: unknown player, yourself, duplicate invite, full lobby.</li>
+  </ul>
+</section>
+
+<section class="update" id="territory">
+  <div class="eyebrow">Update · 27 Sept 2026</div>
+  <h2>Territory</h2>
+  <ul>
+    <li><strong>Players:</strong> minimum 3, maximum 6. With 2 players it would just be a 1v1; above 6 a 30-minute match gets chaotic.</li>
+    <li><strong>Map:</strong> hex regions. 37 regions for 3 to 4 players, 61 for 5 to 6. Each player starts with a home base on the edge.</li>
+    <li><strong>Region values:</strong> Easy on the edge (+1), Medium (+2), Hard (+3), and a Core in the center (+5). The 37-region map totals 65 points.</li>
+    <li><strong>Claim:</strong> solve the problem of an empty region next to one you hold.</li>
+    <li><strong>Attack:</strong> solve a problem one level harder to take a rival's region next to yours.</li>
+    <li><strong>Home bases can't be captured,</strong> so nobody is knocked out early.</li>
+    <li><strong>60-second shield</strong> on newly captured regions, so regions don't flip back and forth.</li>
+    <li><strong>Winning:</strong> first to more than half the points (33 of 65), or the most points when the 30 minutes run out.</li>
+    <li><strong>Screen:</strong> map in the center, reachable regions tinted, a score bar with a 50% marker, the selected region's problem and action on the right, and a live match feed. In the real app, Claim or Attack opens the editor next to the map.</li>
+    <li><strong>Ranked through Find a match,</strong> unranked through challenges, like 1v1.</li>
+  </ul>
+</section>
+
+<section class="update" id="conquest">
+  <div class="eyebrow">Proposal · 27 Sept 2026</div>
+  <h2>World Conquest (world map mode)</h2>
+  <p>A long-running world map where players conquer regions for their country by solving problems, without walking anywhere. It's closer to a season than a match, so it should be its own mode rather than a Battle royale.</p>
+  <ul>
+    <li><strong>Country from the profile,</strong> not GPS. No location tracking and no privacy issue.</li>
+    <li><strong>Season-based:</strong> 2 to 4 weeks. Players join whenever they want; each solve adds influence for their country in a region, and the region flips when another country's influence overtakes it.</li>
+    <li><strong>Attack range:</strong> regions next to anything your country already holds, so geography matters.</li>
+    <li><strong>Fair for small countries:</strong> a daily cap per player, and influence averaged per active player instead of summed.</li>
+    <li><strong>Unranked, with generated problems:</strong> regions serve randomized variants, since problems stay up for days. Season rewards and badges instead of rating.</li>
+    <li><strong>Stylized hex world, not real borders,</strong> to avoid disputed borders on a coding platform.</li>
+    <li><strong>Battle royale stays</strong> as the short elimination mode (8 to 20 players, rounds, about 15 minutes).</li>
+  </ul>
+</section>
+
+<section class="update" id="leaderboard">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Leaderboard</h2>
+  <ul>
+    <li><strong>Fully free.</strong> Pro only adds analytics about your own position.</li>
+    <li><strong>Boards:</strong> Duels, Contests, This week (rating gained in 7 days), Hard mode (no docs), Creators. Solve counts and streaks stay on profiles, since they measure activity rather than skill.</li>
+    <li><strong>Scopes:</strong> Global, Country, Friends, My class. Filters by language and tier; seasons can come later.</li>
+    <li><strong>Your position pinned at the top</strong> (rank, top %, tier, weekly change), with "Jump to me" showing the 5 players above and below you.</li>
+    <li><strong>Rating distribution</strong> histogram with tier bands and a "you are here" marker.</li>
+    <li><strong>Rows:</strong> rank with daily change, player and country code, tier, rating, games, win rate, main language, 7-day sparkline.</li>
+    <li><strong>Trust rules:</strong> hidden until 10 ranked games, hidden after 30 days inactive (no rating decay), games under review don't count, ties go to whoever reached the rating first, players can hide their country.</li>
+    <li><strong>Technical:</strong> a scheduled Convex job rebuilds a <code>leaderboardSnapshots</code> table every few minutes; friends and class boards are computed live; your own row reads live data.</li>
+  </ul>
+</section>
+
+<section class="update" id="profile-screens">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Profile screens</h2>
+  <ul>
+    <li><strong>Public profile:</strong> banner, avatar, name, bio, links, favorite languages, the fixed stats block (duel rating and tier, global rank, contest rating, duel record, solved, streak), rating history, badges (earned and locked), 26-week activity grid, pinned solutions, recent duels. Buttons: Edit, Follow, Challenge to a duel.</li>
+    <li><strong>Edit profile</strong> with a live preview. Free themes (Default, Slate, Ink), earned themes (unlocked by rating), Pro themes (Terminal, Editorial, Blueprint).</li>
+    <li><strong>Pro options:</strong> accent color, banner pattern or image, heading font, reorder and hide sections. A contrast check rejects unreadable colors.</li>
+    <li><strong>Free users can try Pro options in the preview;</strong> saving them is rejected by the server with an upgrade prompt.</li>
+  </ul>
+</section>
+
+<section class="update" id="library">
+  <div class="eyebrow">Update · 26 Sept 2026</div>
+  <h2>Problem library</h2>
+  <ul>
+    <li><strong>Language first:</strong> a main language is set at sign-up and a "Solving in" switch sits at the top of the library. Status, progress and filters follow the selected language.</li>
+    <li><strong>Status per language:</strong> a problem solved in Python still counts as unsolved in Rust, and shows "solved in Python". Language-only problems appear only when that language is selected.</li>
+    <li><strong>Top of the page:</strong> progress by difficulty, "Continue" with your last attempt, problem of the day.</li>
+    <li><strong>Collections:</strong> free hand-picked sets (Start here, Arrays & hashing, Graphs, Dynamic programming, Contest archive). Guided courses with lessons remain Pro.</li>
+    <li><strong>Filters:</strong> search, difficulty, status, source (Official, Community, Beta, Contest archive), sort, and combinable topic chips.</li>
+    <li><strong>Rows:</strong> status, number, title with tags, difficulty word plus numeric rating, acceptance, source badge with creator, solve count.</li>
+    <li><strong>Hidden from the library:</strong> problems in the ranked duel pool and upcoming contests. Beta problems count for practice only until approved.</li>
+    <li><strong>In the editor</strong> the language can still be switched per problem, and each language keeps its own draft.</li>
+  </ul>
+</section>
+
+<section class="update" id="later">
+  <div class="eyebrow">Saved for later</div>
+  <h2>V2 and beyond</h2>
+  <ul>
+    <li><strong>Desktop app and offline lite version:</strong> saved in <code>desktop-and-offline.md</code>. Tauri or Electron for an online desktop app; an offline practice-only version with JavaScript, TypeScript and Python in the browser, hand-written hints, no AI and free to download.</li>
+    <li><strong>Free roam:</strong> saved in <code>v2-ideas.md</code>. Pick a language and build terminal apps or websites; web languages and Python run in the browser for free, C++, Java and C# through the existing runner with a daily quota.</li>
+    <li><strong>Prepare now:</strong> problems stored as portable files, the runner behind a <code>runCode</code> interface, Convex calls kept in hooks, hand-written hints per problem.</li>
+  </ul>
+</section>
+
+<section class="update">
+  <div class="eyebrow">Still open</div>
+  <h2>Decisions to make</h2>
+  <ul>
+    <li>Duels: official docs allowed, or no docs at all?</li>
+    <li>Judging model: stdin/stdout only for the MVP, or function signatures from day one?</li>
+    <li>First release: 1v1 race only, or 1v1 plus Territory?</li>
+    <li>World Conquest: add it as a separate season mode next to Battle royale (recommended), or replace Battle royale?</li>
+    <li>Brand name: "duelcode" in the mockups is a placeholder.</li>
+  </ul>
+</section>
+</article>
+
+<p style="max-width:1080px;margin:40px auto 0;font-size:13px;color:#737373;font-family:system-ui,sans-serif">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/artifact/AqZbz5eWiSJym6Qpb1Ueio</p>
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Launch Roadmap V1</title>
+<style>
+:root{--bg:#ffffff;--ink:#0a0a0a;--muted:#555555;--line:#e5e5e5;--soft:#f5f5f5;--axis:#737373;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0a0a0a;--ink:#fafafa;--muted:#a1a1a1;--line:#262626;--soft:#171717;--axis:#8a8a8a;--accent:#60a5fa;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:40px 20px 80px}
+main{max-width:760px;margin:0 auto}
+h1{font-size:36px;line-height:1.15;font-weight:500;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;font-weight:500;margin:40px 0 12px;padding-top:24px;border-top:1px solid var(--line)}
+p,ul,ol{margin:0 0 14px}
+table{border-collapse:collapse;width:100%;margin:0 0 16px;font-size:14px;display:block;overflow-x:auto}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--soft)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:var(--soft);padding:1px 5px;border-radius:4px}
+li.task{list-style:none;margin-left:-22px}
+.dia{margin:16px 0;border:1px solid var(--line);border-radius:12px;padding:12px}
+.dia svg{width:100%;height:auto;display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.src{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Launch Roadmap V1</h1>
+<p>27 Sept 2026 · Daniel</p>
+<p>V1 launches as a complete loop: learn, compete, level up, show it off. It covers four areas (Learn, Compete, Events, Progression) tied together by one XP and badge system, with a separate leaderboard for each area.</p>
+<h2>Goal and quality bar</h2>
+<p><strong>The one thing V1 must nail:</strong> a live coding match (1v1 or Territory) that feels fast, fair and worth sharing. Everything else feeds that loop or gives people a reason to come back tomorrow.</p>
+<p><strong>Principles</strong></p>
+<ul>
+<li>Skill and effort are measured separately. Ratings show how good you are and can go down. XP shows how much you play and only goes up.</li>
+<li>Every area keeps its own points and its own leaderboard, so a strong learner and a strong duelist can both be at the top of something.</li>
+<li>Never sell an advantage in competition. Ratings, ranked games and leaderboard placement stay free.</li>
+<li>Every check happens in Convex before data leaves the server.</li>
+</ul>
+<p><strong>Quality bar</strong></p>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Landing page to first match</td>
+<td>Under 3 minutes</td>
+</tr>
+<tr>
+<td>Verdict after Submit</td>
+<td>Under 3 seconds</td>
+</tr>
+<tr>
+<td>Wrong verdicts</td>
+<td>Zero: judging correctness is the reputation</td>
+</tr>
+<tr>
+<td>XP, badges and ratings</td>
+<td>Never double-counted, never lost</td>
+</tr>
+<tr>
+<td>Themes</td>
+<td>Light and dark</td>
+</tr>
+<tr>
+<td>Phones</td>
+<td>Marketing, profiles, leaderboards and challenges work; solving is desktop-first</td>
+</tr>
+</tbody>
+</table>
+<h2>What changed from the lean plan</h2>
+<p>The lean cut shipped only 1v1 and practice. V1 now also ships Territory, courses and roadmaps, daily and weekly challenges, company-run ninjathons, full profiles and a progression system. That roughly doubles the build, so the build order and risks sections matter more.</p>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Lean plan</th>
+<th>V1 now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Learning</td>
+<td>Library and docs only</td>
+<td>Plus free tutorials, Pro courses and roadmaps</td>
+</tr>
+<tr>
+<td>1v1 challenges</td>
+<td>Always unranked</td>
+<td>Challenger picks ranked or unranked, with anti-boosting limits</td>
+</tr>
+<tr>
+<td>Territory</td>
+<td>V1.1</td>
+<td>V1, strong for offices and friend groups</td>
+</tr>
+<tr>
+<td>Events</td>
+<td>Weekly contests in V1.1</td>
+<td>Daily and weekly challenges in V1; ninjathons created by us</td>
+</tr>
+<tr>
+<td>Profiles</td>
+<td>Free basic profile</td>
+<td>Default and custom (Pro) profiles</td>
+</tr>
+<tr>
+<td>Gamification</td>
+<td>Ratings and streaks</td>
+<td>XP, levels, titles, badges, points and a leaderboard per area</td>
+</tr>
+<tr>
+<td>Payments</td>
+<td>V1.1</td>
+<td>V1, because courses and custom profiles are Pro</td>
+</tr>
+</tbody>
+</table>
+<h2>V1 scope: Learn</h2>
+<p>Practice and tutorials are free; structured courses and roadmaps are Pro, with the first module free.</p>
+<ul>
+<li><strong>Problem library:</strong> 150 to 200 seeded problems, the "Solving in" language switch, status per language, collections, filters and topic chips.</li>
+<li><strong>Solve view:</strong> Run and Submit, live verdicts, 5 languages (Python, JavaScript/TypeScript, Java, C++, C#).</li>
+<li><strong>Docs library:</strong> Python and MDN at launch, pinned to the runner's versions; more doc sets later.</li>
+<li><strong>Tutorials (free):</strong> short standalone lessons such as "Two pointers" or "Hash maps in Python", each ending in 2 or 3 library problems. They are public pages, so they also bring search traffic.</li>
+<li><strong>Roadmaps (Pro, first module free):</strong> a visual path of topics from beginner to interview-ready. Each node is a lesson plus practice problems, with progress saved per node.</li>
+<li><strong>Courses (Pro, first module free):</strong> a guided sequence inside a roadmap or language, for example "Learn Rust through 40 problems". Exercises stay in the public library; the teaching around them is Pro.</li>
+<li><strong>Launch content:</strong> 3 roadmaps (Programming basics, Data structures and algorithms, Interview prep) and about 20 tutorials. Hand-written hints on every course problem, so learning works before the AI coach exists.</li>
+<li><strong>Learning points:</strong> lessons, modules and finished roadmaps earn XP and feed a Learning leaderboard.</li>
+</ul>
+<h2>V1 scope: Compete</h2>
+<p>Two match modes at launch, each with its own rating and leaderboard: 1v1 race and Territory.</p>
+<p><strong>1v1 race</strong></p>
+<ul>
+<li><strong>Find a match:</strong> always ranked. Matched by 1v1 rating, the range widening the longer you wait.</li>
+<li><strong>Challenge someone:</strong> by username or link. The challenger picks Ranked or Unranked, and the invite shows the choice before the other player accepts.</li>
+<li><strong>Ranked challenges have limits,</strong> so friends can't farm rating off each other: both players need 10 ranked games, the rating gap must be under 400, and only the first 3 ranked games between the same two players per day change ratings.</li>
+<li><strong>Ghost races</strong> when the queue is empty: race a recorded real solve of a player near your rating, clearly labelled as a ghost, no rating change.</li>
+<li><strong>Scoring:</strong> 1v1 rating (Glicko-2), plus wins, losses, win rate, current and best win streak, and fastest solves on the profile.</li>
+</ul>
+<p><strong>Territory (3 to 6 players)</strong></p>
+<ul>
+<li>37-region hex map for 3 to 4 players, 61 for 5 to 6. Home bases can't be captured, new captures are shielded for 60 seconds, first to more than half the points wins, or the most points at 30 minutes.</li>
+<li><strong>Find a match:</strong> ranked. <strong>Challenge someone:</strong> ranked or unranked, same limits as 1v1.</li>
+<li><strong>Scoring:</strong> a separate Territory rating using a multiplayer rating system (OpenSkill, open source), plus regions captured, cores held, placements and wins.</li>
+<li><strong>Office and friend groups:</strong> free private groups joined by invite code. Each group gets its own leaderboards and a "start a Territory lobby with the group" button. This is what makes Territory work in week one without a big queue.</li>
+</ul>
+<h2>V1 scope: Challenges and ninjathons</h2>
+<p>Daily and weekly challenges give everyone a shared reason to show up; ninjathons are bigger events that only we create in V1.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Daily challenge</th>
+<th>Weekly challenge</th>
+<th>Ninjathon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What</td>
+<td>1 problem, same for everyone</td>
+<td>A themed set of 3 to 5 problems</td>
+<td>Team project with a brief, deadline and judges</td>
+</tr>
+<tr>
+<td>Window</td>
+<td>24 hours, resets at 00:00 UTC</td>
+<td>Monday to Sunday</td>
+<td>24 to 72 hours</td>
+</tr>
+<tr>
+<td>Scoring</td>
+<td>Solved + time from opening it</td>
+<td>Points per problem by difficulty, time as tie-break</td>
+<td>Judged against a rubric</td>
+</tr>
+<tr>
+<td>Rewards</td>
+<td>XP, streak, Daily leaderboard</td>
+<td>XP, badge for the top 10%, Weekly leaderboard</td>
+<td>XP, badges, prizes, Hall of fame</td>
+</tr>
+<tr>
+<td>Who creates</td>
+<td>Picked automatically from unused library problems</td>
+<td>Us, one theme per week</td>
+<td>Us only in V1; private ones by Pro users in V1.2</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Daily and weekly challenges are free</strong> and never change the 1v1 or Territory rating; they have their own points.</li>
+<li><strong>Streaks:</strong> a daily streak counter with one "freeze" earned per 7-day streak, so one missed day doesn't erase a month.</li>
+<li><strong>Ninjathons in V1:</strong> an internal admin page to create an event (brief, dates, team size, rubric, prizes), team registration, submission by repository link plus a short demo, judging by our team, and a public results page. Plan one launch ninjathon about 4 weeks after launch.</li>
+<li><strong>Weekly contests</strong> (live, 90 minutes, contest rating) wait for V1.1; weekly challenges cover the "every week" moment until then.</li>
+</ul>
+<h2>V1 scope: Progression</h2>
+<p>Yes to a leveling system: XP and levels reward effort across every area, while each area keeps its own skill points. The two never mix, so XP can't buy a better rating.</p>
+<p><strong>XP sources</strong> (starting values, tuned during the beta)</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>XP</th>
+<th>Anti-farming rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Solve a problem</td>
+<td>10 easy · 20 medium · 40 hard</td>
+<td>First solve per problem per language only</td>
+</tr>
+<tr>
+<td>Daily challenge</td>
+<td>30, +5 per streak day (max +50)</td>
+<td>Once a day</td>
+</tr>
+<tr>
+<td>Weekly challenge</td>
+<td>25 per problem, +100 for the full set</td>
+<td>Once per problem</td>
+</tr>
+<tr>
+<td>Lesson or tutorial</td>
+<td>15</td>
+<td>Once per lesson</td>
+</tr>
+<tr>
+<td>Finish a roadmap module</td>
+<td>100</td>
+<td>Once</td>
+</tr>
+<tr>
+<td>1v1 match</td>
+<td>10 played · 25 won</td>
+<td>Ranked only; max 3 counted per opponent per day</td>
+</tr>
+<tr>
+<td>Territory match</td>
+<td>15 played · 40 for 1st · 20 for 2nd</td>
+<td>Ranked only</td>
+</tr>
+<tr>
+<td>Ninjathon</td>
+<td>200 for submitting, 500 to 1,000 for placing</td>
+<td>Once per event</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Levels and titles:</strong> level n needs 100 × n^1.5 XP in total, which makes early levels come fast and later ones slow. Each title band unlocks a profile badge and, at 20 and 40, a profile theme.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Title (placeholder names)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 to 4</td>
+<td>Initiate</td>
+</tr>
+<tr>
+<td>5 to 9</td>
+<td>Coder</td>
+</tr>
+<tr>
+<td>10 to 14</td>
+<td>Debugger</td>
+</tr>
+<tr>
+<td>15 to 19</td>
+<td>Builder</td>
+</tr>
+<tr>
+<td>20 to 29</td>
+<td>Engineer</td>
+</tr>
+<tr>
+<td>30 to 39</td>
+<td>Architect</td>
+</tr>
+<tr>
+<td>40 to 49</td>
+<td>Sensei</td>
+</tr>
+<tr>
+<td>50+</td>
+<td>Legend</td>
+</tr>
+</tbody>
+</table>
+<p>Titles use different words from the rating tiers (Expert, Master and so on), so nobody mixes up "plays a lot" with "plays well".</p>
+<p><strong>Badges:</strong> grouped by area, each showing its rarity (the share of players who hold it).</p>
+<ul>
+<li>Milestones: first solve, 100 and 500 solves, first ranked win.</li>
+<li>Streaks: 7, 30 and 100 days.</li>
+<li>Skill: reaching each rating tier, a comeback win, holding the Core at the end of a Territory match.</li>
+<li>Learning: first tutorial, each finished roadmap.</li>
+<li>Events: daily challenge streaks, weekly top 10%, ninjathon participant and winner.</li>
+<li>Languages: 50 problems solved in one language.</li>
+</ul>
+<p><strong>Leaderboards, one per area, each with its own points</strong></p>
+<table>
+<thead>
+<tr>
+<th>Leaderboard</th>
+<th>Ranked by</th>
+<th>Resets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1v1</td>
+<td>1v1 rating</td>
+<td>Never (seasons later)</td>
+</tr>
+<tr>
+<td>Territory</td>
+<td>Territory rating</td>
+<td>Never (seasons later)</td>
+</tr>
+<tr>
+<td>Daily challenge</td>
+<td>Current streak, then total dailies solved</td>
+<td>Streak board live</td>
+</tr>
+<tr>
+<td>Weekly challenge</td>
+<td>Points this week</td>
+<td>Every Monday</td>
+</tr>
+<tr>
+<td>Learning</td>
+<td>Lessons and modules completed</td>
+<td>Monthly board + all time</td>
+</tr>
+<tr>
+<td>Level</td>
+<td>Total XP</td>
+<td>Monthly board + all time</td>
+</tr>
+<tr>
+<td>Ninjathons</td>
+<td>Event placements</td>
+<td>Hall of fame, all time</td>
+</tr>
+</tbody>
+</table>
+<p>Every board has Global, Country, Friends and Group scopes; the Group scope is what an office team sees.</p>
+<h2>V1 scope: Profiles, social and growth</h2>
+<p>Profiles ship complete in V1: a strong default for everyone and full customization for Pro.</p>
+<ul>
+<li><strong>Default profile (free):</strong> avatar, bio, links, languages, level and title, the fixed stats block (1v1 and Territory ratings, rank, record, solved, streak), badges, activity grid, pinned solutions, recent matches.</li>
+<li><strong>Themes:</strong> 3 free, more earned through levels and rating tiers, the full template library with Pro.</li>
+<li><strong>Custom profile (Pro):</strong> accent color, banner, heading font, section order and visibility, custom URL. Theme values only, never user CSS, with a contrast check.</li>
+<li><strong>Friends and groups:</strong> follow players, create or join a group by invite code, see friends online.</li>
+<li><strong>Share cards:</strong> an image card for every match result, level-up, badge and finished roadmap, sized for X, LinkedIn and Discord.</li>
+<li><strong>Challenge links:</strong> work for people without an account, who sign up and land straight in the match. This is the main growth loop.</li>
+<li><strong>Notifications:</strong> incoming challenges, a daily-challenge reminder, streak at risk, badge earned. Email plus in-app, each switchable.</li>
+</ul>
+<h2>V1 scope: Trust, platform and Pro at launch</h2>
+<p>Pro launches with V1 because courses, roadmaps and custom profiles are paid, so payments and entitlements are part of the first build.</p>
+<p><strong>Trust and platform</strong></p>
+<ul>
+<li>Sandboxed runner on its own VM: no network, strict CPU, memory, time and output limits, results only through a signed webhook.</li>
+<li>Convex guardrail: every public function built from <code>userQuery</code> / <code>proQuery</code> wrappers; hidden tests and unstarted match problems never leave the server; the server clock decides all timing.</li>
+<li>Anti-cheat: tab-leave and paste signals, provisional ratings, similarity checks after ranked games, the ranked-challenge limits, flagged games reviewed rather than auto-punished.</li>
+<li>Progression integrity: one append-only XP ledger where every entry has a unique key per action, so a retried request can never award XP twice. Badges and levels are computed from the ledger.</li>
+<li>Marketing page, public SEO pages for problems, tutorials, profiles and leaderboards, sitemap and Open Graph images.</li>
+<li>GDPR: tracking disclosed, raw behavior events deleted after 90 days, account deletion.</li>
+</ul>
+<p><strong>Free vs Pro at launch</strong></p>
+<table>
+<thead>
+<tr>
+<th>Free</th>
+<th>Pro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every problem, every language</td>
+<td>Roadmaps and courses (first module free)</td>
+</tr>
+<tr>
+<td>1v1 and Territory, ranked and unranked</td>
+<td>Custom profile, all themes, custom URL</td>
+</tr>
+<tr>
+<td>Daily and weekly challenges, ninjathons</td>
+<td>Pro badge on the profile</td>
+</tr>
+<tr>
+<td>Tutorials and the docs library</td>
+<td></td>
+</tr>
+<tr>
+<td>XP, levels, badges, every leaderboard</td>
+<td></td>
+</tr>
+<tr>
+<td>Default profile, earned themes, groups</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The AI coach and duel replays join Pro in V1.1.</p>
+<h2>After V1</h2>
+<p>Each release is its own launch moment, which brings a new wave of attention instead of one.</p>
+<figure class="dia"><svg viewBox="0 0 760 552" role="img" aria-label="After V1: coaching first, then creators, then organizations" font-size="13" font-family="inherit"><text x="24" y="32" font-size="15" font-weight="600" fill="var(--ink)">After V1: coaching first, then creators, then organizations</text><line x1="48" y1="76" x2="48" y2="460" stroke="var(--axis)" stroke-width="1.25"/><circle cx="48" cy="76" r="5" fill="var(--accent)"/><rect x="80" y="56" width="656" height="56" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"/><text x="96" y="80" font-size="15" font-weight="600" fill="var(--ink)">V1 launch</text><text x="720" y="80" text-anchor="end" font-size="11.5" fill="var(--muted)">this plan</text><text x="96" y="100" fill="var(--ink)">Learn, Compete, Challenges, Ninjathons, Progression, Profiles, Pro</text><circle cx="48" cy="148" r="5" fill="var(--axis)"/><rect x="80" y="128" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="152" font-size="15" font-weight="600" fill="var(--ink)">V1.1</text><text x="720" y="152" text-anchor="end" font-size="11.5" fill="var(--muted)">3 to 6 weeks after launch</text><text x="96" y="172" fill="var(--ink)">AI coach: a few free hints a day, unlimited with Pro</text><text x="96" y="188" fill="var(--ink)">Weekly contests (live, 90 minutes) with a contest rating</text><text x="96" y="204" fill="var(--ink)">Match replays and analytics (Pro), twist modes, more doc sets</text><circle cx="48" cy="252" r="5" fill="var(--axis)"/><rect x="80" y="232" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="256" font-size="15" font-weight="600" fill="var(--ink)">V1.2</text><text x="720" y="256" text-anchor="end" font-size="11.5" fill="var(--muted)">after V1.1</text><text x="96" y="276" fill="var(--ink)">Pro users create private ninjathons and problems (beta review)</text><text x="96" y="292" fill="var(--ink)">More roadmaps and courses, leaderboard seasons</text><text x="96" y="308" fill="var(--ink)">Custom Territory maps (Pro)</text><circle cx="48" cy="356" r="5" fill="var(--axis)"/><rect x="80" y="336" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="360" font-size="15" font-weight="600" fill="var(--ink)">V2</text><text x="720" y="360" text-anchor="end" font-size="11.5" fill="var(--muted)">once the community is active</text><text x="96" y="380" fill="var(--ink)">Organization plan: public branded ninjathons, hiring challenges, classes</text><text x="96" y="396" fill="var(--ink)">Battle royale: 8 to 20 players, eliminations</text><text x="96" y="412" fill="var(--ink)">World Conquest: a season-long mode on a stylized hex world</text><circle cx="48" cy="460" r="5" fill="var(--axis)"/><rect x="80" y="440" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="464" font-size="15" font-weight="600" fill="var(--ink)">Later</text><text x="720" y="464" text-anchor="end" font-size="11.5" fill="var(--muted)">saved in the V2 notes</text><text x="96" y="484" fill="var(--ink)">Desktop app with full browsing in the research panel</text><text x="96" y="500" fill="var(--ink)">Offline lite version: practice only, JavaScript and Python, free</text><text x="96" y="516" fill="var(--ink)">Free roam: build terminal apps and websites in the browser</text></svg><figcaption>Release roadmap · V1 to later</figcaption></figure>
+<p>V1.1 adds what people pay for next (the coach) and a live weekly event; V1.2 opens creation to Pro users; V2 brings the business side and the big multiplayer modes.</p>
+<h2>Build order</h2>
+<p>Build the foundation and the progression engine first, because every later feature writes XP, badges and points into it.</p>
+<ol>
+<li><strong>Foundation:</strong> auth, the Convex guardrail wrappers, the sandboxed runner, the solve view, the problem library with the first 150 to 200 problems.</li>
+<li><strong>Progression engine:</strong> the XP ledger, levels and titles, the badge rules, ratings per area, leaderboard snapshots and scopes, groups.</li>
+<li><strong>1v1:</strong> matchmaking, ranked and unranked challenges with their limits, ghost races, share cards, challenge links.</li>
+<li><strong>Territory:</strong> lobby, map, claim and attack rules, OpenSkill rating, group lobbies.</li>
+<li><strong>Daily and weekly challenges:</strong> automatic daily pick, weekly sets, streaks and freezes, their leaderboards.</li>
+<li><strong>Learn:</strong> tutorials, roadmaps and courses with progress, the docs library for Python and MDN.</li>
+<li><strong>Profiles and Pro:</strong> default and custom profiles, themes, Stripe checkout, the entitlements webhook, Pro checks on every paid function.</li>
+<li><strong>Ninjathons:</strong> the admin page, team registration, submissions, judging, results.</li>
+<li><strong>Launch readiness:</strong> marketing and SEO pages, anti-cheat signals, runner load test, a closed beta with 2 or 3 office teams plus 20 to 50 individual players.</li>
+</ol>
+<h2>Risks and open decisions</h2>
+<p>The biggest risk is scope: this V1 is about twice the lean cut, so the quality bar has to hold even if a feature slips.</p>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>What it looks like</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scope</td>
+<td>Launch keeps moving, or everything ships half-done</td>
+<td>If time runs short, cut in this order: ninjathons to the first month after launch, then weekly challenges, then courses beyond the first roadmap. Never cut judging quality.</td>
+</tr>
+<tr>
+<td>Content load</td>
+<td>Roadmaps, tutorials and weekly sets need writing every week</td>
+<td>Daily challenges picked automatically; write 6 weekly sets before launch; start with 3 roadmaps</td>
+</tr>
+<tr>
+<td>Cold start</td>
+<td>Empty queues, especially for Territory's 3 players</td>
+<td>Ghost races for 1v1; groups and challenge links for Territory; office teams in the closed beta</td>
+</tr>
+<tr>
+<td>Rating boosting</td>
+<td>Friends farming ranked challenges</td>
+<td>Minimum 10 ranked games, rating gap under 400, 3 counted games per pair per day, similarity checks</td>
+</tr>
+<tr>
+<td>XP farming</td>
+<td>Grinding easy problems or duels for levels</td>
+<td>First-solve-only XP, per-opponent caps, XP never affects ratings</td>
+</tr>
+<tr>
+<td>Payment bugs</td>
+<td>Paid users locked out or free users getting Pro</td>
+<td>Entitlements written only by the webhook; a test per Pro function that calls it as a free user</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Open decisions</strong></p>
+<ul>
+<li class="task"><input type="checkbox" disabled> Brand name ("duelcode" is a placeholder), which also names the XP titles.</li>
+<li class="task"><input type="checkbox" disabled> Docs in ranked 1v1: official docs, or none?</li>
+<li class="task"><input type="checkbox" disabled> Judging model: stdin/stdout only, or function signatures from day one?</li>
+<li class="task"><input type="checkbox" disabled> Pro price and whether there is a yearly plan at launch.</li>
+<li class="task"><input type="checkbox" disabled> World Conquest next to Battle royale (recommended) or instead of it.</li>
+</ul>
+<p class="src">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/code/artifact/aa4c2464-5f6a-4532-9ed8-52ba30bf159d</p>
+</main>
+</body>
+</html>

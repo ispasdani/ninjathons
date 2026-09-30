@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Challenge Platform Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F2F4F1;--surface:#FFFFFF;--ink:#18211D;--muted:#5B6660;--line:#CFD6D1;
+  --accent:#1E7A52;--accent-soft:#E1F0E8;--warn:#B4532A;--docs:#2F5FA8;--docs-soft:#E3EAF6;--code-bg:#E7ECE8;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714;--surface:#18201C;--ink:#E4EBE6;--muted:#9AA79F;--line:#2F3B35;
+  --accent:#4FC18A;--accent-soft:#1B3528;--warn:#E38356;--docs:#86A9E6;--docs-soft:#1C2638;--code-bg:#1D2621;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111714;--surface:#18201C;--ink:#E4EBE6;--muted:#9AA79F;--line:#2F3B35;
+  --accent:#4FC18A;--accent-soft:#1B3528;--warn:#E38356;--docs:#86A9E6;--docs-soft:#1C2638;--code-bg:#1D2621;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;padding-inline:20px;padding-block:40px 64px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:40px}
+h1,h2{font-family:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,4.5vw,42px);font-weight:700}
+h2{font-size:22px;font-weight:600}
+p{margin:0;max-width:68ch}
+.eyebrow{font:500 12px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:12px}
+.lede{color:var(--muted)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.88em}
+code{background:var(--code-bg);padding:1px 5px;border-radius:4px}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+.scroll{overflow-x:auto}
+.scroll svg{min-width:900px;width:100%;height:auto;display:block;color:var(--ink)}
+figcaption{color:var(--muted);font-size:14px;max-width:80ch}
+.grp{fill:none;stroke:var(--line);stroke-width:1.5}
+.box{fill:var(--surface);stroke:var(--ink);stroke-width:1.2}
+.box.hot{stroke:var(--accent);stroke-width:1.8;fill:var(--accent-soft)}
+.box.docs{stroke:var(--docs);stroke-width:1.8;fill:var(--docs-soft)}
+.box.later{stroke-dasharray:5 4;stroke:var(--muted)}
+.grp-title{font:600 13px "IBM Plex Sans",sans-serif;fill:var(--ink);letter-spacing:.02em}
+.t{font:500 13px "IBM Plex Sans",sans-serif;fill:var(--ink)}
+.ts{font:400 11px "IBM Plex Mono",monospace;fill:var(--muted)}
+.lbl{font:400 11px "IBM Plex Mono",monospace;fill:var(--muted)}
+.lbl.hot{fill:var(--accent);font-weight:500}
+.lbl.docs{fill:var(--docs);font-weight:500}
+.arr{fill:none;stroke:var(--muted);stroke-width:1.4}
+.arr.hot{stroke:var(--accent);stroke-width:2}
+.arr.docs{stroke:var(--docs);stroke-width:2}
+.arr.later{stroke-dasharray:5 4}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:26px;height:0;border-top:2px solid var(--accent)}
+.sw.docs{border-top-color:var(--docs)}
+.sw.plain{border-top:1.5px solid var(--muted)}
+.sw.dash{border-top:1.5px dashed var(--muted)}
+section{display:grid;gap:16px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px}
+.cols > *{min-width:0}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:12px}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start}
+ol.steps li::before{content:counter(s);font:500 12px/24px "IBM Plex Mono",monospace;width:24px;height:24px;text-align:center;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent)}
+ol.duel li::before{border-color:var(--warn);color:var(--warn)}
+ol.docs li::before{border-color:var(--docs);color:var(--docs)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td:first-child,td:nth-child(2){white-space:nowrap;font-weight:500}
+.sec td:nth-child(2){white-space:normal;font-weight:400;color:var(--muted);min-width:180px}
+.pill{display:inline-block;font:500 11px "IBM Plex Mono",monospace;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.rt{border-color:var(--accent);color:var(--accent)}
+.note{border-left:3px solid var(--warn);padding-left:14px;color:var(--ink)}
+.policy{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.policy div{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--surface);display:grid;gap:4px}
+.policy b{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;font-size:16px;font-weight:600}
+.policy span{color:var(--muted);font-size:14px}
+.guard{border:1.5px solid var(--warn);border-radius:10px;padding:22px 24px;background:var(--surface)}
+.guard .eyebrow{color:var(--warn)}
+ul.rules{margin:0;padding-left:20px;display:grid;gap:10px}
+ul.rules li::marker{color:var(--warn)}
+.guard pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;font:12.5px/1.55 "IBM Plex Mono",ui-monospace,Menlo,monospace;align-self:start}
+.guard pre code{background:none;padding:0;font-size:inherit}
+.small{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Tech-first MVP · Next.js · Clerk · Convex · Judge0 · updated 26 Sept 2026, 11:30</div>
+  <h1>How the challenge platform fits together</h1>
+  <p class="lede">Three zones: the browser app, Convex as the realtime backend, and outside services that Convex calls or that feed it. The browser never talks to the code runner directly, and there is no open web search. Research happens in a docs library you host yourself, so every page read stays inside the platform.</p>
+</header>
+
+<figure>
+  <div class="scroll">
+  <svg viewBox="0 0 1000 560" role="img" aria-label="System diagram: the Next.js browser app talks only to Convex. Convex calls the Judge0 runner and later an AI coach. A docs scraper job imports version-pinned documentation into Convex, where the research panel searches and reads it. Clerk issues the sign-in token Convex verifies. Runner results return by webhook and reach the browser through live subscriptions.">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+    </defs>
+
+    <rect class="grp" x="20" y="60" width="280" height="480" rx="10"/>
+    <text class="grp-title" x="36" y="84">NEXT.JS APP (BROWSER)</text>
+    <rect class="grp" x="380" y="60" width="280" height="480" rx="10"/>
+    <text class="grp-title" x="396" y="84">CONVEX BACKEND</text>
+    <text class="grp-title" x="740" y="50">EXTERNAL SERVICES</text>
+
+    <!-- client -->
+    <rect class="box" x="40" y="100" width="240" height="44" rx="6"/>
+    <text class="t" x="54" y="120">Problem view</text><text class="ts" x="54" y="136">statement, examples, tags</text>
+    <rect class="box docs" x="40" y="160" width="240" height="44" rx="6"/>
+    <text class="t" x="54" y="180">Research panel</text><text class="ts" x="54" y="196">docs library, pinned version</text>
+    <rect class="box hot" x="40" y="220" width="240" height="44" rx="6"/>
+    <text class="t" x="54" y="240">Results view</text><text class="ts" x="54" y="256">verdict per test, runtime</text>
+    <rect class="box hot" x="40" y="280" width="240" height="44" rx="6"/>
+    <text class="t" x="54" y="300">Editor · Monaco</text><text class="ts" x="54" y="316">Run (samples) / Submit</text>
+    <rect class="box" x="40" y="340" width="240" height="44" rx="6"/>
+    <text class="t" x="54" y="360">Integrity signals</text><text class="ts" x="54" y="376">tab-leave, paste, page views</text>
+    <rect class="box" x="40" y="400" width="240" height="44" rx="6"/>
+    <text class="t" x="54" y="420">Duel HUD</text><text class="ts" x="54" y="436">clock, opponent 7/12 tests</text>
+    <rect class="box" x="40" y="460" width="240" height="60" rx="6"/>
+    <text class="t" x="54" y="482">Clerk components</text><text class="ts" x="54" y="498">sign-in UI, session token</text><text class="ts" x="54" y="512">attached to every Convex call</text>
+
+    <!-- convex -->
+    <rect class="box hot" x="400" y="100" width="240" height="164" rx="6"/>
+    <text class="t" x="414" y="120">Queries · subscriptions</text>
+    <text class="ts" x="414" y="140">getProblem</text>
+    <text class="ts" x="414" y="156">searchDocs, getDocPage</text>
+    <text class="ts" x="414" y="172">  checks mode's docs policy</text>
+    <text class="ts" x="414" y="196">getSubmission, leaderboard</text>
+    <text class="ts" x="414" y="212">matchState</text>
+    <text class="ts" x="414" y="236">push updates on every</text>
+    <text class="ts" x="414" y="252">database write</text>
+    <rect class="box hot" x="400" y="280" width="240" height="44" rx="6"/>
+    <text class="t" x="414" y="300">Actions</text><text class="ts" x="414" y="316">submit / run, rate-limited</text>
+    <rect class="box hot" x="400" y="340" width="240" height="44" rx="6"/>
+    <text class="t" x="414" y="360">Mutations</text><text class="ts" x="414" y="376">verdicts, signals, doc views</text>
+    <rect class="box" x="400" y="400" width="240" height="44" rx="6"/>
+    <text class="t" x="414" y="420">Match engine (scheduled)</text><text class="ts" x="414" y="436">matchmaking, server clock</text>
+    <rect class="box" x="400" y="460" width="240" height="60" rx="6"/>
+    <text class="t" x="414" y="482">Database</text>
+    <text class="ts" x="414" y="498">users profiles problems</text>
+    <text class="ts" x="414" y="512">matches events entitlements</text>
+
+    <!-- external -->
+    <rect class="box" x="740" y="60" width="240" height="60" rx="6"/>
+    <text class="t" x="754" y="84">Clerk</text><text class="ts" x="754" y="102">identity, issues JWT</text>
+    <rect class="box docs" x="740" y="140" width="240" height="80" rx="6"/>
+    <text class="t" x="754" y="162">Docs scraper job</text>
+    <text class="ts" x="754" y="180">DevDocs-style pipeline</text>
+    <text class="ts" x="754" y="196">once per language version</text>
+    <text class="ts" x="754" y="212">MDN, Python, cppreference…</text>
+    <rect class="box hot" x="740" y="240" width="240" height="110" rx="6"/>
+    <text class="t" x="754" y="262">Runner service</text>
+    <text class="ts" x="754" y="280">Judge0 on its own VM</text>
+    <text class="ts" x="754" y="296">fresh sandbox, no network</text>
+    <text class="ts" x="754" y="312">CPU · memory · time limits</text>
+    <text class="ts" x="754" y="328">versions match the docs</text>
+    <rect class="box later" x="740" y="396" width="240" height="48" rx="6"/>
+    <text class="t" x="754" y="416">AI coach (later)</text><text class="ts" x="754" y="434">hints link to docs, quota</text>
+    <rect class="box later" x="740" y="452" width="240" height="28" rx="6"/>
+    <text class="t" x="754" y="471">Similarity checker (later)</text>
+    <rect class="box" x="740" y="488" width="240" height="52" rx="6"/>
+    <text class="t" x="754" y="508">Payments</text><text class="ts" x="754" y="526">Stripe / Clerk Billing</text>
+
+    <!-- auth -->
+    <path class="arr" d="M160,60 V30 H950 V58" marker-end="url(#ah)" style="color:var(--muted)"/>
+    <text class="lbl" x="555" y="24" text-anchor="middle">sign in → JWT back to browser</text>
+    <line class="arr" x1="738" y1="92" x2="662" y2="92" marker-end="url(#ah)" style="color:var(--muted)"/>
+    <text class="lbl" x="700" y="86" text-anchor="middle">JWKS</text>
+
+    <!-- client <-> convex -->
+    <line class="arr" x1="398" y1="122" x2="282" y2="122" marker-end="url(#ah)" style="color:var(--muted)"/>
+    <text class="lbl" x="340" y="116" text-anchor="middle">statement</text>
+    <line class="arr docs" x1="398" y1="182" x2="282" y2="182" marker-end="url(#ah)" marker-start="url(#ah)" style="color:var(--docs)"/>
+    <text class="lbl docs" x="340" y="176" text-anchor="middle">search, pages</text>
+    <line class="arr hot" x1="398" y1="242" x2="282" y2="242" marker-end="url(#ah)" style="color:var(--accent)"/>
+    <text class="lbl hot" x="340" y="236" text-anchor="middle">live verdict</text>
+    <line class="arr hot" x1="282" y1="302" x2="398" y2="302" marker-end="url(#ah)" style="color:var(--accent)"/>
+    <text class="lbl hot" x="340" y="296" text-anchor="middle">submit / run</text>
+    <line class="arr" x1="282" y1="362" x2="398" y2="362" marker-end="url(#ah)" style="color:var(--muted)"/>
+    <text class="lbl" x="340" y="356" text-anchor="middle">signals, views</text>
+    <line class="arr" x1="398" y1="422" x2="282" y2="422" marker-end="url(#ah)" style="color:var(--muted)"/>
+    <text class="lbl" x="340" y="416" text-anchor="middle">match state</text>
+
+    <!-- convex <-> external -->
+    <line class="arr docs" x1="738" y1="180" x2="662" y2="180" marker-end="url(#ah)" style="color:var(--docs)"/>
+    <text class="lbl docs" x="700" y="174" text-anchor="middle">import</text>
+    <line class="arr hot" x1="642" y1="302" x2="738" y2="302" marker-end="url(#ah)" style="color:var(--accent)"/>
+    <text class="lbl hot" x="690" y="296" text-anchor="middle">code+tests</text>
+    <path class="arr hot" d="M800,350 V372 H642" marker-end="url(#ah)" style="color:var(--accent)"/>
+    <text class="lbl hot" x="722" y="366" text-anchor="middle">webhook: verdict</text>
+    <path class="arr later" d="M642,316 H700 V430 H738" marker-end="url(#ah)" style="color:var(--muted)"/>
+    <text class="lbl" x="706" y="416">hints</text>
+    <line class="arr" x1="738" y1="514" x2="642" y2="498" marker-end="url(#ah)" style="color:var(--muted)"/>
+    <text class="lbl" x="690" y="496" text-anchor="middle">plan</text>
+  </svg>
+  </div>
+  <figcaption>Green is the submission loop: editor → action → sandboxed runner → webhook → mutation → subscription → results view. Blue is research: a scraper imports version-pinned docs into Convex once per language version, and the research panel searches and reads them through queries that check the current mode's docs policy. Every page opened is logged as a doc view. The payment provider only ever reaches Convex through a webhook that updates a user's plan. Dashed parts come later.</figcaption>
+  <div class="legend">
+    <span><i class="sw"></i>submission path</span>
+    <span><i class="sw docs"></i>docs library</span>
+    <span><i class="sw plain"></i>other calls</span>
+    <span><i class="sw dash"></i>later phase</span>
+  </div>
+</figure>
+
+<div class="cols">
+  <section>
+    <h2>A submission, step by step</h2>
+    <ol class="steps">
+      <li><span>User presses <b>Submit</b>. The browser calls the Convex action <code>submit(code, lang, problemId)</code> with the Clerk token attached.</span></li>
+      <li><span>Convex verifies the token, checks the rate limit, and a mutation inserts a <code>submissions</code> row with status <span class="pill">queued</span>.</span></li>
+      <li><span>The action loads the hidden test cases and posts code plus tests to the runner, with a callback URL (a Convex HTTP endpoint).</span></li>
+      <li><span>The runner compiles once, runs every test in a fresh sandbox with no network, and posts results to the callback.</span></li>
+      <li><span>The HTTP endpoint checks a shared secret and runs a mutation that writes the verdict, runtime and memory.</span></li>
+      <li><span>Every browser subscribed to that submission, or to the match, updates instantly. In a duel, the opponent sees the test count, never the code.</span></li>
+    </ol>
+  </section>
+  <section>
+    <h2>A 1v1 duel, step by step</h2>
+    <ol class="steps duel">
+      <li><span>Player joins the queue (a <code>matchQueue</code> row with their duel rating), or opens a friend's challenge link.</span></li>
+      <li><span>A scheduled function pairs players by rating band and widens the band the longer someone waits.</span></li>
+      <li><span>It creates a <code>matches</code> row in <span class="pill">lobby</span>, picks a problem neither player has solved, and keeps it hidden.</span></li>
+      <li><span>The server sets the start time. At start the state flips to <span class="pill rt">active</span> and the problem becomes readable.</span></li>
+      <li><span>Each submission writes a <code>matchEvents</code> row. Both HUDs subscribe to the match and show progress live.</span></li>
+      <li><span>First full pass wins. A mutation finishes the match, updates Glicko-2 ratings, and queues a similarity check on both solutions.</span></li>
+    </ol>
+  </section>
+</div>
+
+<section>
+  <h2>Research: the docs library</h2>
+  <p>No embedded Google and no iframes. Google's own search APIs no longer cover the whole web for new customers, most docs sites refuse to be framed, and an iframe hides which page someone reads and where their links lead. Hosting the docs yourself fixes all three.</p>
+  <div class="cols">
+    <ol class="steps docs">
+      <li><span>A scraper job (reusing DevDocs' open-source scrapers) downloads each doc set for a specific language version, for example Python 3.13, and cleans the HTML.</span></li>
+      <li><span>It imports the pages into a <code>docPages</code> table (language, version, path, title, body, license line) with a Convex search index on the text.</span></li>
+      <li><span>The research panel calls <code>searchDocs</code> and <code>getDocPage</code>. Links inside a page point to other stored pages; external links are disabled or opened in a logged new tab.</span></li>
+      <li><span>Before returning anything, the query checks the attempt's mode. Docs a mode doesn't allow are never sent to the browser, so the rule can't be bypassed in the client.</span></li>
+      <li><span>Each opened page writes a <code>docViews</code> row (user, attempt, page, time spent). The results view shows it as "solved using 3 doc pages".</span></li>
+      <li><span>When a runner language is upgraded, the job runs again for the new version. That is roughly once a year per language, not a recurring crawl.</span></li>
+    </ol>
+    <div class="policy">
+      <div><b>Practice</b><span>All doc sets, plus a logged "open in new tab" button for anything outside the library.</span></div>
+      <div><b>Duels</b><span>Official language references only. Decision still open.</span></div>
+      <div><b>Hard-mode contests</b><span>No docs. A separate leaderboard for no-docs solves.</span></div>
+      <div><b>Desktop app (later)</b><span>Its own web view can show any site and log every URL, so full browsing becomes possible there.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="cols">
+  <section>
+    <h2>Creating a problem</h2>
+    <p>Creating problems is a paid feature (Pro, or invited top players in a creator program).</p>
+    <ol class="steps">
+      <li><span>A creator writes the statement, test cases (sample and hidden) and a reference solution in any supported language. By default every language may solve it; the creator can restrict languages.</span></li>
+      <li><span>The platform runs the reference solution in the runner. It must pass every test, ideally alongside a second solution in another language. Time limits get a per-language multiplier.</span></li>
+      <li><span>The problem enters <span class="pill">beta</span> in practice only. Users who solved it vote on difficulty and quality and can file issue reports.</span></li>
+      <li><span>After enough solves, good ratings and a reviewer sign-off it becomes <span class="pill rt">approved</span> and can appear in ranked duels.</span></li>
+      <li><span>Difficulty is then recalculated from real results: solve rate, attempts, time taken and the ratings of solvers versus non-solvers.</span></li>
+      <li><span>Discussion unlocks for each user only after they solve the problem. Contests use fresh problems nobody has seen.</span></li>
+    </ol>
+  </section>
+  <section>
+    <h2>Running a ninjathon</h2>
+    <p>Creating ninjathons is paid: Pro for small private events, the Organization plan for public, branded ones.</p>
+    <ol class="steps duel">
+      <li><span>An organizer creates an <code>events</code> row: dates, rules, judges, prizes, and an entry type of <span class="pill">free</span>, <span class="pill">paid</span> or <span class="pill">invite</span>.</span></li>
+      <li><span>Participants register in <code>registrations</code>. For paid entry, the row is confirmed only by the payment webhook, never by the browser.</span></li>
+      <li><span>Teams form and submit projects before the server-side deadline; submissions lock at that time.</span></li>
+      <li><span>Judges score against a rubric; results and rankings publish when judging closes.</span></li>
+      <li><span>Paid entry (later) pays organizers through Stripe Connect minus a platform fee. Check local rules on paid entry with prizes before launching it.</span></li>
+    </ol>
+  </section>
+</div>
+
+<div class="cols">
+  <section>
+    <h2>Plans and entitlements</h2>
+    <p>One <code>entitlements</code> row per user or organization (plan, quotas, renewal date). Only the payment webhook writes it, and every paid feature checks it inside Convex, never in the browser.</p>
+    <div class="policy">
+      <div><b>Free</b><span>All exercises, ranked duels, contests, rankings and leaderboards, docs library, basic profile with free and earned themes, a few AI hints per day, joining ninjathons.</span></div>
+      <div><b>Pro</b><span>Courses and tutorials, unlimited AI coach, deep analytics and duel replays, problem creation, private ninjathons, full profile customization.</span></div>
+      <div><b>Organization</b><span>Public branded ninjathons, hiring challenges, candidate reports, classes and assignments.</span></div>
+    </div>
+    <p>Never paid: rating, ranked games, leaderboard placement, or anything that helps win a duel.</p>
+  </section>
+  <section>
+    <h2>Profiles</h2>
+    <ol class="steps docs">
+      <li><span>A <code>profiles</code> row stores a template id and validated theme values: colors, font choice, banner and background image, section order.</span></li>
+      <li><span>Users never write CSS or HTML. The server validates values, including a text contrast check, and your code renders the page.</span></li>
+      <li><span>Images go to Convex file storage with size limits and a content check before going public.</span></li>
+      <li><span>Rating, rank, solved count and duel record render in a fixed platform block that no theme can restyle or hide.</span></li>
+      <li><span>Free users edit the basics and unlock themes by playing; Pro users get the full template library and custom styling.</span></li>
+    </ol>
+  </section>
+</div>
+
+<section class="guard" id="guardrail">
+  <div class="eyebrow">Guardrail · non-negotiable</div>
+  <h2>Every check happens in Convex, before the data leaves the server</h2>
+  <p>Next.js decides what to show. Convex decides what to send. Middleware, route protection, hidden buttons and client-side plan checks are for user experience only and are never treated as security. If a Convex function returns data, it must already have checked who is asking and what their plan allows.</p>
+  <div class="cols">
+    <ul class="rules">
+      <li><b>Wrappers instead of raw functions.</b> All public functions are built from <code>userQuery</code>, <code>proQuery</code>, <code>proMutation</code> and similar wrappers that check identity and <code>entitlements</code> first. A lint rule blocks importing raw <code>query</code> and <code>mutation</code> outside <code>convex/lib</code>.</li>
+      <li><b>Actions go through internal queries.</b> Actions have no database access, so they call an internal query that runs the same check before calling the runner or the AI coach.</li>
+      <li><b>No Pro content in pages.</b> Course pages are never statically generated with lesson text, and locked content is never sent blurred or hidden. Public pages show title, outline and the free preview module only.</li>
+      <li><b>One writer for plans.</b> Only the payment webhook writes <code>entitlements</code>. No function callable from the browser can change a plan.</li>
+      <li><b>Test the denial path.</b> Each Pro function gets a test that calls it as a free user and expects it to throw.</li>
+    </ul>
+<pre><code>// convex/lib/functions.ts
+export const proQuery = customQuery(query,
+  customCtx(async (ctx) =&gt; {
+    const user = await requireUser(ctx);
+    const plan = await ctx.db.query("entitlements")
+      .withIndex("by_user", (q) =&gt; q.eq("userId", user._id))
+      .unique();
+    if (!plan || plan.tier === "free" || plan.expiresAt &lt; Date.now())
+      throw new ConvexError("PRO_REQUIRED");
+    return { user, plan };
+  }));
+
+// convex/courses.ts
+export const getLesson = proQuery({
+  args: { lessonId: v.id("lessons") },
+  handler: async (ctx, { lessonId }) =&gt;
+    ctx.db.get(lessonId),  // runs only after the check
+});</code></pre>
+  </div>
+  <p class="small">Uses <code>customQuery</code> and <code>customCtx</code> from the <code>convex-helpers</code> package. Free preview modules use a separate <code>userQuery</code> that checks the lesson's <code>isPreview</code> flag.</p>
+</section>
+
+<section>
+  <h2>One Next.js app, three route groups</h2>
+  <div class="policy">
+    <div><b>(marketing)</b><span><code>/</code>, <code>/features</code>, <code>/pricing</code>, <code>/blog</code>. Statically generated, metadata, Open Graph images, sitemap, structured data, little JavaScript.</span></div>
+    <div><b>(public)</b><span><code>/problems/[slug]</code>, <code>/u/[username]</code>, <code>/leaderboard</code>, <code>/contests/[id]</code>. Server-rendered for search engines; turns into the solving view for signed-in users. Most SEO traffic comes from here.</span></div>
+    <div><b>(app)</b><span><code>/dashboard</code>, <code>/duel/[id]</code>, <code>/solve/[slug]</code>, <code>/courses</code>, <code>/settings</code>. Behind sign-in, client-heavy, live Convex subscriptions. Monaco and the duel HUD load only here.</span></div>
+  </div>
+  <p>Split into a monorepo (for example <code>apps/web</code>, <code>apps/app</code>, <code>packages/ui</code>, one <code>convex</code> folder) only when a marketing team needs its own CMS and deploys, or build times start to hurt. Keeping shared components in their own folder from day one makes that split cheap.</p>
+</section>
+
+<section>
+  <h2>Security checklist</h2>
+  <div class="tablewrap">
+  <table class="sec">
+    <thead><tr><th>Area</th><th>Risk</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Code runner</td><td>Sandbox escape, crypto mining, fork bombs</td><td>Separate VM, fresh sandbox per run, no network, unprivileged user, read-only filesystem, CPU/memory/process/time/output limits, load alerts</td></tr>
+      <tr><td>Runner webhook</td><td>Forged verdicts</td><td>Signed with a shared secret; reject unknown submission ids</td></tr>
+      <tr><td>Convex functions</td><td>Leaked answers or early problems</td><td>Every public function checks the caller. Hidden tests only in internal functions. Duel problems hidden until the match is active. Opponent progress returns counts only</td></tr>
+      <tr><td>Timing</td><td>Faked solve times</td><td>Server clock only, never client timestamps</td></tr>
+      <tr><td>Rankings</td><td>Smurfs, multi-accounts, win trading</td><td>Provisional ratings, verified login for ranked play, detect repeated one-sided pairings, rate-limit Run/Submit</td></tr>
+      <tr><td>User content</td><td>Script injection, broken tests</td><td>Sanitize rendered markdown; new problems run only in practice until approved</td></tr>
+      <tr><td>Profiles</td><td>Phishing forms, tracking images</td><td>Theme values instead of CSS; uploads checked; fixed stats block</td></tr>
+      <tr><td>Payments</td><td>Unpaid access</td><td>Plans set only by the payment webhook; every paid query and mutation checks <code>entitlements</code> in Convex before returning data (see the guardrail above)</td></tr>
+      <tr><td>Next.js middleware</td><td>Bypassed route protection</td><td>Used for redirects and UX only; never the thing that protects data</td></tr>
+      <tr><td>AI coach</td><td>Cost abuse, full solutions via prompt injection</td><td>Server-side quotas, coach limited to hints and doc links</td></tr>
+      <tr><td>Privacy (GDPR)</td><td>Over-collecting behavior data</td><td>Disclose tracking, delete raw events after e.g. 90 days, keep only trust scores, support account deletion</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Who talks to whom</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>From</th><th>To</th><th>How</th><th>What moves</th></tr></thead>
+    <tbody>
+      <tr><td>Browser</td><td>Clerk</td><td><span class="pill">Clerk SDK</span></td><td>Sign-in, session, JWT for Convex</td></tr>
+      <tr><td>Browser</td><td>Convex</td><td><span class="pill rt">WebSocket</span></td><td>Queries and live subscriptions, mutations, action calls. Token on every request</td></tr>
+      <tr><td>Convex</td><td>Clerk</td><td><span class="pill">JWKS</span></td><td>Verifies the token signature; user identity inside every function</td></tr>
+      <tr><td>Clerk</td><td>Convex</td><td><span class="pill">webhook</span></td><td>User created or updated, keeps the <code>users</code> table in sync</td></tr>
+      <tr><td>Convex action</td><td>Runner</td><td><span class="pill">HTTPS</span></td><td>Code, language, test inputs, limits, callback URL</td></tr>
+      <tr><td>Runner</td><td>Convex</td><td><span class="pill">webhook</span></td><td>Verdict per test, runtime, memory, compiler output</td></tr>
+      <tr><td>Scraper job</td><td>Convex</td><td><span class="pill">HTTP action</span></td><td>Cleaned doc pages for one language version, with source and license lines</td></tr>
+      <tr><td>Research panel</td><td>Convex</td><td><span class="pill rt">WebSocket</span></td><td>Doc search and pages out, filtered by mode; page views back in as <code>docViews</code></td></tr>
+      <tr><td>Convex scheduler</td><td>Convex</td><td><span class="pill">cron / runAfter</span></td><td>Matchmaking passes, match start and end times, cleanup</td></tr>
+      <tr><td>Payments</td><td>Convex</td><td><span class="pill">webhook</span></td><td>Subscription started, renewed or cancelled; paid ninjathon entry confirmed. Updates <code>entitlements</code> and <code>registrations</code></td></tr>
+      <tr><td>Convex action</td><td>Payments</td><td><span class="pill">HTTPS</span></td><td>Creates checkout sessions; later, organizer payouts through Stripe Connect</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">The runner is the only part that executes untrusted code. Keep it on a separate VM with no route to Convex secrets or your database; it only knows its callback URL and a shared secret.</p>
+</section>
+</div>
+
+<p style="max-width:1080px;margin:40px auto 0;font-size:13px;color:#737373;font-family:system-ui,sans-serif">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/artifact/TdLuLfe3ymELTeeEac46NC</p>
+</body>
+</html>
