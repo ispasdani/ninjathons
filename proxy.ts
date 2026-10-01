@@ -1,10 +1,23 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)", "/"]);
+// Redirects signed-out visitors away from the (app) routes. This is for user
+// experience only: data is protected by the Convex wrappers in
+// convex/lib/functions.ts, never by this file. Marketing and public pages
+// (problems, profiles, leaderboards) stay open for search engines.
+const isAppRoute = createRouteMatcher([
+  "/dashboard(.*)",
+  "/duel(.*)",
+  "/solve(.*)",
+  "/courses(.*)",
+  "/settings(.*)",
+]);
 
-export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) await auth.protect();
-});
+export default clerkMiddleware(
+  async (auth, req) => {
+    if (isAppRoute(req)) await auth.protect();
+  },
+  { signInUrl: "/sign-in", signUpUrl: "/sign-up" },
+);
 
 export const config = {
   matcher: [

@@ -1,26 +1,286 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Design system: docs/notes/design.md. Token names follow shadcn/ui. */
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Neutrals (2.1) */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0a;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e5e5e5;
+  --text-secondary: #555555;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #0a0a0a;
+  --accent: #f5f5f5;
+  --accent-foreground: #0a0a0a;
+  --border: #e5e5e5;
+  --border-strong: #d4d4d4;
+  --input: #e5e5e5;
+  --ring: #a1a1a1;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+
+  /* Status (2.2) */
+  --success: #24c55f;
+  --warning: #e49e21;
+  --destructive: #e40014;
+
+  /* Verdicts (2.3) */
+  --verdict-ac: #16a34a;
+  --verdict-wa: #dc2626;
+  --verdict-tle: #d97706;
+  --verdict-mle: #c2410c;
+  --verdict-re: #9333ea;
+  --verdict-ce: #737373;
+  --verdict-pending: #2563eb;
+
+  /* Duel sides (2.4) */
+  --duel-you: #2563eb;
+  --duel-opponent: #e11d48;
+  --duel-neutral: #a3a3a3;
+  --duel-p3: #7c3aed;
+  --duel-p4: #0d9488;
+
+  /* Rating tiers (2.5) */
+  --tier-newbie: #737373;
+  --tier-apprentice: #16a34a;
+  --tier-specialist: #0891b2;
+  --tier-expert: #2563eb;
+  --tier-master: #7c3aed;
+  --tier-grandmaster: #dc2626;
+
+  /* Pro accent (2.6) */
+  --pro-bg: #1a1a1c;
+  --pro-bg-hover: #2d2e30;
+  --pro-text: #e4e4e7;
+  --pro-border: rgb(255 255 255 / 0.08);
+  --pro-sheen: #9d9ea0;
+
+  /* shadcn extras, kept monochrome */
+  --chart-1: #0a0a0a;
+  --chart-2: #525252;
+  --chart-3: #737373;
+  --chart-4: #a3a3a3;
+  --chart-5: #d4d4d4;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #171717;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #0a0a0a;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #a1a1a1;
+
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --bg-secondary: #171717;
+  --bg-tertiary: #262626;
+  --text-secondary: #a1a1a1;
+  --muted: #171717;
+  --muted-foreground: #a1a1a1;
+  --primary: #fafafa;
+  --primary-foreground: #171717;
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  --accent: #262626;
+  --accent-foreground: #fafafa;
+  --border: #262626;
+  --border-strong: #525252;
+  --input: #262626;
+  --ring: #525252;
+  --card: #0a0a0a;
+  --card-foreground: #fafafa;
+  --popover: #0a0a0a;
+  --popover-foreground: #fafafa;
+
+  --success: #52dc78;
+  --warning: #f7b345;
+  --destructive: #e40014;
+
+  --verdict-ac: #4ade80;
+  --verdict-wa: #f87171;
+  --verdict-tle: #fbbf24;
+  --verdict-mle: #fb923c;
+  --verdict-re: #c084fc;
+  --verdict-ce: #a1a1a1;
+  --verdict-pending: #60a5fa;
+
+  --duel-you: #60a5fa;
+  --duel-opponent: #fb7185;
+  --duel-neutral: #525252;
+  --duel-p3: #a78bfa;
+  --duel-p4: #2dd4bf;
+
+  --tier-newbie: #a3a3a3;
+  --tier-apprentice: #4ade80;
+  --tier-specialist: #22d3ee;
+  --tier-expert: #60a5fa;
+  --tier-master: #a78bfa;
+  --tier-grandmaster: #f87171;
+
+  --pro-bg: #323335;
+  --pro-bg-hover: #47484a;
+  --pro-text: #d6d7d9;
+  --pro-border: rgb(255 255 255 / 0.1);
+  --pro-sheen: #b6b7b9;
+
+  --chart-1: #fafafa;
+  --chart-2: #d4d4d4;
+  --chart-3: #a3a3a3;
+  --chart-4: #737373;
+  --chart-5: #525252;
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #171717;
+  --sidebar-accent: #171717;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #262626;
+  --sidebar-ring: #525252;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-text-secondary: var(--text-secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-destructive: var(--destructive);
+
+  --color-verdict-ac: var(--verdict-ac);
+  --color-verdict-wa: var(--verdict-wa);
+  --color-verdict-tle: var(--verdict-tle);
+  --color-verdict-mle: var(--verdict-mle);
+  --color-verdict-re: var(--verdict-re);
+  --color-verdict-ce: var(--verdict-ce);
+  --color-verdict-pending: var(--verdict-pending);
+
+  --color-duel-you: var(--duel-you);
+  --color-duel-opponent: var(--duel-opponent);
+  --color-duel-neutral: var(--duel-neutral);
+  --color-duel-p3: var(--duel-p3);
+  --color-duel-p4: var(--duel-p4);
+
+  --color-tier-newbie: var(--tier-newbie);
+  --color-tier-apprentice: var(--tier-apprentice);
+  --color-tier-specialist: var(--tier-specialist);
+  --color-tier-expert: var(--tier-expert);
+  --color-tier-master: var(--tier-master);
+  --color-tier-grandmaster: var(--tier-grandmaster);
+
+  --color-pro: var(--pro-bg);
+  --color-pro-hover: var(--pro-bg-hover);
+  --color-pro-foreground: var(--pro-text);
+  --color-pro-border: var(--pro-border);
+  --color-pro-sheen: var(--pro-sheen);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography (3) */
+  --font-sans:
+    var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, "Roboto Mono",
+    monospace;
+  --font-heading: var(--font-sans);
+
+  /* Radius (4.2) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Elevation (4.3) */
+  --shadow-ring: 0 0 0 1px var(--border);
+  --shadow-soft: 0 1px 4px 0 rgb(0 0 0 / 0.1);
+  --shadow-raised: 0 2px 8px -2px rgb(0 0 0 / 0.3);
+  --shadow-overlay:
+    inset 0 1px 0 rgb(0 0 0 / 0.08), 0 2px 8px -3px rgb(0 0 0 / 0.35),
+    0 28px 56px -24px rgb(0 0 0 / 0.5);
+
+  /* Motion (7) */
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-dialog: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

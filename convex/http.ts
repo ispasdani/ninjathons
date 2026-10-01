@@ -1,4 +1,4 @@
-import type { WebhookEvent } from "@clerk/nextjs/server";
+import type { UserJSON, WebhookEvent } from "@clerk/nextjs/server";
 import { httpRouter } from "convex/server";
 import { Webhook } from "svix";
 
@@ -10,33 +10,42 @@ const handleClerkWebhook = httpAction(async (ctx, request) => {
   if (!event) {
     return new Response("Invalid request", { status: 400 });
   }
+
   switch (event.type) {
     case "user.created":
-      await ctx.runMutation(internal.user.createUser, {
-        clerkId: event.data.id,
-        email: event.data.email_addresses[0].email_address,
-        imageUrl: event.data.image_url,
-        name: event.data.first_name as string,
-        credits: 0,
-      });
-      break;
     case "user.updated":
-      await ctx.runMutation(internal.user.updateUser, {
-        clerkId: event.data.id,
-        imageUrl: event.data.image_url,
-        email: event.data.email_addresses[0].email_address,
-      });
+      await ctx.runMutation(internal.user.upsertFromClerk, toUserFields(event.data));
       break;
     case "user.deleted":
-      await ctx.runMutation(internal.user.deleteUser, {
-        clerkId: event.data.id as string,
-      });
+      if (event.data.id) {
+        await ctx.runMutation(internal.user.deleteFromClerk, {
+          clerkId: event.data.id,
+        });
+      }
       break;
   }
-  return new Response(null, {
-    status: 200,
-  });
+
+  return new Response(null, { status: 200 });
 });
+
+// Clerk allows sign-ups without a first name or without an email (phone,
+// some OAuth providers), so every field needs a fallback.
+function toUserFields(data: UserJSON) {
+  const email =
+    data.email_addresses.find((e) => e.id === data.primary_email_address_id)
+      ?.email_address ??
+    data.email_addresses[0]?.email_address ??
+    "";
+  const fullName = [data.first_name, data.last_name].filter(Boolean).join(" ");
+  const name = fullName || data.username || email.split("@")[0] || "Player";
+
+  return {
+    clerkId: data.id,
+    email,
+    name,
+    imageUrl: data.image_url ?? "",
+  };
+}
 
 const http = httpRouter();
 
@@ -46,30 +55,28 @@ http.route({
   handler: handleClerkWebhook,
 });
 
-const validateRequest = async (
-  req: Request,
-): Promise<WebhookEvent | undefined> => {
-  // key note : add the webhook secret variable to the environment variables field in convex dashboard setting
-  const webhookSecret = process.env.CLERK_WEBHOOK_SECRET!;
+async function validateRequest(req: Request): Promise<WebhookEvent | undefined> {
+  // Set CLERK_WEBHOOK_SECRET in the Convex dashboard (Settings → Environment Variables).
+  const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {
     throw new Error("CLERK_WEBHOOK_SECRET is not defined");
   }
-  const payloadString = await req.text();
-  const headerPayload = req.headers;
+
+  const payload = await req.text();
   const svixHeaders = {
-    "svix-id": headerPayload.get("svix-id")!,
-    "svix-timestamp": headerPayload.get("svix-timestamp")!,
-    "svix-signature": headerPayload.get("svix-signature")!,
+    "svix-id": req.headers.get("svix-id") ?? "",
+    "svix-timestamp": req.headers.get("svix-timestamp") ?? "",
+    "svix-signature": req.headers.get("svix-signature") ?? "",
   };
-  const wh = new Webhook(webhookSecret);
+
   try {
     // svix v2 verify() throws on a bad signature and returns nothing, so parse the payload ourselves
-    wh.verify(payloadString, svixHeaders);
+    new Webhook(webhookSecret).verify(payload, svixHeaders);
   } catch (error) {
     console.error("Error verifying Clerk webhook", error);
     return undefined;
   }
-  return JSON.parse(payloadString) as WebhookEvent;
-};
+  return JSON.parse(payload) as WebhookEvent;
+}
 
 export default http;
