@@ -59,6 +59,12 @@ export const deleteFromClerk = internalMutation({
       .collect();
     for (const plan of plans) await ctx.db.delete(plan._id);
 
+    const xp = await ctx.db
+      .query("xpLedger")
+      .withIndex("by_user_key", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const entry of xp) await ctx.db.delete(entry._id);
+
     await ctx.db.delete(user._id);
   },
 });
