@@ -124,7 +124,7 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <p>Practice and tutorials are free; structured courses and roadmaps are Pro, with the first module free.</p>
 <ul>
 <li><strong>Problem library:</strong> 150 to 200 seeded problems, the "Solving in" language switch, status per language, collections, filters and topic chips.</li>
-<li><strong>Solve view:</strong> Run and Submit, live verdicts, 5 languages (Python, JavaScript/TypeScript, Java, C++, C#).</li>
+<li><strong>Solve view:</strong> Run and Submit, live verdicts, 9 languages: JavaScript, TypeScript, Python, Java, C#, C++ and Rust ranked; HTML and CSS practice-only until V1.1.</li>
 <li><strong>Docs library:</strong> Python and MDN at launch, pinned to the runner's versions; more doc sets later.</li>
 <li><strong>Tutorials (free):</strong> short standalone lessons such as "Two pointers" or "Hash maps in Python", each ending in 2 or 3 library problems. They are public pages, so they also bring search traffic.</li>
 <li><strong>Roadmaps (Pro, first module free):</strong> a visual path of topics from beginner to interview-ready. Each node is a lesson plus practice problems, with progress saved per node.</li>
@@ -369,7 +369,7 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <p>Pro launches with V1 because courses, roadmaps and custom profiles are paid, so payments and entitlements are part of the first build.</p>
 <p><strong>Trust and platform</strong></p>
 <ul>
-<li>Sandboxed runner on its own VM: no network, strict CPU, memory, time and output limits, results only through a signed webhook.</li>
+<li>Sandboxed runner on Vercel Sandbox: a fresh microVM per run, no network, strict CPU, memory, time and output limits; Convex waits for the output and decides the verdict.</li>
 <li>Convex guardrail: every public function built from <code>userQuery</code> / <code>proQuery</code> wrappers; hidden tests and unstarted match problems never leave the server; the server clock decides all timing.</li>
 <li>Anti-cheat: tab-leave and paste signals, provisional ratings, similarity checks after ranked games, the ranked-challenge limits, flagged games reviewed rather than auto-punished.</li>
 <li>Progression integrity: one append-only XP ledger where every entry has a unique key per action, so a retried request can never award XP twice. Badges and levels are computed from the ledger.</li>
@@ -477,14 +477,15 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <li class="task"><input type="checkbox" checked disabled> Usernames: our own, unique and chosen by each user in onboarding, stored in Convex (not Clerk).</li>
 <li class="task"><input type="checkbox" checked disabled> Payments: Stripe directly, not Clerk Billing. Stripe Tax or a merchant of record is still to choose.</li>
 <li class="task"><input type="checkbox" checked disabled> Judging model: a hybrid. Each problem is either function mode (fill in a generated signature) or full-program stdin/stdout mode. A "write the whole program" toggle on function problems comes after V1.</li>
+<li class="task"><input type="checkbox" checked disabled> Code runner: Vercel Sandbox, called from Convex; the desktop app runs code locally later.</li>
+<li class="task"><input type="checkbox" checked disabled> Brand name: Ninjathons, with a shuriken logo and a neon green accent.</li>
+<li class="task"><input type="checkbox" checked disabled> Languages: all 9 in V1 (JavaScript, TypeScript, Python, Java, C#, C++, Rust ranked; HTML and CSS practice-only until ranked CSS duels in V1.1).</li>
+<li class="task"><input type="checkbox" checked disabled> Docs in ranked 1v1: official language references only; no-docs play is a separate Hard mode.</li>
+<li class="task"><input type="checkbox" checked disabled> Pro price: about €8/month or €69/year, regional prices, early-bird pricing kept when it rises with V1.1.</li>
+<li class="task"><input type="checkbox" checked disabled> World Conquest and Battle royale: keep both; choose the order in V2 by how many players are online at once.</li>
 </ul>
 <p><strong>Open decisions</strong></p>
-<ul>
-<li class="task"><input type="checkbox" disabled> Brand name ("duelcode" is a placeholder), which also names the XP titles.</li>
-<li class="task"><input type="checkbox" disabled> Docs in ranked 1v1: official docs, or none?</li>
-<li class="task"><input type="checkbox" disabled> Pro price and whether there is a yearly plan at launch.</li>
-<li class="task"><input type="checkbox" disabled> World Conquest next to Battle royale (recommended) or instead of it.</li>
-</ul>
+<p>None right now.</p>
 <p class="src">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/code/artifact/aa4c2464-5f6a-4532-9ed8-52ba30bf159d<br>Edited 3 Oct 2026 for the decisions in <code>notes/decisions.md</code>, also applied to the live version.</p>
 </main>
 </body>

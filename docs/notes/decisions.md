@@ -9,6 +9,12 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Judging is a hybrid: each problem is either function mode or full-program (stdio) mode | [3](#3-judging-model-hybrid) |
 | 3 Oct 2026 | Account deletion: 14-day grace period, then a batched hard delete; shared records are anonymized | [4](#4-deleting-data) |
 | 3 Oct 2026 | The code runner is Vercel Sandbox, called from Convex; the desktop app runs code locally | [5](#5-code-runner-vercel-sandbox) |
+| 3 Oct 2026 | Brand: Ninjathons, shuriken logo, neon green `#c4f012` accent | [6](#6-brand) |
+| 3 Oct 2026 | Problems are folders of files in `problems/`: JSON settings, tests, reference and must-fail solutions | [7](#7-problem-file-format) |
+| 3 Oct 2026 | All 9 languages in V1; HTML/CSS practice-only until V1.1 | [8](#8-launch-languages) |
+| 3 Oct 2026 | Ranked 1v1 allows official language docs only | [9](#9-docs-in-ranked-1v1) |
+| 3 Oct 2026 | Pro: about €8/month or €69/year, regional prices, early-bird pricing | [10](#10-pro-price) |
+| 3 Oct 2026 | Keep both World Conquest and Battle royale; pick the order in V2 | [11](#11-world-conquest-and-battle-royale) |
 
 ---
 
@@ -149,7 +155,7 @@ User code that counts (Submit, duels, challenges, anything that gives XP or chan
 
 ### Languages
 
-Target list: JavaScript, TypeScript, Python, Java, C#, C++, Rust, plus HTML and CSS. HTML and CSS are a different kind of exercise (DOM checks or pixel matching, rendered by headless Chromium), so they need their own judge mode. Still open: which languages ship at launch and which in V1.1.
+JavaScript, TypeScript, Python, Java, C#, C++, Rust, plus HTML and CSS. HTML and CSS are a different kind of exercise (DOM checks or pixel matching, rendered by headless Chromium), so they need their own judge mode. Launch scope: section 8.
 
 ### How it works
 
@@ -178,4 +184,115 @@ Target list: JavaScript, TypeScript, Python, Java, C#, C++, Rust, plus HTML and 
 - Submissions pass about 30,000–40,000 a month: a flat-price server (Hetzner VM) becomes cheaper. The `runCode` interface keeps that a contained change.
 - The prototype shows verdicts slower than the 3-second target.
 
-**Next step:** a 1–2 day prototype: one image with Python and Java, a Convex action that runs a solution against a few tests in a sandbox with the network blocked, and real cold and warm verdict times.
+**When to prototype:** right after the pieces that let us test it properly exist: the problem file format, a handful of sample problems with reference solutions, the language Docker image, and the local check script that runs them in Docker Desktop. Then the prototype pushes that same image to Vercel Sandbox and runs the same sample problems from a Convex action, with the network blocked, and measures real cold and warm verdict times. Passing locally and in the sandbox on the same problems is the proof.
+
+## 6. Brand
+
+- **Name:** Ninjathons, from "hackathons". Replaces the "duelcode" placeholder in the roadmap. The domain is bought. In code the name lives only in `lib/site.ts`.
+- **Logo:** a shuriken mark (`public/logo.svg`) plus a full lockup with the wordmark NINJATHONS in capitals, Orbitron Bold, outlined (`public/logo-full.svg` for light backgrounds, `public/logo-full-white.svg` for dark). Orbitron is for the logo only; the interface stays in Geist.
+- **Brand color:** neon green `#c4f012`, the one accent in an otherwise monochrome interface, used in small doses (logo backdrop, one brand button per screen, *your* position and progress). It fails contrast as text on white, so light mode uses `#5e720d` for brand-colored text.
+- Rules, tokens and contrast numbers: `design.md` sections 0 and 2.7. Tokens are in `app/globals.css` (`--brand`, `--brand-foreground`, `--brand-text`) and the `brand` button variant in `components/ui/button.tsx`.
+- Still open: the XP title names (the roadmap ties them to the brand; ninja-themed names are an option).
+
+## 7. Problem file format
+
+Every exercise is a folder in `problems/<slug>/` in this (private) repo. Scripts check it and upload it to Convex; the website never imports these files.
+
+```
+problems/two-sum/
+  problem.json        settings (JSON, validated against a schema)
+  statement.md        what users read
+  hints.md            hand-written hints, one "## Hint" section each
+  tests/
+    examples.json     public examples: shown in the statement, used by Run
+    hidden.json       hidden tests (function mode)
+    hidden/01.in/.out hidden tests (stdio mode: plain text files)
+    generate.py       optional: builds large tests from a fixed seed
+  solutions/
+    reference.<ext>   the official correct answer (more languages optional)
+    wrong-*.<ext>     known-wrong answers that must fail (required, at least one)
+    slow-*.<ext>      known-too-slow answers that must time out (where the limit matters)
+```
+
+### `problem.json`
+
+```json
+{
+  "slug": "two-sum",
+  "title": "Two Sum",
+  "difficulty": "easy",
+  "tags": ["arrays", "hash-map"],
+  "mode": "function",
+  "signature": {
+    "functionName": "twoSum",
+    "params": [{ "name": "nums", "type": "int[]" }, { "name": "target", "type": "int" }],
+    "returns": "int[]"
+  },
+  "checker": { "kind": "unordered" },
+  "limits": { "timeMs": 2000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "approved",
+  "version": 1
+}
+```
+
+- **Format:** JSON, not YAML: strict and easy to validate.
+- `mode`: `function`, `stdio`, or later `visual` (HTML/CSS). `signature` only in function mode.
+- `pool`: `practice`, `ranked` or `contest`; decides how secret the tests must be.
+- `version` goes up whenever the tests change, so every submission records which tests judged it.
+- The slug never changes once published: URLs, XP keys and submissions point to it.
+
+### Tests
+
+- Function mode: JSON, `{"input": {"nums": [2,7,11,15], "target": 9}, "output": [0,1]}`, type-checked against the signature.
+- Stdio mode: `.in` / `.out` file pairs, since large inputs don't belong in JSON.
+- At least 10 hidden tests per problem: edge cases plus large generated ones. Expected outputs of generated tests come from the reference solution, never typed by hand.
+
+### Must-fail solutions
+
+- **Every problem needs at least one wrong solution** that the tests must reject. This proves the tests are strong enough, not just that the right answer passes.
+- A too-slow solution is added wherever the time limit is part of the problem (for example, O(n²) where O(n) is expected).
+
+### Scripts
+
+- `npm run problems:check`: validates every `problem.json`; then, in the language Docker image, runs the reference in every allowed language through the generated drivers, confirms it passes, confirms every `wrong-*` and `slow-*` solution fails, and suggests time limits from the reference's runtime × a per-language multiplier. Runs in CI too, so a broken problem can't be merged.
+- `npm run problems:seed`: uploads to Convex, matched by slug (re-running updates, never duplicates). Examples go to `problems`, hidden tests to `problemTests`.
+
+### Secrecy
+
+- `practice` problems: plain files in the private repo.
+- `ranked` and `contest` problems: hidden tests and solutions **encrypted with `sops`** (key on the author's machine and as a GitHub secret for CI). **Turned on before the closed beta**, when the duel pool starts to matter; until then everything is plain files with the `pool` field set.
+- A lint rule blocks importing anything from `problems/` in `app/` and `components/`, so no page can ship tests to the browser.
+
+### Schema changes (made with the seed script)
+
+`problems` gains `pool`, `version`, `languages` and a `limits` object; `problemTests` gains `version`.
+
+## 8. Launch languages
+
+- **All 9 ship in V1:** JavaScript, TypeScript, Python, Java, C#, C++, Rust, HTML, CSS. This replaces the roadmap's 5.
+- **The 7 code languages are ranked from day one.** They share one image, one runner and the function and stdio modes; each adds a driver generator and a docs set. In a match each player picks their own language; per-language time-limit multipliers keep it fair.
+- **HTML and CSS are practice-only in V1:** tutorials and practice problems, checked in the browser (sandboxed iframe), free and instant, no XP-for-rating or ranked play.
+- **Ranked HTML/CSS arrives in V1.1:** the `visual` judge mode (DOM checks and pixel matching with headless Chromium in Vercel Sandbox) and a duel screen for it. "CSS duels" is the V1.1 launch headline.
+- Docs sets needed at launch: MDN (JS, TS, HTML, CSS), Python, Java API, .NET API (C#), cppreference (C++), Rust std. Each keeps its source and license line.
+
+## 9. Docs in ranked 1v1
+
+- **Ranked 1v1 allows official language references only** (the sets in section 8), served from Convex, which enforces the policy per mode so it can't be bypassed in the browser.
+- Results show doc use: "Won in 4:12 · used 2 doc pages".
+- **No-docs play is a separate Hard mode** with its own leaderboard, as already planned for contests.
+- Practice keeps every doc set plus the logged "open in new tab" button.
+
+## 10. Pro price
+
+- **About €8/month or €69/year** at launch (yearly ≈ 2 months free), both offered from day one. Final numbers are set in Stripe before launch.
+- **Regional pricing** through Stripe: lower prices in lower-income countries (for example about half in India or Brazil).
+- **Early-bird:** beta users and early subscribers keep their launch price when it rises.
+- **Raise the price with V1.1**, when the AI coach and replays join Pro; existing subscribers stay on their price.
+- Later: a student discount, and team pricing with the Organization plan in V2.
+
+## 11. World Conquest and Battle royale
+
+- **Keep both** for V2; neither replaces the other.
+- **Choose the order in V2 by concurrent players:** Battle royale needs 8–20 people online at the same time; World Conquest is season-long and asynchronous, so it works with fewer people online but needs generated problem variants. If concurrent players are low, build World Conquest first.
