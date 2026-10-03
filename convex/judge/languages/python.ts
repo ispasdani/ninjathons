@@ -61,6 +61,24 @@ __nj_main()
 `;
 }
 
+/** Drops traceback frames in the driver (and their code lines) and renames the file. */
+function cleanError(stderr: string, sourceLines: number): string {
+  const out: string[] = [];
+  let skipping = false;
+  for (const line of stderr.replace(/\r\n/g, "\n").split("\n")) {
+    const frame = line.match(/^ {2}File "([^"]*)", line (\d+)/);
+    if (frame) {
+      skipping = /main\.py$/.test(frame[1]) && Number(frame[2]) > sourceLines;
+      if (!skipping) out.push(line.replace(frame[1], "solution.py"));
+      continue;
+    }
+    if (skipping && line.startsWith("    ")) continue;
+    skipping = false;
+    out.push(line);
+  }
+  return out.join("\n").trim();
+}
+
 export const python: LanguageSpec = {
   id: "python",
   label: "Python",
@@ -68,6 +86,7 @@ export const python: LanguageSpec = {
   // CPython is roughly 2x slower than Node on typical problems.
   timeMultiplier: 2,
   starterCode,
+  cleanError,
   program(judge, source) {
     const code = judge.mode === "function" ? source + driver(judge.signature) : source;
     return {

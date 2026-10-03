@@ -36,6 +36,7 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 - Vercel project `ninjathons` linked (no deployment yet); token, team and project IDs set in Convex dev.
 - Real sandbox runs on Two Sum, both languages, all verdict kinds correct: Run 1.2 s, Submit 2.1–2.7 s. Got there by saving the verdict before stopping the sandbox, gzipping the job and using iad1 (details in decisions §5).
 - Warm-up problem `add-two-integers` (its wrong solution overflows 32-bit ints) and a problem list on the dashboard linking to `/solve/<slug>`.
+- First hands-on test of the solve view: errors now show only the user's own code (`solution.js:2`, `File "solution.py", line 2`), without Node internals, the driver or temp paths, and Run stops at the first crash or timeout instead of repeating it on every example.
 - Open: the solve view hasn't been checked in a browser (needs sign-in); CI hasn't run on the branch yet; memory limits aren't enforced (only the sandbox's own 4 GB).
 
 ### 3 Oct 2026 · Phase 0

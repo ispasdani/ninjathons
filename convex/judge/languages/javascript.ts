@@ -43,6 +43,28 @@ function driver(signature: Signature): string {
 `;
 }
 
+/**
+ * Drops Node's internal stack frames, frames in the driver and the "Node.js
+ * vXX" footer. When the error is thrown inside the driver (the function is
+ * missing), the code snippet Node prints above the message is the driver's,
+ * so it goes too.
+ */
+function cleanError(stderr: string, sourceLines: number): string {
+  const lines = stderr.replace(/\r\n/g, "\n").split("\n");
+  const header = lines[0]?.match(/main\.js:(\d+)$/);
+  if (header && Number(header[1]) > sourceLines) lines.splice(0, 3);
+  return lines
+    .filter((line) => {
+      if (/^Node\.js v\d/.test(line)) return false;
+      if (!/^\s+at\s/.test(line)) return true;
+      const frame = line.match(/main\.js:(\d+):\d+/);
+      return frame !== null && Number(frame[1]) <= sourceLines;
+    })
+    .join("\n")
+    .replace(/[^\s()]*main\.js/g, "solution.js")
+    .trim();
+}
+
 export const javascript: LanguageSpec = {
   id: "javascript",
   label: "JavaScript",
@@ -50,6 +72,7 @@ export const javascript: LanguageSpec = {
   version: "Node.js 24",
   timeMultiplier: 1,
   starterCode,
+  cleanError,
   program(judge, source) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;
     return {

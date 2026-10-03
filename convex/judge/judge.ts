@@ -45,7 +45,9 @@ export async function runCode(
     ...spec.program(request.judge, request.source),
     tests: request.tests,
     timeLimitMs: Math.round(request.limits.timeMs * spec.timeMultiplier),
-    stopOnError: request.stopAtFirstFailure,
+    // A crash or timeout usually repeats on every test, so stop at the first
+    // one even on Run. Wrong answers are found here, after the run.
+    stopOnError: true,
   });
 }
 
@@ -55,7 +57,7 @@ export async function judgeSubmission(runner: CodeRunner, request: JudgeRequest)
 }
 
 export function decideVerdict(
-  request: Pick<JudgeRequest, "judge" | "checker" | "tests" | "stopAtFirstFailure">,
+  request: Pick<JudgeRequest, "judge" | "checker" | "tests" | "stopAtFirstFailure" | "language" | "source">,
   output: RunOutput,
 ): Verdict {
   const total = request.tests.length;
@@ -66,10 +68,11 @@ export function decideVerdict(
   const tests: TestResult[] = [];
   let status: VerdictStatus = "accepted";
   let passed = 0;
+  const sourceLines = request.source.split("\n").length;
   for (let i = 0; i < output.tests.length && i < total; i++) {
     const test = request.tests[i];
     const run = output.tests[i];
-    const result = judgeOne(request, test, run);
+    const result = judgeOne(request, test, run, sourceLines);
     tests.push(result);
     if (result.status === "accepted") {
       passed++;
@@ -86,9 +89,10 @@ export function decideVerdict(
 }
 
 function judgeOne(
-  request: Pick<JudgeRequest, "judge" | "checker">,
+  request: Pick<JudgeRequest, "judge" | "checker" | "language">,
   test: JudgeTest,
   run: TestRun,
+  sourceLines: number,
 ): TestResult {
   const status: VerdictStatus =
     run.status !== "ok"
@@ -101,7 +105,8 @@ function judgeOne(
     result.input = test.input;
     result.expected = test.expected;
     result.actual = clip(run.stdout.trimEnd());
-    if (run.stderr) result.logs = clip(run.stderr);
+    const logs = LANGUAGES[request.language].cleanError(run.stderr, sourceLines);
+    if (logs) result.logs = clip(logs);
   }
   // Hidden tests return no output at all, not even an error message: a
   // solution could print the hidden input to stderr and then crash on purpose.

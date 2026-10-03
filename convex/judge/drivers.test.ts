@@ -5,7 +5,7 @@
 import { describe, expect, test } from "vitest";
 
 import { localRunner } from "../../scripts/lib/local-runner";
-import { runCode } from "./judge";
+import { judgeSubmission, runCode } from "./judge";
 import { LANGUAGES } from "./languages";
 import { snakeCase } from "./languages/python";
 import type { Judge, Language, ValueType } from "./types";
@@ -89,6 +89,36 @@ describe.each(Object.keys(LANGUAGES) as Language[])("%s driver", (language) => {
   test("reports a missing function as a runtime error", async () => {
     const out = await run(language, echo("int"), "", ['{"value": 1}']);
     expect(out.tests[0].status).toBe("runtime_error");
+  });
+
+  test("shows errors from the user's code only, stopping at the first crash", async () => {
+    const source = {
+      javascript: "function echoValue(value) {\n  return a - b;\n}\n",
+      python: "def echo_value(value):\n    return a - b\n",
+    };
+    const tests = ['{"value": 1}', '{"value": 2}'].map((input) => ({ input, expected: "1", visible: true }));
+    const verdict = await judgeSubmission(localRunner, {
+      judge: echo("int"), checker: { kind: "exact" }, limits, language, source: source[language], tests, stopAtFirstFailure: false,
+    });
+    expect(verdict.status).toBe("runtime_error");
+    expect(verdict.tests).toHaveLength(1);
+    const logs = verdict.tests[0].logs ?? "";
+    expect(logs).toMatch(/a.*(is not|not) defined/);
+    expect(logs).toContain(`solution.${language === "python" ? "py" : "js"}`);
+    expect(logs).toMatch(/:2|line 2/);
+    for (const internal of ["main.", "node:internal", "__nj", "__args", "Node.js v", "Temp", "/tmp"]) {
+      expect(logs, internal).not.toContain(internal);
+    }
+  });
+
+  test("names the missing function without showing the driver", async () => {
+    const verdict = await judgeSubmission(localRunner, {
+      judge: echo("int"), checker: { kind: "exact" }, limits, language, source: "",
+      tests: [{ input: '{"value": 1}', expected: "1", visible: true }], stopAtFirstFailure: false,
+    });
+    const logs = verdict.tests[0].logs ?? "";
+    expect(logs).toMatch(/echo_?[vV]alue.*not defined/);
+    expect(logs).not.toContain("__");
   });
 
   test("stops an infinite loop at the time limit", async () => {

@@ -63,13 +63,13 @@ describe("decideVerdict", () => {
   const ok = (stdout: string) => ({ status: "ok" as const, stdout, stderr: "", timeMs: 10, exitCode: 0 });
 
   test("accepted when every output matches", () => {
-    const v = decideVerdict({ judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true }, { tests: [ok("[1]"), ok("[2]")] });
+    const v = decideVerdict({ judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true, language: "python", source: "" }, { tests: [ok("[1]"), ok("[2]")] });
     expect(v).toMatchObject({ status: "accepted", passed: 2, total: 2 });
   });
 
   test("hides everything about hidden tests", () => {
     const v = decideVerdict(
-      { judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true },
+      { judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true, language: "python", source: "" },
       { tests: [ok("[1]"), { ...ok("[9]"), stderr: "secret input" }] },
     );
     expect(v.status).toBe("wrong_answer");
@@ -78,13 +78,13 @@ describe("decideVerdict", () => {
   });
 
   test("missing results never count as accepted", () => {
-    const v = decideVerdict({ judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true }, { tests: [ok("[1]")] });
+    const v = decideVerdict({ judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true, language: "python", source: "" }, { tests: [ok("[1]")] });
     expect(v.status).not.toBe("accepted");
   });
 
   test("compile errors come back with the compiler output", () => {
     const v = decideVerdict(
-      { judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true },
+      { judge: fn, checker: { kind: "exact" }, tests, stopAtFirstFailure: true, language: "python", source: "" },
       { compile: { ok: false, output: "error: x" }, tests: [] },
     );
     expect(v).toMatchObject({ status: "compile_error", compileOutput: "error: x", passed: 0 });
