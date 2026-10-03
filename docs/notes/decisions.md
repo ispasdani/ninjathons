@@ -8,6 +8,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Payments use Stripe directly, not Clerk Billing | [2](#2-payments-stripe) |
 | 3 Oct 2026 | Judging is a hybrid: each problem is either function mode or full-program (stdio) mode | [3](#3-judging-model-hybrid) |
 | 3 Oct 2026 | Account deletion: 14-day grace period, then a batched hard delete; shared records are anonymized | [4](#4-deleting-data) |
+| 3 Oct 2026 | The code runner is Vercel Sandbox, called from Convex; the desktop app runs code locally | [5](#5-code-runner-vercel-sandbox) |
 
 ---
 
@@ -134,3 +135,47 @@ A soft-deleted row is still in the table, so a query that forgets the filter lea
 - Put `status` or `deletedAt` in the indexes (for example `problems.by_status`), so queries filter through the index instead of scanning.
 - Read through shared helpers in `convex/lib` (`getActiveProblem`, `getActiveUser`…) so the filter is written once.
 - Each public query gets a test that a soft-deleted row doesn't come back.
+
+## 5. Code runner: Vercel Sandbox
+
+User code that counts (Submit, duels, challenges, anything that gives XP or changes a rating) runs in **Vercel Sandbox**, called from Convex. This replaces Judge0 on its own VM in the architecture doc. No separate server to host or maintain, and the runner code stays in this repo.
+
+### Why
+
+- Each run gets its own Firecracker microVM with its own kernel: stronger isolation than containers, built for untrusted code.
+- One custom image (a Dockerfile in this repo, pushed to Vercel Container Registry by a GitHub Action) carries every compiler, so all languages are covered.
+- Outbound network can be blocked with a firewall policy.
+- Cost: free on Hobby while building (5,000 sandboxes/month, 10 at once). At launch the site needs Vercel Pro anyway (Hobby is non-commercial), and Pro's $20 monthly usage credit covers roughly 25,000 submissions; after that about $0.0008 per submission. Spend management caps the bill.
+
+### Languages
+
+Target list: JavaScript, TypeScript, Python, Java, C#, C++, Rust, plus HTML and CSS. HTML and CSS are a different kind of exercise (DOM checks or pixel matching, rendered by headless Chromium), so they need their own judge mode. Still open: which languages ship at launch and which in V1.1.
+
+### How it works
+
+- **The browser never talks to the runner.** A Convex action checks the user (an internal query, as the guardrail requires) and the rate limit, creates a sandbox with the network blocked, runs the code, and reads the output.
+- **One compile, then all tests.** The driver (function mode) or a wrapper script (stdio mode) compiles once and runs every test inside the same sandbox, stopping at the first failure on Submit.
+- **Verdicts are decided in Convex,** not in the sandbox: Convex compares the output with the expected answers using the problem's checker. Expected outputs of hidden tests never leave Convex.
+- **Everything goes through one interface,** `runCode({ language, source, tests, limits })`. Vercel Sandbox is the first implementation; a browser runner and a local desktop runner plug in beside it.
+- **Exercises can be written and checked before the hosted runner exists:** the same Docker image runs locally in Docker Desktop, and a check script runs every reference solution against its tests.
+
+### Where code runs
+
+| Where | What runs there | Counts for XP, ratings, duels? |
+|---|---|---|
+| **Vercel Sandbox** (via Convex) | Submit and duels in every language; Run for Java, C#, C++, Rust; batch "write and run" programs | Yes |
+| **Browser** (WASM: QuickJS, Pyodide; sandboxed iframe) | Practice Run for JavaScript, TypeScript, Python; HTML and CSS previews | No |
+| **Desktop app** (later) | Everything locally on the user's computer, including a live interactive terminal and offline use | No |
+
+### Desktop app (later)
+
+- The desktop app runs code **locally on the user's computer**: real compilers, a real interactive terminal, no server cost, and it works offline. Compilers are downloaded per language on first use rather than bundled.
+- Local runs are for practice, free roam and the terminal only. Submit, XP, ratings and duels still go to the server runner when online; offline solves never change ratings.
+- The same local runner can also serve the website through `localhost` when the app is installed, so one install gives both. It must accept requests only from our site, after a pairing step with a secret token.
+
+### Revisit when
+
+- Submissions pass about 30,000–40,000 a month: a flat-price server (Hetzner VM) becomes cheaper. The `runCode` interface keeps that a contained change.
+- The prototype shows verdicts slower than the 3-second target.
+
+**Next step:** a 1–2 day prototype: one image with Python and Java, a Convex action that runs a solution against a few tests in a sandbox with the network blocked, and real cold and warm verdict times.

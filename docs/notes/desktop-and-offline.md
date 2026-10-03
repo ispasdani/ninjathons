@@ -65,7 +65,7 @@ Better options:
 A few decisions in the first version make both desktop versions much easier:
 
 1. **Problem format as plain files.** Store statements, tests and hints in a portable format (JSON plus markdown), not only as Convex records, so you can export a practice pack.
-2. **Code runner behind an interface.** Write something like `runCode(code, lang, tests)` with a Judge0 implementation now. Later you add a local implementation (Pyodide, JavaScript workers) without touching the UI.
+2. **Code runner behind an interface.** Write something like `runCode(code, lang, tests)` with a Vercel Sandbox implementation now (decided 3 Oct 2026, see `decisions.md` section 5). Later you add local implementations (Pyodide and JavaScript workers in the browser, real compilers in the desktop app) without touching the UI.
 3. **Data access behind a thin layer.** Keep Convex calls in hooks or services rather than scattered through components, so a local SQLite version can replace them for offline screens.
 4. **Hand-written hints per problem.** Worth doing anyway: they work offline, cost nothing, and back up the AI coach.
 

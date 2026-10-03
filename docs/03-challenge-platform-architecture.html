@@ -88,14 +88,14 @@ ul.rules li::marker{color:var(--warn)}
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">Tech-first MVP · Next.js · Clerk · Convex · Judge0 · updated 26 Sept 2026, 11:30</div>
+  <div class="eyebrow">Tech-first MVP · Next.js · Clerk · Convex · Vercel Sandbox · updated 3 Oct 2026</div>
   <h1>How the challenge platform fits together</h1>
   <p class="lede">Three zones: the browser app, Convex as the realtime backend, and outside services that Convex calls or that feed it. The browser never talks to the code runner directly, and there is no open web search. Research happens in a docs library you host yourself, so every page read stays inside the platform.</p>
 </header>
 
 <figure>
   <div class="scroll">
-  <svg viewBox="0 0 1000 560" role="img" aria-label="System diagram: the Next.js browser app talks only to Convex. Convex calls the Judge0 runner and later an AI coach. A docs scraper job imports version-pinned documentation into Convex, where the research panel searches and reads it. Clerk issues the sign-in token Convex verifies. Runner results return by webhook and reach the browser through live subscriptions.">
+  <svg viewBox="0 0 1000 560" role="img" aria-label="System diagram: the Next.js browser app talks only to Convex. Convex runs user code in Vercel Sandbox and later calls an AI coach. A docs scraper job imports version-pinned documentation into Convex, where the research panel searches and reads it. Clerk issues the sign-in token Convex verifies. The Convex action waits for the sandbox output, writes the verdict, and it reaches the browser through live subscriptions.">
     <defs>
       <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
     </defs>
@@ -152,9 +152,9 @@ ul.rules li::marker{color:var(--warn)}
     <text class="ts" x="754" y="196">once per language version</text>
     <text class="ts" x="754" y="212">MDN, Python, cppreference…</text>
     <rect class="box hot" x="740" y="240" width="240" height="110" rx="6"/>
-    <text class="t" x="754" y="262">Runner service</text>
-    <text class="ts" x="754" y="280">Judge0 on its own VM</text>
-    <text class="ts" x="754" y="296">fresh sandbox, no network</text>
+    <text class="t" x="754" y="262">Code runner</text>
+    <text class="ts" x="754" y="280">Vercel Sandbox microVM</text>
+    <text class="ts" x="754" y="296">fresh VM per run, no network</text>
     <text class="ts" x="754" y="312">CPU · memory · time limits</text>
     <text class="ts" x="754" y="328">versions match the docs</text>
     <rect class="box later" x="740" y="396" width="240" height="48" rx="6"/>
@@ -190,14 +190,14 @@ ul.rules li::marker{color:var(--warn)}
     <line class="arr hot" x1="642" y1="302" x2="738" y2="302" marker-end="url(#ah)" style="color:var(--accent)"/>
     <text class="lbl hot" x="690" y="296" text-anchor="middle">code+tests</text>
     <path class="arr hot" d="M800,350 V372 H642" marker-end="url(#ah)" style="color:var(--accent)"/>
-    <text class="lbl hot" x="722" y="366" text-anchor="middle">webhook: verdict</text>
+    <text class="lbl hot" x="722" y="366" text-anchor="middle">output per test</text>
     <path class="arr later" d="M642,316 H700 V430 H738" marker-end="url(#ah)" style="color:var(--muted)"/>
     <text class="lbl" x="706" y="416">hints</text>
     <line class="arr" x1="738" y1="514" x2="642" y2="498" marker-end="url(#ah)" style="color:var(--muted)"/>
     <text class="lbl" x="690" y="496" text-anchor="middle">plan</text>
   </svg>
   </div>
-  <figcaption>Green is the submission loop: editor → action → sandboxed runner → webhook → mutation → subscription → results view. Blue is research: a scraper imports version-pinned docs into Convex once per language version, and the research panel searches and reads them through queries that check the current mode's docs policy. Every page opened is logged as a doc view. The payment provider only ever reaches Convex through a webhook that updates a user's plan. Dashed parts come later.</figcaption>
+  <figcaption>Green is the submission loop: editor → action → Vercel Sandbox → output back to the action → checker and mutation in Convex → subscription → results view. Blue is research: a scraper imports version-pinned docs into Convex once per language version, and the research panel searches and reads them through queries that check the current mode's docs policy. Every page opened is logged as a doc view. The payment provider only ever reaches Convex through a webhook that updates a user's plan. Dashed parts come later.</figcaption>
   <div class="legend">
     <span><i class="sw"></i>submission path</span>
     <span><i class="sw docs"></i>docs library</span>
@@ -212,9 +212,9 @@ ul.rules li::marker{color:var(--warn)}
     <ol class="steps">
       <li><span>User presses <b>Submit</b>. The browser calls the Convex action <code>submit(code, lang, problemId)</code> with the Clerk token attached.</span></li>
       <li><span>Convex verifies the token, checks the rate limit, and a mutation inserts a <code>submissions</code> row with status <span class="pill">queued</span>.</span></li>
-      <li><span>The action loads the hidden test cases and posts code plus tests to the runner, with a callback URL (a Convex HTTP endpoint).</span></li>
-      <li><span>The runner compiles once, runs every test in a fresh sandbox with no network, and posts results to the callback.</span></li>
-      <li><span>The HTTP endpoint checks a shared secret and runs a mutation that writes the verdict, runtime and memory.</span></li>
+      <li><span>The action loads the hidden test inputs through an internal query and starts a Vercel Sandbox with the network blocked. Only the code and the inputs go in; expected outputs stay in Convex.</span></li>
+      <li><span>The sandbox compiles once, runs every test (stopping at the first failure), and the action reads the output per test. There is no callback to forge: the action waits for the result.</span></li>
+      <li><span>Convex compares each output with the expected answer using the problem's checker, and a mutation writes the verdict, runtime and memory.</span></li>
       <li><span>Every browser subscribed to that submission, or to the match, updates instantly. In a duel, the opponent sees the test count, never the code.</span></li>
     </ol>
   </section>
@@ -351,8 +351,8 @@ export const getLesson = proQuery({
   <table class="sec">
     <thead><tr><th>Area</th><th>Risk</th><th>Rule</th></tr></thead>
     <tbody>
-      <tr><td>Code runner</td><td>Sandbox escape, crypto mining, fork bombs</td><td>Separate VM, fresh sandbox per run, no network, unprivileged user, read-only filesystem, CPU/memory/process/time/output limits, load alerts</td></tr>
-      <tr><td>Runner webhook</td><td>Forged verdicts</td><td>Signed with a shared secret; reject unknown submission ids</td></tr>
+      <tr><td>Code runner</td><td>Sandbox escape, crypto mining, fork bombs</td><td>Vercel Sandbox: a fresh Firecracker microVM with its own kernel per run, network blocked by firewall policy, CPU/memory/time/output limits, spend limits on the account</td></tr>
+      <tr><td>Runner results</td><td>Forged or leaked verdicts</td><td>No webhook: the Convex action waits for the output. Expected outputs never leave Convex; verdicts are decided there</td></tr>
       <tr><td>Convex functions</td><td>Leaked answers or early problems</td><td>Every public function checks the caller. Hidden tests only in internal functions. Duel problems hidden until the match is active. Opponent progress returns counts only</td></tr>
       <tr><td>Timing</td><td>Faked solve times</td><td>Server clock only, never client timestamps</td></tr>
       <tr><td>Rankings</td><td>Smurfs, multi-accounts, win trading</td><td>Provisional ratings, verified login for ranked play, detect repeated one-sided pairings, rate-limit Run/Submit</td></tr>
@@ -377,8 +377,8 @@ export const getLesson = proQuery({
       <tr><td>Browser</td><td>Convex</td><td><span class="pill rt">WebSocket</span></td><td>Queries and live subscriptions, mutations, action calls. Token on every request</td></tr>
       <tr><td>Convex</td><td>Clerk</td><td><span class="pill">JWKS</span></td><td>Verifies the token signature; user identity inside every function</td></tr>
       <tr><td>Clerk</td><td>Convex</td><td><span class="pill">webhook</span></td><td>User created or updated, keeps the <code>users</code> table in sync</td></tr>
-      <tr><td>Convex action</td><td>Runner</td><td><span class="pill">HTTPS</span></td><td>Code, language, test inputs, limits, callback URL</td></tr>
-      <tr><td>Runner</td><td>Convex</td><td><span class="pill">webhook</span></td><td>Verdict per test, runtime, memory, compiler output</td></tr>
+      <tr><td>Convex action</td><td>Vercel Sandbox</td><td><span class="pill">SDK · HTTPS</span></td><td>Code, language, test inputs, limits</td></tr>
+      <tr><td>Vercel Sandbox</td><td>Convex action</td><td><span class="pill">response</span></td><td>Output per test, runtime, memory, compiler output</td></tr>
       <tr><td>Scraper job</td><td>Convex</td><td><span class="pill">HTTP action</span></td><td>Cleaned doc pages for one language version, with source and license lines</td></tr>
       <tr><td>Research panel</td><td>Convex</td><td><span class="pill rt">WebSocket</span></td><td>Doc search and pages out, filtered by mode; page views back in as <code>docViews</code></td></tr>
       <tr><td>Convex scheduler</td><td>Convex</td><td><span class="pill">cron / runAfter</span></td><td>Matchmaking passes, match start and end times, cleanup</td></tr>
@@ -387,7 +387,7 @@ export const getLesson = proQuery({
     </tbody>
   </table>
   </div>
-  <p class="note">The runner is the only part that executes untrusted code. Keep it on a separate VM with no route to Convex secrets or your database; it only knows its callback URL and a shared secret.</p>
+  <p class="note">The code runner is the only part that executes untrusted code. Each run gets its own Vercel Sandbox microVM with the network blocked; it never receives Convex secrets, database access or expected outputs, only the code and the test inputs. Practice Run for JavaScript, TypeScript and Python can also run in the browser, and the desktop app (later) runs code locally, but neither counts for XP, ratings or duels.</p>
 </section>
 </div>
 
