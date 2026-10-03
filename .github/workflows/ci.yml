@@ -28,6 +28,11 @@ jobs:
           node-version: 24
           cache: npm
 
+      # Same majors as the runner image (decisions §5): Node 24, Python 3.14.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
       - run: npm ci
       - name: Type-check
         run: npm run typecheck
@@ -35,5 +40,7 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm run test:once
+      - name: Check problems
+        run: npm run problems:check
       - name: Build
         run: npm run build

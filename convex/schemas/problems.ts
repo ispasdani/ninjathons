@@ -7,9 +7,12 @@ export const difficulty = v.union(
   v.literal("hard"),
 );
 
-// Types a function-mode signature can use. The starter-code and driver
-// generators support exactly these, in all five languages. ListNode and
-// TreeNode come later.
+// Languages the runner supports so far. Phase 1 ships JavaScript and Python;
+// the other code languages join in phase 2 (docs/progress.md).
+export const language = v.union(v.literal("javascript"), v.literal("python"));
+
+// Types a function-mode signature can use. Every driver generator supports
+// exactly these. ListNode and TreeNode come later.
 export const valueType = v.union(
   v.literal("int"),
   v.literal("long"),
@@ -28,6 +31,14 @@ export const valueType = v.union(
   v.literal("string[][]"),
 );
 
+// A function-mode problem's function, defined once per problem; every
+// language's starter code and driver are generated from it.
+export const signature = v.object({
+  functionName: v.string(),
+  params: v.array(v.object({ name: v.string(), type: valueType })),
+  returns: valueType,
+});
+
 // How the user's code is judged (docs/notes/decisions.md). The problem sets the
 // mode, never the player, so both sides of a duel get the same one. Either way
 // the runner only sees stdin/stdout: in function mode a generated driver reads
@@ -37,11 +48,7 @@ export const judge = v.union(
   // per language from this signature.
   v.object({
     mode: v.literal("function"),
-    signature: v.object({
-      functionName: v.string(),
-      params: v.array(v.object({ name: v.string(), type: valueType })),
-      returns: valueType,
-    }),
+    signature,
   }),
   // The user writes the whole program. The statement must spell out the exact
   // input and output format.
@@ -57,8 +64,9 @@ export const checker = v.union(
 
 // Everything in this table is safe to send to the browser. Hidden tests live
 // in problemTests so a query returning a problem row can't leak them.
+// Rows are written only by the seed script (problems/ folder, decisions §7).
 export const problems = defineTable({
-  slug: v.string(),
+  slug: v.string(), // never changes once published
   title: v.string(),
   statement: v.string(), // markdown
   difficulty,
@@ -73,8 +81,14 @@ export const problems = defineTable({
       explanation: v.optional(v.string()),
     }),
   ),
-  timeLimitMs: v.number(),
-  memoryLimitMb: v.number(),
+  // Base limits. Each language multiplies the time limit by its own factor
+  // (convex/judge/languages.ts).
+  limits: v.object({ timeMs: v.number(), memoryMb: v.number() }),
+  languages: v.union(v.literal("all"), v.array(language)),
+  // practice: plain files. ranked and contest: tests encrypted in the repo.
+  pool: v.union(v.literal("practice"), v.literal("ranked"), v.literal("contest")),
+  // Goes up whenever the tests change; every submission records it.
+  version: v.number(),
   // Hand-written hints, so learning works before the AI coach exists.
   hints: v.array(v.string()),
   // beta: practice only. approved: may appear in ranked matches.
@@ -83,12 +97,15 @@ export const problems = defineTable({
   .index("by_slug", ["slug"])
   .index("by_status", ["status"]);
 
-// Hidden tests. Read only from internal functions, never from a public one.
+// Hidden tests, one row per problem version. The tests themselves are one
+// JSON file in Convex file storage (an array of {input, expectedOutput}),
+// because large tests run to megabytes and a document holds at most 1 MB.
 // In function mode, input is a JSON object of arguments ({"a":2,"b":3}) and
 // expectedOutput is the JSON return value. In stdio mode both are plain text.
+// Read only from internal functions; never call storage.getUrl on `file`.
 export const problemTests = defineTable({
   problemId: v.id("problems"),
-  order: v.number(),
-  input: v.string(),
-  expectedOutput: v.string(),
-}).index("by_problem", ["problemId", "order"]);
+  version: v.number(),
+  file: v.id("_storage"),
+  count: v.number(),
+}).index("by_problem_version", ["problemId", "version"]);
