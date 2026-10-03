@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <title>Ninjathons</title>
+  <defs>
+    <mask id="hole">
+      <rect width="240" height="240" fill="#fff"/>
+      <circle cx="120" cy="120" r="20" fill="#000"/>
+    </mask>
+  </defs>
+  <path
+    mask="url(#hole)"
+    fill="#0A0A0A"
+    stroke="#0A0A0A"
+    stroke-width="2"
+    stroke-linejoin="round"
+    d="M118.2 21
+       L131.7 50.7 A11 11 0 1 0 142.5 64.2
+       L219 118.2
+       L189.3 131.7 A11 11 0 1 0 175.8 142.5
+       L121.8 219
+       L108.3 189.3 A11 11 0 1 0 97.5 175.8
+       L21 121.8
+       L50.7 108.3 A11 11 0 1 0 64.2 97.5
+       Z"/>
+</svg>
