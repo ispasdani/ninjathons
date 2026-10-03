@@ -59,6 +59,11 @@
   --tier-master: #7c3aed;
   --tier-grandmaster: #dc2626;
 
+  /* Brand (2.7). Neon is a fill; use --brand-text for brand-colored text. */
+  --brand: #c4f012;
+  --brand-foreground: #0a0a0a;
+  --brand-text: #5e720d;
+
   /* Pro accent (2.6) */
   --pro-bg: #1a1a1c;
   --pro-bg-hover: #2d2e30;
@@ -132,6 +137,10 @@
   --tier-master: #a78bfa;
   --tier-grandmaster: #f87171;
 
+  --brand: #c4f012;
+  --brand-foreground: #0a0a0a;
+  --brand-text: #c4f012;
+
   --pro-bg: #323335;
   --pro-bg-hover: #47484a;
   --pro-text: #d6d7d9;
@@ -200,6 +209,10 @@
   --color-tier-expert: var(--tier-expert);
   --color-tier-master: var(--tier-master);
   --color-tier-grandmaster: var(--tier-grandmaster);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-text: var(--brand-text);
 
   --color-pro: var(--pro-bg);
   --color-pro-hover: var(--pro-bg-hover);

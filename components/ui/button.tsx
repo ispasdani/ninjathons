@@ -18,6 +18,8 @@ const buttonVariants = cva(
         destructive: "bg-destructive text-white hover:bg-destructive/90",
         link: "text-text-secondary underline-offset-4 hover:underline",
         pro: "border-pro-border bg-pro text-pro-foreground shadow-raised hover:bg-pro-hover",
+        // At most one per screen (design.md 2.7).
+        brand: "bg-brand text-brand-foreground shadow-soft hover:brightness-[.92]",
       },
       size: {
         default:

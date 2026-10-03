@@ -1,6 +1,6 @@
-# design.md — Challenge Platform Design System
+# design.md — Ninjathons Design System
 
-Version 0.1 · 26 Sept 2026
+Version 0.2 · 3 Oct 2026 (0.1: 26 Sept 2026)
 
 This style guide adapts the visual language of getcracked.io: monochrome, typographic, calm, with color reserved for meaning. The values below were read from getcracked.io's live CSS (CSS variables, computed styles) on 26 Sept 2026, then extended for our own features: duels, verdicts, ratings, profiles and the research panel.
 
@@ -10,12 +10,37 @@ This style guide adapts the visual language of getcracked.io: monochrome, typogr
 
 ## 1. Principles
 
-1. **Monochrome first.** The interface is black, white and neutral grays. Color appears only when it means something: a verdict, a duel side, a rating tier, syntax highlighting.
+1. **Monochrome first, one brand accent.** The interface is black, white and neutral grays. Color appears only when it means something: a verdict, a duel side, a rating tier, syntax highlighting. The one exception is the brand's neon green (section 2.7), used sparingly to mark what is *ours* and what is *you*: the logo, the main call to action, your own progress and position.
 2. **Type does the work.** Large headings are set at regular weight (400) with tight negative tracking, not bold. Hierarchy comes from size, spacing and gray levels.
 3. **Quiet surfaces.** Cards are separated by a 1px border or a 1px ring shadow, not heavy drop shadows. Real shadows are reserved for floating elements and one premium button style.
 4. **Dense, readable UI.** 13px is the main interface size. Body copy is 16px. Nothing important is below 12px.
 5. **Mono means data.** Geist Mono is used for labels, code, numbers, timers and ratings, never for paragraphs.
 6. **Both themes are first-class.** Every token has a light and a dark value. Dark mode is not an inverted light mode.
+
+---
+
+## 0. Brand
+
+**Name:** Ninjathons, from "hackathons": ninjas who code. Written as one word, capital N only.
+
+### 0.1 Logo files
+
+| File | What | Use on |
+|---|---|---|
+| `public/logo.svg` | The shuriken mark alone (240 × 240) | Favicon, app icon, avatars, tight spaces |
+| `public/logo-full.svg` | Mark + "NINJATHONS" wordmark, `#0A0A0A` | Light backgrounds and the neon brand fill |
+| `public/logo-full-white.svg` | Mark + wordmark, `#FAFAFA` | Dark backgrounds |
+
+- The wordmark is **NINJATHONS in capitals, set in Orbitron Bold** (700, SIL Open Font License) with +0.06em tracking, cap height 88/240 of the mark, **converted to outlines** so it looks the same everywhere without the font. To change it, regenerate the outlines rather than editing the paths by hand.
+- Orbitron is the logo's font only. The interface stays in Geist Sans and Geist Mono (section 3).
+- The mark has a round hole in its centre: it is a cut-out, so whatever is behind the logo shows through.
+
+### 0.2 Logo rules
+
+- **Clear space:** at least the height of the wordmark's letters on every side.
+- **Minimum size:** full logo 20px tall; mark alone 16px.
+- **Colors:** ink (`#0A0A0A`) or white (`#FAFAFA`) only. The ink logo may sit on the neon brand fill. Never recolor the logo neon on white (it fails contrast), never add gradients, glows, outlines or shadows.
+- **Don't** stretch, rotate, re-space the letters, or set the name in another font next to the mark.
 
 ---
 
@@ -104,6 +129,30 @@ The reference marks premium offers with a dark, slightly cool "metal" button rat
 | `--pro-sheen` | `#9d9ea0` | `#b6b7b9` |
 
 Pro is never shown with gold, gradients or sparkles. The Pro badge is this dark button style at small size.
+
+### 2.7 Brand: neon green
+
+The brand color is a neon yellow-green, `#c4f012`. It is bright enough to carry the identity in very small doses, and only works in small doses.
+
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `--brand` | `#c4f012` | `#c4f012` | Brand fills: the brand button, highlights, your XP bar, the "you" marker |
+| `--brand-foreground` | `#0a0a0a` | `#0a0a0a` | Text and icons on a `--brand` fill (14.9:1) |
+| `--brand-text` | `#5e720d` | `#c4f012` | Brand-colored text, links and icons on the page background |
+
+**Contrast, measured:** `#c4f012` on white is 1.33:1, so it can never be text, a thin line or an icon on a light background. On `#0a0a0a` it is 14.9:1, and `#0a0a0a` text on it is 14.9:1. `--brand-text` in light mode (`#5e720d`, same hue, darker) is 5.4:1 on white and 4.95:1 on `#f5f5f5`.
+
+**Use it for:**
+- The logo's neon backdrop (ink logo on `--brand`).
+- **One** main call to action per screen at most (the brand button, section 6), for example "Find a match" on the home page.
+- *You*: your row in a leaderboard (a 2px `--brand` left edge or a 10% tint), your XP bar and level-up moment, "your turn" and "live" indicators.
+- Selected state of the main navigation (a 2px underline or left edge).
+
+**Don't use it for:**
+- **Verdicts or success.** Accepted stays `--verdict-ac` (hue 142°) and success stays `--success`. Neon is hue 72°, distinct enough side by side, but never use it to mean "correct".
+- **Duel sides.** You are `--duel-you` (blue) in matches and Territory.
+- Large areas, backgrounds of whole sections, gradients, glows or neon text effects (section 10: the color is always flat).
+- Body text, or anything below 12px on a light background (use `--brand-text`).
 
 ---
 
@@ -220,7 +269,10 @@ All buttons: 13px, weight 500, `--radius-md` (12px), height 36px (32px small, 40
 | Ghost (nav) | transparent | `--foreground` | none | none; hover `--bg-secondary` |
 | Link | transparent | `--text-secondary` | none | underline on hover |
 | Pro | `--pro-bg` | `--pro-text` | `--pro-border` | Raised |
+| Brand | `--brand` | `--brand-foreground` | transparent | Soft; hover darkens 8% |
 | Destructive | `--destructive` | white | transparent | none |
+
+At most one Brand button per screen; everywhere else the primary button stays black or white.
 
 **Two-line button** (from the reference, good for Pro and events): title at 13px/500, sublabel below at 9–10px in muted text, for example "Go Pro" over "Courses + unlimited coach", or "Weekly Contest" over "Sun · 18:00 CET".
 
@@ -387,13 +439,15 @@ Use `next-themes` with `attribute="class"` for the light, dark and system toggle
 ## 10. Do and don't
 
 **Do**
+- Use the brand green in small doses: the logo, one brand button per screen, and *your* position and progress.
 - Keep screens mostly black, white and gray, and let verdicts and duel colors stand out.
 - Use Geist Mono for every number the user compares: ratings, timers, runtimes, ranks.
 - Show real product UI on marketing pages.
 - Keep headings at weight 400 with negative tracking.
 
 **Don't**
-- Use gradients, glows or neon for Pro or for rankings.
+- Use gradients, glows or neon glow effects for Pro or for rankings. The brand green is a flat fill, never a glow.
+- Use the brand green for verdicts, success states, duel sides, large areas or text on light backgrounds.
 - Put colored pills on every tag.
 - Bold headings or center long blocks of text.
 - Copy getcracked's logo, illustrations, copy, page layouts or product names.
