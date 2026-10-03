@@ -12,5 +12,5 @@ Saved 27 Sept 2026. Open the .html files in any browser; they work offline.
 | notes/desktop-and-offline.md            | Desktop app and offline lite version, for later               |                                                                      |
 | notes/v2-ideas.md                       | Free roam and other V2 ideas, for later                       |                                                                      |
 
-The live versions are the ones to edit; these files are a snapshot. Exception: `notes/decisions.md` (3 Oct 2026) is newer than all three and wins where they disagree. The three snapshots were edited to point to it, but the live versions don't have those edits yet.
+The live versions are the ones to edit; these files are a snapshot. Exception: `notes/decisions.md` (3 Oct 2026) is newer than all three and wins where they disagree. The snapshots and the live versions were both updated to point to it.
 The mockups canvas can be exported from its Share menu (Export tab).

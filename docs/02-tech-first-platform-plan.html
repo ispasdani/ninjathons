@@ -47,7 +47,7 @@ pre code{background:none;padding:0;font-size:inherit}
 <div class="head">
   <div class="eyebrow">Brainstorm · tech track · Sept 2026</div>
   <h1>Tech-first plan: practice, duels, contests</h1>
-  <nav class="jump"><span>Decided since:</span> <a href="#research">Research panel</a> <a href="#plans">Free, Pro, Organization</a> <a href="#creation">Problem creation</a> <a href="#ninjathons">Ninjathons</a> <a href="#profiles">Profiles</a> <a href="#security">Security</a> <a href="#app">App structure &amp; guardrail</a> <a href="#play">Play modes</a> <a href="#territory">Territory</a> <a href="#conquest">World Conquest</a> <a href="#leaderboard">Leaderboard</a> <a href="#profile-screens">Profile screens</a> <a href="#library">Problem library</a> <a href="#later">Later</a></nav>
+  <nav class="jump"><span>Decided since:</span> <a href="#research">Research panel</a> <a href="#plans">Free, Pro, Organization</a> <a href="#creation">Problem creation</a> <a href="#ninjathons">Ninjathons</a> <a href="#profiles">Profiles</a> <a href="#security">Security</a> <a href="#app">App structure &amp; guardrail</a> <a href="#play">Play modes</a> <a href="#territory">Territory</a> <a href="#conquest">World Conquest</a> <a href="#leaderboard">Leaderboard</a> <a href="#profile-screens">Profile screens</a> <a href="#library">Problem library</a> <a href="#later">Later</a> <a href="#decisions">Usernames, payments, judging</a></nav>
 </div>
 
 <p>Good choice. Tech gives you one grader type (code runs against tests) to get right before adding others. Here's how I'd shape it.</p>
@@ -386,6 +386,19 @@ Convex mutation → updates submission → UI updates live for both players</cod
   </ul>
 </section>
 
+<section class="update" id="decisions">
+  <div class="eyebrow">Update · 3 Oct 2026</div>
+  <h2>Usernames, payments and judging</h2>
+  <p>Three decisions that shape the database, taken before the first V1 phase. Full details in <code>notes/decisions.md</code>.</p>
+  <ul>
+    <li><strong>Usernames are our own.</strong> Each user picks a unique handle in onboarding, stored in Convex, not Clerk. Uniqueness ignores case ("Dani" and "dani" can't both exist). 3 to 20 characters, reserved words blocked, changes allowed every 30 days. The display name stays separate.</li>
+    <li><strong>Payments use Stripe directly,</strong> not Clerk Billing. Stripe covers regional pricing, one-time ninjathon entry, Stripe Connect payouts and EU VAT. Only the Stripe webhook writes <code>entitlements</code>. Still open: Stripe Tax or a merchant of record.</li>
+    <li><strong>Judging is a hybrid, chosen per problem.</strong> Function mode: the user fills in a function, and starter code plus a driver are generated for each language from the problem's signature. Full-program mode: the user writes the whole program with stdin/stdout. Function mode suits beginners and most duels; full-program mode suits advanced problems and contests. The runner only ever sees stdin/stdout.</li>
+    <li><strong>Mode rules:</strong> the problem sets the mode, never the player, so both sides of a duel get the same one. The mode is labelled in the library. Ratings ignore it.</li>
+    <li><strong>Later:</strong> a "write the whole program" toggle on function problems for practice, custom checkers for problems with many valid answers, and <code>ListNode</code> / <code>TreeNode</code> types.</li>
+  </ul>
+</section>
+
 <section class="update">
   <div class="eyebrow">Still open</div>
   <h2>Decisions to make</h2>
@@ -399,6 +412,6 @@ Convex mutation → updates submission → UI updates live for both players</cod
 </section>
 </article>
 
-<p style="max-width:1080px;margin:40px auto 0;font-size:13px;color:#737373;font-family:system-ui,sans-serif">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/artifact/AqZbz5eWiSJym6Qpb1Ueio<br>Edited 3 Oct 2026 for the decisions in <code>notes/decisions.md</code>; the live version doesn't have these edits yet.</p>
+<p style="max-width:1080px;margin:40px auto 0;font-size:13px;color:#737373;font-family:system-ui,sans-serif">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/artifact/AqZbz5eWiSJym6Qpb1Ueio<br>Edited 3 Oct 2026 for the decisions in <code>notes/decisions.md</code>, also applied to the live version.</p>
 </body>
 </html>
