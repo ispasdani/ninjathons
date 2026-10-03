@@ -14,7 +14,16 @@ npx convex dev   # in one terminal: syncs convex/ to your dev deployment
 npm run dev      # in another: http://localhost:3000
 ```
 
-`.env.local` needs `NEXT_PUBLIC_CONVEX_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`. In the Convex dashboard, set `CLERK_JWT_ISSUER_DOMAIN` and `CLERK_WEBHOOK_SECRET`, and point a Clerk webhook (`user.created`, `user.updated`, `user.deleted`) at `<CONVEX_SITE_URL>/clerk`.
+Copy `.env.example` to `.env.local` and fill it in. It also lists the variables that go in the Convex dashboard (`CLERK_JWT_ISSUER_DOMAIN`, `CLERK_WEBHOOK_SECRET`). Point a Clerk webhook (`user.created`, `user.updated`, `user.deleted`) at `<CONVEX_SITE_URL>/clerk`.
+
+Checks (CI runs all four on every push to `main` and every pull request):
+
+```bash
+npm run typecheck
+npm run lint
+npm run test:once   # Convex function tests (convex-test, in memory; no deployment needed)
+npm run build
+```
 
 ## Layout
 
