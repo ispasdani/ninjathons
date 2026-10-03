@@ -165,6 +165,8 @@ JavaScript, TypeScript, Python, Java, C#, C++, Rust, plus HTML and CSS. HTML and
 - **Verdicts are decided in Convex,** not in the sandbox: Convex compares the output with the expected answers using the problem's checker. Expected outputs of hidden tests never leave Convex.
 - **Everything goes through one interface,** `runCode({ language, source, tests, limits })`. Vercel Sandbox is the first implementation; a browser runner and a local desktop runner plug in beside it.
 - **Exercises can be written and checked before the hosted runner exists:** the same Docker image runs locally in Docker Desktop, and a check script runs every reference solution against its tests.
+- **Measured 3 Oct 2026** (Two Sum, dev deployment in eu-west-1, sandboxes in **iad1**): Run 1.2 s, Submit 2.1–2.7 s for 17 tests including 1.5 MB of gzipped large tests; a time-limit verdict about 4 s, since it waits out the limit. Sandboxes in dub1 were slower despite being nearer (create ~650 ms against ~280 ms, verdicts 2–4.4 s), so iad1 is the default (`SANDBOX_REGION` overrides it). What made the difference: saving the verdict before stopping the sandbox (stopping takes 3 s), gzipping the job, and the region. Next levers if needed: run all function-mode tests in one process (currently ~60 ms of start-up per test), and moving Convex to a US region.
+- **Phase 1 uses Vercel's managed `universal` image** (Node.js 24, Python 3.14), since JavaScript and Python are all it needs; `SANDBOX_IMAGE` switches to our own image when phase 2 adds the compiled languages. Locally, `problems:check` runs code with the installed Node.js and Python through the same harness (Docker isn't required yet).
 
 ### Where code runs
 
@@ -269,6 +271,17 @@ problems/two-sum/
 ### Schema changes (made with the seed script)
 
 `problems` gains `pool`, `version`, `languages` and a `limits` object; `problemTests` gains `version`.
+
+### As built in phase 1 (3 Oct 2026)
+
+- **Hidden tests are one file per problem version** in Convex file storage (a JSON array of `{input, expectedOutput}`), pointed to by a `problemTests` row (`problemId`, `version`, `file`, `count`). Large tests run to megabytes, and a document holds at most 1 MB. Only internal functions read the file; nothing calls `getUrl` on it.
+- **Seeding goes through storage too:** `problems:seed` uploads one JSON package per problem and calls the internal action `problems:seedFromUpload`, so no test data passes through command lines.
+- **Generated tests:** `tests/generate.py` prints only inputs (fixed seed); expected outputs come from the first reference solution, run through the same driver.
+- **Time limits:** `limits.timeMs` is the base; each language multiplies it (JavaScript ×1, Python ×2 for now). The check script warns when a reference uses more than half its limit.
+- **Python names are snake_case** (`twoSum` → `two_sum`, parameters too), and the driver also accepts a LeetCode-style `class Solution` method.
+- **What the user sees:** for examples, input, expected and actual output plus whatever the program printed; for hidden tests, only the verdict and time, not even an error message, since a program could print the hidden input to stderr and then crash on purpose.
+- **Submit stops at the first failing test.** The sandbox stops at the first crash or timeout; wrong answers are found in Convex, which compares after the run.
+- **The code lives in** `convex/judge/` (generators, harness, checker, verdicts, Vercel runner), `convex/submissions.ts` and `convex/judging.ts` (the action), and `scripts/` (problem loader, local runner, check and seed).
 
 ## 8. Launch languages
 

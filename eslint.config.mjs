@@ -35,8 +35,28 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // Problem secrecy (docs/notes/decisions.md §7): no page may import problem
+  // files, or the scripts that read them, so tests can't ship to the browser.
+  {
+    files: ["app/**", "components/**", "lib/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/problems/**", "@/problems/**", "**/scripts/**", "@/scripts/**"],
+              message: "Problem files and scripts stay on the server. Read problems through Convex queries.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
+    // Solutions are standalone programs written the way users write them.
+    "problems/**/solutions/**",
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",

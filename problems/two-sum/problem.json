@@ -1,0 +1,21 @@
+{
+  "slug": "two-sum",
+  "title": "Two Sum",
+  "difficulty": "easy",
+  "tags": ["arrays", "hash-map"],
+  "mode": "function",
+  "signature": {
+    "functionName": "twoSum",
+    "params": [
+      { "name": "nums", "type": "int[]" },
+      { "name": "target", "type": "int" }
+    ],
+    "returns": "int[]"
+  },
+  "checker": { "kind": "unordered" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}
