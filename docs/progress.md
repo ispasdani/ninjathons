@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 1, Judging core: the 3-second target is met. **Next step:** see the solve view working in the browser and get CI green on the branch, then mark phase 1 done and start phase 2.
+**Now:** Phase 1, Judging core: the 3-second target is met. **Next step:** get CI green on the branch, then mark phase 1 done and start phase 2.
 
 ## Phases
 
@@ -37,7 +37,7 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 - Real sandbox runs on Two Sum, both languages, all verdict kinds correct: Run 1.2 s, Submit 2.1–2.7 s. Got there by saving the verdict before stopping the sandbox, gzipping the job and using iad1 (details in decisions §5).
 - Warm-up problem `add-two-integers` (its wrong solution overflows 32-bit ints) and a problem list on the dashboard linking to `/solve/<slug>`.
 - First hands-on test of the solve view: errors now show only the user's own code (`solution.js:2`, `File "solution.py", line 2`), without Node internals, the driver or temp paths, and Run stops at the first crash or timeout instead of repeating it on every example.
-- Open: the solve view hasn't been checked in a browser (needs sign-in); CI hasn't run on the branch yet; memory limits aren't enforced (only the sandbox's own 4 GB).
+- Open: CI hasn't run on the branch yet; memory limits aren't enforced (only the sandbox's own 4 GB).
 
 ### 3 Oct 2026 · Phase 0
 - Phased build plan written into the roadmap and decisions §12; this progress file added.
