@@ -4,6 +4,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalAction } from "./_generated/server";
 import { judgeSubmission, type JudgeTest } from "./judge/judge";
+import type { CodeRunner } from "./judge/types";
 import { RunnerNotConfiguredError, vercelRunner } from "./judge/vercelRunner";
 
 /**
@@ -13,12 +14,16 @@ import { RunnerNotConfiguredError, vercelRunner } from "./judge/vercelRunner";
 export const judge = internalAction({
   args: { submissionId: v.id("submissions") },
   handler: async (ctx, { submissionId }) => {
+    const started = Date.now();
     const job = await ctx.runQuery(internal.submissions.loadForJudging, { submissionId });
     if (!job) return;
     const { submission, problem, testsFile } = job;
+    console.log(`judging: picked up ${started - submission._creationTime} ms after submit`);
     await ctx.runMutation(internal.submissions.markRunning, { submissionId });
 
+    let runner: CodeRunner | undefined;
     try {
+      runner = vercelRunner();
       const tests: JudgeTest[] = problem.examples.map((e) => ({
         input: e.input,
         expected: e.output,
@@ -32,7 +37,7 @@ export const judge = internalAction({
         tests.push(...hidden.map((t) => ({ input: t.input, expected: t.expectedOutput, visible: false })));
       }
 
-      const verdict = await judgeSubmission(vercelRunner(), {
+      const verdict = await judgeSubmission(runner, {
         judge: problem.judge,
         checker: problem.checker,
         limits: problem.limits,
@@ -49,6 +54,9 @@ export const judge = internalAction({
           ? error.message
           : "The code runner failed. This is on our side, not your code; please try again.";
       await ctx.runMutation(internal.submissions.finish, { submissionId, error: message });
+    } finally {
+      // After the verdict is saved: the user doesn't wait for the sandbox to stop.
+      await runner?.close?.();
     }
   },
 });

@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 1, Judging core. **Next step:** add the Vercel credentials to Convex, then measure Run and Submit times on Two Sum against the 3-second target.
+**Now:** Phase 1, Judging core: the 3-second target is met. **Next step:** see the solve view working in the browser and get CI green on the branch, then mark phase 1 done and start phase 2.
 
 ## Phases
 
@@ -33,7 +33,9 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 - Convex: `submissions` table, `submissions.create` / `get`, the `judging.judge` action with the Vercel Sandbox runner; hidden tests stored as one file per problem version.
 - Basic solve view at `/solve/[slug]`: statement, Monaco, Run and Submit, live verdicts.
 - 54 tests: drivers round-trip every signature type in both languages; the full submit flow runs in Convex tests against the local runner.
-- Open: Vercel credentials aren't set in Convex yet, so nothing has run in a real sandbox and the 3-second target isn't measured. Memory limits aren't enforced yet (only the sandbox's own 4 GB).
+- Vercel project `ninjathons` linked (no deployment yet); token, team and project IDs set in Convex dev.
+- Real sandbox runs on Two Sum, both languages, all verdict kinds correct: Run 1.2 s, Submit 2.1–2.7 s. Got there by saving the verdict before stopping the sandbox, gzipping the job and using iad1 (details in decisions §5).
+- Open: the solve view hasn't been checked in a browser (needs sign-in); CI hasn't run on the branch yet; memory limits aren't enforced (only the sandbox's own 4 GB).
 
 ### 3 Oct 2026 · Phase 0
 - Phased build plan written into the roadmap and decisions §12; this progress file added.

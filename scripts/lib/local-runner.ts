@@ -6,6 +6,7 @@
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { gzipSync } from "node:zlib";
 import { dirname, join } from "node:path";
 
 import { HARNESS_FILE, HARNESS_SOURCE, JOB_FILE } from "../../convex/judge/harness";
@@ -31,7 +32,7 @@ export const localRunner: CodeRunner = {
         compile: job.compile && localCommand(job.compile),
         run: localCommand(job.run),
       };
-      writeFileSync(join(dir, JOB_FILE), JSON.stringify(localJob));
+      writeFileSync(join(dir, JOB_FILE), gzipSync(JSON.stringify(localJob)));
       const result = spawnSync(process.execPath, [HARNESS_FILE, JOB_FILE], {
         cwd: dir,
         encoding: "utf8",

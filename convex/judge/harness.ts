@@ -1,5 +1,5 @@
 /**
- * The program every runner executes as `node harness.cjs job.json`, inside
+ * The program every runner executes as `node harness.cjs job.json.gz`, inside
  * Vercel Sandbox or in a temporary folder locally. It compiles once, runs each
  * test with its stdin and a time limit, and prints a RunOutput as JSON. It
  * never sees expected outputs, so it can't decide verdicts.
@@ -7,13 +7,15 @@
  * Plain CommonJS with no dependencies, kept as a string so Convex can upload it.
  */
 export const HARNESS_FILE = "harness.cjs";
-export const JOB_FILE = "job.json";
+// Gzipped: tests can be megabytes of JSON, and the upload is the slowest step.
+export const JOB_FILE = "job.json.gz";
 
 export const HARNESS_SOURCE = String.raw`"use strict";
 const { spawnSync } = require("child_process");
 const fs = require("fs");
+const zlib = require("zlib");
 
-const job = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+const job = JSON.parse(zlib.gunzipSync(fs.readFileSync(process.argv[2])).toString("utf8"));
 const MAX_BUFFER = 16 * 1024 * 1024;
 const MAX_STDERR = 8 * 1024;
 

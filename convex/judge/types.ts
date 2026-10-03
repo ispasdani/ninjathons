@@ -57,4 +57,9 @@ export type RunOutput = {
 /** Where code runs: Vercel Sandbox, a local process, later the browser or desktop app. */
 export interface CodeRunner {
   run(job: RunJob): Promise<RunOutput>;
+  /**
+   * Waits for clean-up started by `run` (stopping a sandbox). Callers save the
+   * verdict first and call this after, so the user doesn't wait for it.
+   */
+  close?(): Promise<void>;
 }
