@@ -15,6 +15,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Ranked 1v1 allows official language docs only | [9](#9-docs-in-ranked-1v1) |
 | 3 Oct 2026 | Pro: about €8/month or €69/year, regional prices, early-bird pricing | [10](#10-pro-price) |
 | 3 Oct 2026 | Keep both World Conquest and Battle royale; pick the order in V2 | [11](#11-world-conquest-and-battle-royale) |
+| 3 Oct 2026 | Build plan: 11 phases with a check that marks each one done; judging core first | [12](#12-build-plan-phases) |
 
 ---
 
@@ -296,3 +297,33 @@ problems/two-sum/
 
 - **Keep both** for V2; neither replaces the other.
 - **Choose the order in V2 by concurrent players:** Battle royale needs 8–20 people online at the same time; World Conquest is season-long and asynchronous, so it works with fewer people online but needs generated problem variants. If concurrent players are low, build World Conquest first.
+
+## 12. Build plan: phases
+
+The roadmap's build order is now 11 phases (0 to 10), each with a check that must pass before the next phase starts. The full table is in the roadmap's Build order section.
+
+| # | Phase | Done when |
+|---|---|---|
+| 0 | Setup ✅ | Auth, guardrail wrappers, schema, tests and CI, brand |
+| 1 | Judging core | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
+| 2 | Foundation | All 9 languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
+| 3 | Progression engine | Solves award XP and badges, and leaderboards update |
+| 4 | 1v1 and private alpha | Runner load test passes; 10 to 20 friends play real matches |
+| 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |
+| 6 | Territory | Group lobbies of 3 to 6 players finish full games |
+| 7 | Learn | 3 roadmaps and about 20 tutorials live |
+| 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
+| 9 | Ninjathons | One event runs from creation to results (first to cut) |
+| 10 | Closed beta and launch | 2 or 3 office teams plus 20 to 50 players; beta issues fixed |
+
+**Content track:** runs alongside the build from phase 2. Problems grow from about 30 to 150–200 by launch, tutorials and roadmaps are written before phase 7, and weekly sets before phase 5.
+
+### What changed from the first build order, and why
+
+- **The foundation is split in two.** The runner and driver generators are the biggest unknown, and almost every feature depends on them, so they get their own phase and are proven on one problem before the rest is built.
+- **Every phase has a check that marks it done,** so it's clear when a phase is finished.
+- **Content is its own track.** It's too much writing to fit inside the feature phases.
+- **Daily and weekly challenges move before Territory.** They reuse the solve view and progression engine, need no other players online, and bring people back every day; Territory is the most expensive feature and suffers most from empty queues.
+- **A private alpha follows 1v1,** so problems with the runner and judging are found early, not only in the closed beta.
+- **The runner load test moves to 1v1,** when many people first submit code at the same moment.
+- **Unchanged:** the cut order if time runs short (ninjathons, then weekly challenges, then courses beyond the first roadmap), and never cutting judging quality.

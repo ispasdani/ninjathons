@@ -417,18 +417,87 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <figure class="dia"><svg viewBox="0 0 760 552" role="img" aria-label="After V1: coaching first, then creators, then organizations" font-size="13" font-family="inherit"><text x="24" y="32" font-size="15" font-weight="600" fill="var(--ink)">After V1: coaching first, then creators, then organizations</text><line x1="48" y1="76" x2="48" y2="460" stroke="var(--axis)" stroke-width="1.25"/><circle cx="48" cy="76" r="5" fill="var(--accent)"/><rect x="80" y="56" width="656" height="56" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"/><text x="96" y="80" font-size="15" font-weight="600" fill="var(--ink)">V1 launch</text><text x="720" y="80" text-anchor="end" font-size="11.5" fill="var(--muted)">this plan</text><text x="96" y="100" fill="var(--ink)">Learn, Compete, Challenges, Ninjathons, Progression, Profiles, Pro</text><circle cx="48" cy="148" r="5" fill="var(--axis)"/><rect x="80" y="128" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="152" font-size="15" font-weight="600" fill="var(--ink)">V1.1</text><text x="720" y="152" text-anchor="end" font-size="11.5" fill="var(--muted)">3 to 6 weeks after launch</text><text x="96" y="172" fill="var(--ink)">AI coach: a few free hints a day, unlimited with Pro</text><text x="96" y="188" fill="var(--ink)">Weekly contests (live, 90 minutes) with a contest rating</text><text x="96" y="204" fill="var(--ink)">Match replays and analytics (Pro), twist modes, more doc sets</text><circle cx="48" cy="252" r="5" fill="var(--axis)"/><rect x="80" y="232" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="256" font-size="15" font-weight="600" fill="var(--ink)">V1.2</text><text x="720" y="256" text-anchor="end" font-size="11.5" fill="var(--muted)">after V1.1</text><text x="96" y="276" fill="var(--ink)">Pro users create private ninjathons and problems (beta review)</text><text x="96" y="292" fill="var(--ink)">More roadmaps and courses, leaderboard seasons</text><text x="96" y="308" fill="var(--ink)">Custom Territory maps (Pro)</text><circle cx="48" cy="356" r="5" fill="var(--axis)"/><rect x="80" y="336" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="360" font-size="15" font-weight="600" fill="var(--ink)">V2</text><text x="720" y="360" text-anchor="end" font-size="11.5" fill="var(--muted)">once the community is active</text><text x="96" y="380" fill="var(--ink)">Organization plan: public branded ninjathons, hiring challenges, classes</text><text x="96" y="396" fill="var(--ink)">Battle royale: 8 to 20 players, eliminations</text><text x="96" y="412" fill="var(--ink)">World Conquest: a season-long mode on a stylized hex world</text><circle cx="48" cy="460" r="5" fill="var(--axis)"/><rect x="80" y="440" width="656" height="88" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"/><text x="96" y="464" font-size="15" font-weight="600" fill="var(--ink)">Later</text><text x="720" y="464" text-anchor="end" font-size="11.5" fill="var(--muted)">saved in the V2 notes</text><text x="96" y="484" fill="var(--ink)">Desktop app with full browsing in the research panel</text><text x="96" y="500" fill="var(--ink)">Offline lite version: practice only, JavaScript and Python, free</text><text x="96" y="516" fill="var(--ink)">Free roam: build terminal apps and websites in the browser</text></svg><figcaption>Release roadmap · V1 to later</figcaption></figure>
 <p>V1.1 adds what people pay for next (the coach) and a live weekly event; V1.2 opens creation to Pro users; V2 brings the business side and the big multiplayer modes.</p>
 <h2>Build order</h2>
-<p>Build the foundation and the progression engine first, because every later feature writes XP, badges and points into it.</p>
-<ol>
-<li><strong>Foundation:</strong> auth, the Convex guardrail wrappers, the sandboxed runner, the solve view, the starter-code and driver generators for function-mode problems, the problem library with the first 150 to 200 problems, username onboarding.</li>
-<li><strong>Progression engine:</strong> the XP ledger, levels and titles, the badge rules, ratings per area, leaderboard snapshots and scopes, groups.</li>
-<li><strong>1v1:</strong> matchmaking, ranked and unranked challenges with their limits, ghost races, share cards, challenge links.</li>
-<li><strong>Territory:</strong> lobby, map, claim and attack rules, OpenSkill rating, group lobbies.</li>
-<li><strong>Daily and weekly challenges:</strong> automatic daily pick, weekly sets, streaks and freezes, their leaderboards.</li>
-<li><strong>Learn:</strong> tutorials, roadmaps and courses with progress, the docs library for Python and MDN.</li>
-<li><strong>Profiles and Pro:</strong> default and custom profiles, themes, Stripe checkout, the entitlements webhook, Pro checks on every paid function.</li>
-<li><strong>Ninjathons:</strong> the admin page, team registration, submissions, judging, results.</li>
-<li><strong>Launch readiness:</strong> marketing and SEO pages, anti-cheat signals, runner load test, a closed beta with 2 or 3 office teams plus 20 to 50 individual players.</li>
-</ol>
+<p>Build the judging core first, then the foundation and the progression engine, because every later feature runs code through the runner and writes XP, badges and points into the engine. Each phase ends with a check that must pass before the next one starts. Revised 3 Oct 2026 (see <code>notes/decisions.md</code>).</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Phase</th>
+<th>What it builds</th>
+<th>Done when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Setup ✅</td>
+<td>Auth, the Convex guardrail wrappers, schema, tests and CI, brand</td>
+<td>Done 3 Oct 2026</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Judging core</td>
+<td>The problem file format and its schema, the function-mode driver generator, <code>runCode</code> on Vercel Sandbox, <code>problems:check</code> and <code>problems:seed</code>, a basic solve view</td>
+<td>Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 seconds; <code>problems:check</code> runs in CI</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Foundation</td>
+<td>All 9 languages, stdio mode, username onboarding, the designed problem library and solve view</td>
+<td>A new user signs up, picks a username and solves any of about 30 problems in any language</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Progression engine</td>
+<td>The XP ledger, levels and titles, the badge rules, ratings per area, leaderboard snapshots and scopes, groups</td>
+<td>Solves award XP and badges, and leaderboards update</td>
+</tr>
+<tr>
+<td>4</td>
+<td>1v1 and private alpha</td>
+<td>Matchmaking, ranked and unranked challenges with their limits, ghost races, share cards, challenge links, runner load test</td>
+<td>The runner holds the load test, and 10 to 20 friends play real matches</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Daily and weekly challenges</td>
+<td>Automatic daily pick, weekly sets, streaks and freezes, their leaderboards</td>
+<td>Daily challenges run unattended, and 6 weekly sets are written</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Territory</td>
+<td>Lobby, map, claim and attack rules, OpenSkill rating, group lobbies</td>
+<td>Group lobbies of 3 to 6 players finish full games</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Learn</td>
+<td>Tutorials, roadmaps and courses with progress, the docs library for Python and MDN</td>
+<td>3 roadmaps and about 20 tutorials are live</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Profiles and Pro</td>
+<td>Default and custom profiles, themes, Stripe checkout, the entitlements webhook, Pro checks on every paid function</td>
+<td>A test for every Pro function calls it as a free user and is refused</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Ninjathons</td>
+<td>The admin page, team registration, submissions, judging, results</td>
+<td>One event runs from creation to its results page (first to cut)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Closed beta and launch</td>
+<td>Marketing and SEO pages, anti-cheat signals, a closed beta with 2 or 3 office teams plus 20 to 50 individual players</td>
+<td>Beta issues fixed; launch</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Content track</strong>, alongside the build from phase 2: problems grow from about 30 to 150–200 by phase 10. Tutorials and roadmaps are written before phase 7, and weekly sets before phase 5.</p>
+<p><strong>What changed from the first build order:</strong> the foundation is split into the judging core and the rest; every phase has a check that marks it done; content is its own track; daily and weekly challenges come before Territory because they are cheaper and need no other players online; a private alpha follows 1v1 instead of waiting for the closed beta; and the runner load test moves from launch readiness to 1v1.</p>
 <h2>Risks and open decisions</h2>
 <p>The biggest risk is scope: this V1 is about twice the lean cut, so the quality bar has to hold even if a feature slips.</p>
 <table>
@@ -453,7 +522,7 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <tr>
 <td>Cold start</td>
 <td>Empty queues, especially for Territory's 3 players</td>
-<td>Ghost races for 1v1; groups and challenge links for Territory; office teams in the closed beta</td>
+<td>Ghost races for 1v1; a private alpha with friends after 1v1; groups and challenge links for Territory; office teams in the closed beta</td>
 </tr>
 <tr>
 <td>Rating boosting</td>
@@ -483,10 +552,11 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <li class="task"><input type="checkbox" checked disabled> Docs in ranked 1v1: official language references only; no-docs play is a separate Hard mode.</li>
 <li class="task"><input type="checkbox" checked disabled> Pro price: about €8/month or €69/year, regional prices, early-bird pricing kept when it rises with V1.1.</li>
 <li class="task"><input type="checkbox" checked disabled> World Conquest and Battle royale: keep both; choose the order in V2 by how many players are online at once.</li>
+<li class="task"><input type="checkbox" checked disabled> Build plan: 11 phases (0 to 10), each with a check that marks it done; the judging core comes first, daily and weekly challenges move before Territory, a private alpha follows 1v1, and content is its own track.</li>
 </ul>
 <p><strong>Open decisions</strong></p>
 <p>None right now.</p>
-<p class="src">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/code/artifact/aa4c2464-5f6a-4532-9ed8-52ba30bf159d<br>Edited 3 Oct 2026 for the decisions in <code>notes/decisions.md</code>, also applied to the live version.</p>
+<p class="src">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/code/artifact/aa4c2464-5f6a-4532-9ed8-52ba30bf159d<br>Edited 3 Oct 2026 for the decisions in <code>notes/decisions.md</code> and the phased build order, also applied to the live version.</p>
 </main>
 </body>
 </html>
