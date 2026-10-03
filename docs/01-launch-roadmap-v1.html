@@ -419,7 +419,7 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <h2>Build order</h2>
 <p>Build the foundation and the progression engine first, because every later feature writes XP, badges and points into it.</p>
 <ol>
-<li><strong>Foundation:</strong> auth, the Convex guardrail wrappers, the sandboxed runner, the solve view, the problem library with the first 150 to 200 problems.</li>
+<li><strong>Foundation:</strong> auth, the Convex guardrail wrappers, the sandboxed runner, the solve view, the starter-code and driver generators for function-mode problems, the problem library with the first 150 to 200 problems, username onboarding.</li>
 <li><strong>Progression engine:</strong> the XP ledger, levels and titles, the badge rules, ratings per area, leaderboard snapshots and scopes, groups.</li>
 <li><strong>1v1:</strong> matchmaking, ranked and unranked challenges with their limits, ghost races, share cards, challenge links.</li>
 <li><strong>Territory:</strong> lobby, map, claim and attack rules, OpenSkill rating, group lobbies.</li>
@@ -472,15 +472,20 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 </tr>
 </tbody>
 </table>
+<p><strong>Decided</strong> (3 Oct 2026, details in <code>notes/decisions.md</code>)</p>
+<ul>
+<li class="task"><input type="checkbox" checked disabled> Usernames: our own, unique and chosen by each user in onboarding, stored in Convex (not Clerk).</li>
+<li class="task"><input type="checkbox" checked disabled> Payments: Stripe directly, not Clerk Billing. Stripe Tax or a merchant of record is still to choose.</li>
+<li class="task"><input type="checkbox" checked disabled> Judging model: a hybrid. Each problem is either function mode (fill in a generated signature) or full-program stdin/stdout mode. A "write the whole program" toggle on function problems comes after V1.</li>
+</ul>
 <p><strong>Open decisions</strong></p>
 <ul>
 <li class="task"><input type="checkbox" disabled> Brand name ("duelcode" is a placeholder), which also names the XP titles.</li>
 <li class="task"><input type="checkbox" disabled> Docs in ranked 1v1: official docs, or none?</li>
-<li class="task"><input type="checkbox" disabled> Judging model: stdin/stdout only, or function signatures from day one?</li>
 <li class="task"><input type="checkbox" disabled> Pro price and whether there is a yearly plan at launch.</li>
 <li class="task"><input type="checkbox" disabled> World Conquest next to Battle royale (recommended) or instead of it.</li>
 </ul>
-<p class="src">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/code/artifact/aa4c2464-5f6a-4532-9ed8-52ba30bf159d</p>
+<p class="src">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/code/artifact/aa4c2464-5f6a-4532-9ed8-52ba30bf159d<br>Edited 3 Oct 2026 for the decisions in <code>notes/decisions.md</code>; the live version doesn't have these edits yet.</p>
 </main>
 </body>
 </html>

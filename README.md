@@ -2,7 +2,9 @@
 
 Competitive coding platform: practice, live 1v1 and Territory matches, challenges and ninjathons. Plans and design live in [`docs/`](docs/README.md).
 
-Stack: Next.js 16 · Clerk · Convex · Tailwind v4 + shadcn/ui · Judge0 runner (planned).
+Stack: Next.js 16 · Clerk · Convex · Tailwind v4 + shadcn/ui · Judge0 runner (planned) · Stripe (planned).
+
+Decisions made since the planning docs (usernames, Stripe, judging modes) are in [`docs/notes/decisions.md`](docs/notes/decisions.md).
 
 ## Run locally
 

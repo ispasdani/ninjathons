@@ -88,6 +88,7 @@ pre code{background:none;padding:0;font-size:inherit}
   <li><strong>Function signature</strong> (LeetCode style): the user fills in <code>twoSum(nums, target)</code>. This is nicer for users, but you need a generated test harness for every language on every problem.</li>
 </ul>
 <p>My recommendation is to start with stdin/stdout, store test cases as language-agnostic JSON, and add function-signature problems later with a harness generator.</p>
+<p><strong>Decided 3 Oct 2026:</strong> both modes from V1. Each problem is either function mode (generated starter code and driver) or full-program stdin/stdout mode. See <code>notes/decisions.md</code>.</p>
 <p><strong>Sandbox.</strong> Judge0 self-hosted is the fastest path, since it supports dozens of languages. Run it on its own VM, separate from everything else. The non-negotiables:</p>
 <ul>
   <li>No network access</li>
@@ -390,7 +391,7 @@ Convex mutation → updates submission → UI updates live for both players</cod
   <h2>Decisions to make</h2>
   <ul>
     <li>Duels: official docs allowed, or no docs at all?</li>
-    <li>Judging model: stdin/stdout only for the MVP, or function signatures from day one?</li>
+    <li><s>Judging model: stdin/stdout only for the MVP, or function signatures from day one?</s> Decided: both, chosen per problem (<code>notes/decisions.md</code>).</li>
     <li>First release: 1v1 race only, or 1v1 plus Territory?</li>
     <li>World Conquest: add it as a separate season mode next to Battle royale (recommended), or replace Battle royale?</li>
     <li>Brand name: "duelcode" in the mockups is a placeholder.</li>
@@ -398,6 +399,6 @@ Convex mutation → updates submission → UI updates live for both players</cod
 </section>
 </article>
 
-<p style="max-width:1080px;margin:40px auto 0;font-size:13px;color:#737373;font-family:system-ui,sans-serif">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/artifact/AqZbz5eWiSJym6Qpb1Ueio</p>
+<p style="max-width:1080px;margin:40px auto 0;font-size:13px;color:#737373;font-family:system-ui,sans-serif">Offline copy exported 27 Sept 2026. Live version: https://claude.ai/artifact/AqZbz5eWiSJym6Qpb1Ueio<br>Edited 3 Oct 2026 for the decisions in <code>notes/decisions.md</code>; the live version doesn't have these edits yet.</p>
 </body>
 </html>
