@@ -7,6 +7,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Usernames are our own, unique and chosen by each user | [1](#1-usernames) |
 | 3 Oct 2026 | Payments use Stripe directly, not Clerk Billing | [2](#2-payments-stripe) |
 | 3 Oct 2026 | Judging is a hybrid: each problem is either function mode or full-program (stdio) mode | [3](#3-judging-model-hybrid) |
+| 3 Oct 2026 | Account deletion: 14-day grace period, then a batched hard delete; shared records are anonymized | [4](#4-deleting-data) |
 
 ---
 
@@ -19,7 +20,7 @@ Every user picks a unique username. It lives in Convex, not Clerk. Clerk only ha
 - **Rules.** 3 to 20 characters, `a-z`, `0-9`, `_` and `-`, starting with a letter.
 - **Reserved names.** Route and system words (`admin`, `api`, `dashboard`, `settings`, `u`, `support`, `help`, `login`, `signup`…) and the brand name are blocked.
 - **When it's chosen.** In an onboarding step right after sign-up, before the first match. Until then the user can't be challenged by name.
-- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for a while (or redirects), so nobody can grab a well-known player's old name right after they change it.
+- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for 90 days (and redirects to the new one), so nobody can grab a well-known player's old name right after they change it. The same 90 days apply to the username of a deleted account.
 
 ## 2. Payments: Stripe
 
@@ -66,3 +67,70 @@ Each problem has a **judge mode**. Function mode is easier to start with, and fu
 - **"Write the whole program" toggle on function problems.** Advanced users could switch any function problem to full-program mode. This works once the generators use a simple, documented stdin format for each signature (for example `n` on one line, then the values), which the statement can show when the toggle is on. Ranked duels would keep the problem's own mode, so the toggle only applies to practice. XP and solve status count the same either way.
 - **Custom checkers** for problems with many valid answers (a checker program stored with the hidden tests).
 - **`ListNode` and `TreeNode` types** in signatures.
+
+## 4. Deleting data
+
+Two kinds of deletion: **hard delete** removes the row; **soft delete** keeps it, marked with `deletedAt` or a `status`, and every query filters it out.
+
+The rule: **soft-delete when other rows point to it or an undo makes sense; hard-delete when the data is purely personal or the law says it must go.** For account deletion under GDPR, soft delete is only a grace period, never the end state: hidden-but-stored is not erasure.
+
+### Account deletion
+
+| Phase | What happens |
+|---|---|
+| **1. Grace period (soft), 14 days** | The user clicks "Delete account" in settings. Mark `users.deletedAt`, hide the public profile and leaderboard rows, remove them from the match queue, cancel pending challenges, forfeit a live match (opponent wins, no rating change). Signing in during the 14 days offers "Restore account". |
+| **2. Hard delete** | Cancel the Stripe subscription, delete email and analytics contacts, run the batched cascade below (one table at a time, about 500 rows per scheduled run, rescheduling until done), delete stored files, delete the Clerk account, then delete the `users` row last. Keep a `deletedUsers` record with a hashed Clerk id and the date, so late webhook retries and audits see the deletion finished. |
+
+Deletion starts **in our app**, so a restore is possible. If Clerk deletes the user first (for example from the Clerk dashboard), its `user.deleted` webhook skips the grace period and goes straight to phase 2.
+
+### What happens to each kind of data
+
+Most of these tables don't exist yet. **Every new table gets a row here when it is created.**
+
+| Data | Tables | On account deletion |
+|---|---|---|
+| Account and profile | `users`, `profiles`, `notificationPrefs`, `notifications` | Delete (`users` last) |
+| Username | `users.username` | Delete, and reserve the name for 90 days |
+| Uploaded and generated files | avatars, banners, share cards in Convex storage | Delete each storage id |
+| Practice | `submissions`, `drafts`, `docViews`, `integritySignals` | Delete |
+| Learning progress | `lessonProgress`, `roadmapProgress` | Delete |
+| Progression | `xpLedger`, `userBadges`, `streaks`, `ratings`, `ratingHistory`, `dailyResults`, `weeklyResults` | Delete |
+| Leaderboards | `leaderboardSnapshots` | Remove their rows (also gone on the next rebuild) |
+| Queue and invites | `matchQueue`, `challenges` | Delete in phase 1 |
+| Finished matches | `matches`, `matchEvents` | **Anonymize** ("Deleted player"): opponents keep their games and rating changes. Their code in those matches is deleted with `submissions` |
+| Anti-cheat cases | `similarityFlags` | **Anonymize**: the opponent's case stays, the code is gone |
+| Social | `follows` (both directions), `groupMembers` | Delete |
+| Groups they own | `groups` | Transfer to the oldest member; delete if empty |
+| Ninjathons | `registrations`, `teamMembers`, `ninjathonSubmissions`, `results` | Delete the registration before the event starts; afterwards remove them from the team, keep the team's project if it has other members, and anonymize placements and Hall of fame |
+| Plan | `entitlements` | Delete |
+| Stripe | subscription, invoices | Cancel the subscription. **Keep** invoices and the Stripe customer, unlinked from the account: tax law requires keeping invoices for years |
+| Aggregates | solve counts and acceptance rates on `problems`, badge rarity | **Keep**: plain counts, nothing personal |
+| Later (V1.2+) | problems they created, discussion comments, private ninjathons they organized | Problems anonymized ("Deleted user"); comment text replaced with "[deleted]"; ninjathons transferred or cancelled (asked at deletion time) |
+| Later, if they were banned | ban record | Keep only a hash of the email, to stop ban evasion; disclosed in the privacy policy |
+
+### Everyday deletions (not account deletion)
+
+| Data | Treatment |
+|---|---|
+| `problems` | Soft: `status: "retired"`. Hidden from the library and duel pool, still readable in old results |
+| `lessons`, `courses`, `roadmaps` | Soft: `status: "archived"` |
+| Badge definitions | Soft: `retired: true`. People keep badges they earned |
+| `matches` | Never deleted. `status` covers cancelled and forfeited |
+| Ninjathon `events` | Soft: `status: "cancelled"` |
+| `groups` | Soft: `deletedAt`, the owner can restore it for 30 days, then hard delete |
+| Comments (V1.2) | Soft: text replaced with "[deleted]", replies stay |
+| Usernames given up | A row in `usernameReservations` that expires after 90 days |
+| `drafts`, `follows`, `matchQueue` | Hard delete when cleared, unfollowed or matched |
+| `challenges` | Marked `expired` or `declined`, hard delete after 7 days |
+| `notifications` | Hard delete after 90 days, or when the user clears them |
+| `docViews`, `integritySignals` | Hard delete after 90 days |
+| Replaced avatars, banners, old share cards | Hard delete when replaced |
+| `submissions`, `xpLedger`, `ratings`, `streaks`, progress | Never deleted one by one; only with the account, so nobody can game levels by deleting history |
+
+### Guarding soft-deleted rows
+
+A soft-deleted row is still in the table, so a query that forgets the filter leaks it.
+
+- Put `status` or `deletedAt` in the indexes (for example `problems.by_status`), so queries filter through the index instead of scanning.
+- Read through shared helpers in `convex/lib` (`getActiveProblem`, `getActiveUser`…) so the filter is written once.
+- Each public query gets a test that a soft-deleted row doesn't come back.
