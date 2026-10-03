@@ -62,6 +62,20 @@ async function requirePro(ctx: Ctx) {
  */
 export const publicQuery = query;
 
+/**
+ * Signed in with Clerk, whether or not the users row exists yet. Adds
+ * `ctx.identity`. Only for creating that row (user.ensureUser); everything
+ * else uses userQuery / userMutation.
+ */
+export const identityMutation = customMutation(
+  mutation,
+  customCtx(async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError("UNAUTHENTICATED");
+    return { identity };
+  }),
+);
+
 /** Signed-in users only. Adds `ctx.user`. */
 export const userQuery = customQuery(
   query,

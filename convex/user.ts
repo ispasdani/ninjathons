@@ -1,7 +1,12 @@
 import { v } from "convex/values";
 
 import { internalMutation } from "./_generated/server";
-import { getCurrentUserOrNull, getPlan, publicQuery } from "./lib/functions";
+import {
+  getCurrentUserOrNull,
+  getPlan,
+  identityMutation,
+  publicQuery,
+} from "./lib/functions";
 
 /**
  * The caller's own user row and plan tier, or null when signed out or before
@@ -15,6 +20,43 @@ export const getCurrentUser = publicQuery({
     if (!user) return null;
     const { tier } = await getPlan(ctx, user);
     return { ...user, tier };
+  },
+});
+
+/**
+ * Creates the caller's users row from their Clerk token if the webhook hasn't
+ * yet (slow or failed delivery, or local dev where Clerk can't reach the
+ * webhook). Called by the app right after sign-in. It never updates an
+ * existing row: the webhook stays the sync path and patches in Clerk's full
+ * data when it arrives. The lookup and insert run in one transaction, so it
+ * can't race the webhook into a duplicate row.
+ */
+export const ensureUser = identityMutation({
+  args: {},
+  handler: async (ctx) => {
+    const { identity } = ctx;
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (existing) return existing._id;
+
+    // The token may carry fewer fields than the webhook, so fall back the
+    // same way toUserFields in http.ts does.
+    const email = identity.email ?? "";
+    const name =
+      identity.name ||
+      [identity.givenName, identity.familyName].filter(Boolean).join(" ") ||
+      identity.nickname ||
+      email.split("@")[0] ||
+      "Player";
+
+    return await ctx.db.insert("users", {
+      clerkId: identity.subject,
+      email,
+      name,
+      imageUrl: identity.pictureUrl ?? "",
+    });
   },
 });
 

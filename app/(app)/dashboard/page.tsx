@@ -11,7 +11,8 @@ export default function DashboardPage() {
     return <p className="text-[13px] text-muted-foreground">Loading…</p>;
   }
 
-  // Signed in with Clerk, but the webhook hasn't created the Convex row yet.
+  // Signed in with Clerk, but EnsureUser (or the webhook) hasn't created the
+  // Convex row yet. Normally lasts a moment.
   if (user === null) {
     return (
       <p className="text-[13px] text-muted-foreground">

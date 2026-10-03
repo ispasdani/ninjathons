@@ -14,6 +14,15 @@ const eslintConfig = defineConfig([
       "no-restricted-imports": [
         "error",
         {
+          // The same public builders, untyped, under other names.
+          paths: [
+            {
+              name: "convex/server",
+              importNames: ["queryGeneric", "mutationGeneric", "actionGeneric"],
+              message:
+                "Use publicQuery, userQuery, userMutation, proQuery or proMutation from convex/lib/functions.ts. For actions, call an internal query that runs the same check first.",
+            },
+          ],
           patterns: [
             {
               group: ["**/_generated/server"],
