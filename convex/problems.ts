@@ -11,6 +11,17 @@ import {
   language,
 } from "./schemas/problems";
 
+/** Published problems for the list on the dashboard. The full library page comes in phase 2. */
+export const list = publicQuery({
+  args: {},
+  handler: async (ctx) => {
+    const rows = await ctx.db.query("problems").take(200);
+    return rows
+      .filter((p) => p.status !== "draft")
+      .map((p) => ({ slug: p.slug, title: p.title, difficulty: p.difficulty }));
+  },
+});
+
 /**
  * A published problem for its solve page, with starter code per language.
  * Hidden tests live in problemTests and are never returned.

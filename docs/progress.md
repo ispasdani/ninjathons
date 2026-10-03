@@ -20,7 +20,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 1 of 150–200 problems (two-sum), 0 of ~20 tutorials, 0 of 3 roadmaps, 0 of 6 weekly sets.
+Content track: 2 of 150–200 problems (two-sum, add-two-integers), 0 of ~20 tutorials, 0 of 3 roadmaps, 0 of 6 weekly sets.
 
 ## Log
 
@@ -35,6 +35,7 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 - 54 tests: drivers round-trip every signature type in both languages; the full submit flow runs in Convex tests against the local runner.
 - Vercel project `ninjathons` linked (no deployment yet); token, team and project IDs set in Convex dev.
 - Real sandbox runs on Two Sum, both languages, all verdict kinds correct: Run 1.2 s, Submit 2.1–2.7 s. Got there by saving the verdict before stopping the sandbox, gzipping the job and using iad1 (details in decisions §5).
+- Warm-up problem `add-two-integers` (its wrong solution overflows 32-bit ints) and a problem list on the dashboard linking to `/solve/<slug>`.
 - Open: the solve view hasn't been checked in a browser (needs sign-in); CI hasn't run on the branch yet; memory limits aren't enforced (only the sandbox's own 4 GB).
 
 ### 3 Oct 2026 · Phase 0
