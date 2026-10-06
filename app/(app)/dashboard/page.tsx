@@ -29,6 +29,7 @@ export default function DashboardPage() {
         Dashboard
       </p>
       <h1 className="mt-2 text-3xl sm:text-4xl">Welcome, {user.name}</h1>
+      {user.username && <p className="mt-1 font-mono text-[13px] text-muted-foreground">@{user.username}</p>}
       <p className="mt-2 text-[13px] text-muted-foreground">
         Plan: <span className="font-mono">{user.tier}</span>
       </p>

@@ -28,6 +28,7 @@ import type * as judge_vercelRunner from "../judge/vercelRunner.js";
 import type * as judge_wire from "../judge/wire.js";
 import type * as judging from "../judging.js";
 import type * as lib_functions from "../lib/functions.js";
+import type * as lib_usernames from "../lib/usernames.js";
 import type * as lib_xp from "../lib/xp.js";
 import type * as problems from "../problems.js";
 import type * as schemas_problems from "../schemas/problems.js";
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   "judge/wire": typeof judge_wire;
   judging: typeof judging;
   "lib/functions": typeof lib_functions;
+  "lib/usernames": typeof lib_usernames;
   "lib/xp": typeof lib_xp;
   problems: typeof problems;
   "schemas/problems": typeof schemas_problems;

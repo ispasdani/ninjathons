@@ -26,6 +26,13 @@ Content track: 2 of 150–200 problems (two-sum, add-two-integers), 0 of ~20 tut
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 6 Oct 2026 · Phase 2: username onboarding
+- Usernames (decisions §1): rules in `convex/lib/usernames.ts`, shared by the server and the form; `user.setUsername` checks uniqueness on the lowercased key in the same transaction; `user.checkUsername` for the form as you type.
+- `usernameReservations`: a changed username is held 90 days for its owner only, and a deleted account's for 90 days; changes wait 30 days (the first pick and letter-case changes don't).
+- `/onboarding` page; signed-in users without a username are sent there from any app page, then back. The dashboard shows @username.
+- 30 tests for the rules, uniqueness, cooldown and reservations.
+- Open: redirects from an old username wait for profile pages (`/u/[username]`).
+
 ### 6 Oct 2026 · Phase 2: faster verdicts
 - JavaScript, TypeScript and Python run on Vercel's managed image again (same Node.js 24 and Python 3.14): Run 1.0–1.2 s, Submit 2.2–3.3 s on Two Sum in the real sandbox.
 - Runner image slimmed from 3.2 to 2.45 GB (only Roslyn from the .NET SDK, no ASP.NET, jlink modules or docs). Its sandboxes still take 1.2–1.9 s to start, so size isn't the cause; Vercel caches its managed images on every machine.

@@ -1,12 +1,22 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
-import { internalMutation } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { internalMutation, type QueryCtx } from "./_generated/server";
 import {
   getCurrentUserOrNull,
   getPlan,
   identityMutation,
   publicQuery,
+  userMutation,
+  userQuery,
 } from "./lib/functions";
+import {
+  checkUsernameRules,
+  USERNAME_COOLDOWN_MS,
+  USERNAME_RESERVED_MS,
+  usernameKey,
+  type UsernameProblem,
+} from "./lib/usernames";
 
 /**
  * The caller's own user row and plan tier, or null when signed out or before
@@ -60,6 +70,84 @@ export const ensureUser = identityMutation({
   },
 });
 
+// --- Usernames (docs/notes/decisions.md §1) ---
+
+type UsernameRefusal = UsernameProblem | "taken" | "cooldown";
+
+/** Why `user` can't have `username`, or null when they can. */
+async function usernameRefusal(ctx: QueryCtx, user: Doc<"users">, username: string): Promise<UsernameRefusal | null> {
+  const rules = checkUsernameRules(username);
+  if (rules) return rules;
+  const key = usernameKey(username);
+  const holder = await ctx.db
+    .query("users")
+    .withIndex("by_usernameKey", (q) => q.eq("usernameKey", key))
+    .first();
+  if (holder && holder._id !== user._id) return "taken";
+  const now = Date.now();
+  const reservations = await ctx.db
+    .query("usernameReservations")
+    .withIndex("by_usernameKey", (q) => q.eq("usernameKey", key))
+    .collect();
+  // Reserved for someone else: an account that changed away from it, or a deleted one.
+  if (reservations.some((r) => r.expiresAt > now && r.userId !== user._id)) return "taken";
+  // A real change (not a first pick, not only different letter case) waits for the cooldown.
+  const changing = user.usernameKey !== undefined && user.usernameKey !== key;
+  if (changing && user.usernameChangedAt !== undefined && now - user.usernameChangedAt < USERNAME_COOLDOWN_MS) {
+    return "cooldown";
+  }
+  return null;
+}
+
+/** Whether the caller may take `username`: for the onboarding form, as the user types. */
+export const checkUsername = userQuery({
+  args: { username: v.string() },
+  handler: async (ctx, { username }) => {
+    const refusal = await usernameRefusal(ctx, ctx.user, username);
+    return refusal ? { ok: false as const, refusal } : { ok: true as const };
+  },
+});
+
+/**
+ * Sets or changes the caller's username. The uniqueness check and the write
+ * happen in this one transaction, so two people can't both get a name.
+ * Throws ConvexError("USERNAME_<REASON>"), e.g. USERNAME_TAKEN. A change
+ * reserves the old name for 90 days (only this user may take it back) and
+ * starts the 30-day cooldown; the first pick and letter-case changes don't.
+ */
+export const setUsername = userMutation({
+  args: { username: v.string() },
+  handler: async (ctx, { username }) => {
+    const { user } = ctx;
+    const refusal = await usernameRefusal(ctx, user, username);
+    if (refusal) throw new ConvexError(`USERNAME_${refusal.toUpperCase()}`);
+    if (user.username === username) return;
+
+    const key = usernameKey(username);
+    const now = Date.now();
+    const changing = user.usernameKey !== undefined && user.usernameKey !== key;
+    if (changing) {
+      await ctx.db.insert("usernameReservations", {
+        usernameKey: user.usernameKey!,
+        userId: user._id,
+        expiresAt: now + USERNAME_RESERVED_MS,
+      });
+    }
+    // Taking back a name this user reserved earlier releases the reservation.
+    const own = await ctx.db
+      .query("usernameReservations")
+      .withIndex("by_usernameKey", (q) => q.eq("usernameKey", key))
+      .collect();
+    for (const r of own) if (r.userId === user._id) await ctx.db.delete(r._id);
+
+    await ctx.db.patch(user._id, {
+      username,
+      usernameKey: key,
+      ...(changing ? { usernameChangedAt: now } : {}),
+    });
+  },
+});
+
 // Called by the Clerk webhook for user.created and user.updated. Clerk retries
 // deliveries, so this has to be safe to run more than once.
 export const upsertFromClerk = internalMutation({
@@ -106,6 +194,14 @@ export const deleteFromClerk = internalMutation({
       .withIndex("by_user_key", (q) => q.eq("userId", user._id))
       .collect();
     for (const entry of xp) await ctx.db.delete(entry._id);
+
+    // The name stays reserved for 90 days after the account is gone.
+    if (user.usernameKey) {
+      await ctx.db.insert("usernameReservations", {
+        usernameKey: user.usernameKey,
+        expiresAt: Date.now() + USERNAME_RESERVED_MS,
+      });
+    }
 
     await ctx.db.delete(user._id);
   },

@@ -32,3 +32,14 @@ export const entitlements = defineTable({
   tier: v.union(v.literal("free"), v.literal("pro"), v.literal("organization")),
   expiresAt: v.number(),
 }).index("by_user", ["userId"]);
+
+// Usernames given up by a change or a deleted account, held for 90 days so
+// nobody can take a known player's old name right away (decisions §1, §4).
+// Expired rows are ignored by the checks.
+export const usernameReservations = defineTable({
+  usernameKey: v.string(),
+  // The account that changed away from it may take it back. Absent when the
+  // account was deleted.
+  userId: v.optional(v.id("users")),
+  expiresAt: v.number(),
+}).index("by_usernameKey", ["usernameKey"]);
