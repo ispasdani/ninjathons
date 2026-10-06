@@ -76,22 +76,6 @@ jobs:
             ${{ github.ref == 'refs/heads/main' && format('{0}:latest', env.IMAGE) || '' }}
           outputs: type=image,push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true
 
-      # TEMPORARY: why VCR refuses the push. Prints no secrets.
-      - name: Diagnose VCR access
-        if: failure()
-        env:
-          TEAM: ${{ vars.VERCEL_TEAM_ID }}
-          SLUG: ${{ vars.VERCEL_TEAM_SLUG }}
-        # As annotations, which the run page shows without signing in.
-        run: |
-          note() { printf '::warning title=%s::%s\n' "$1" "$(printf '%s' "$2" | head -c 3000 | awk 'BEGIN { ORS = "%0A" } 1')"; }
-          auth=$(jq -r ".auths[\"vcr.vercel.com\"].auth // empty" ~/.docker/config.json | base64 -d)
-          user="${auth%%:*}"; token="${auth#*:}"
-          note "docker user" "$user (team var: $TEAM, slug var: $SLUG)"
-          note "token claims" "$(echo "$token" | cut -d. -f2 | tr "_-" "/+" | base64 -d 2>/dev/null | jq -c "del(.jti)" || echo "not a JWT")"
-          note "tags list" "$(curl -s -u "$auth" "https://vcr.vercel.com/v2/$SLUG/ninjathons/runner/tags/list")"
-          note "repositories" "$(curl -s -H "Authorization: Bearer $token" "https://api.vercel.com/v1/vcr/repository?teamId=$TEAM" | jq -c .)"
-
       # Sandbox can only boot the image once VCR has prepared it.
       - name: Wait until Sandbox can use it
         uses: vercel/vcr-action/wait-for-optimized-image@v1
