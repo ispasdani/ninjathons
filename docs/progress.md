@@ -29,7 +29,7 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 ### 6 Oct 2026 · Phase 2
 - Runner image `runner/Dockerfile` (Ubuntu 26.04): Node.js 24 (also runs TypeScript), Python 3.14, Java 25, .NET 10, GCC 15, Rust 1.99. 3.2 GB. C# compiles with Roslyn directly (`cs-build`) instead of `dotnet build`; `<bits/stdc++.h>` is precompiled.
 - Smoke test `runner/smoke/` builds and runs hello world in all 7 languages. Locally in Docker with 2 CPUs: compile C# 1.2 s, C++ 0.8 s, Java 0.6 s, Rust 0.1 s; every run under 100 ms.
-- Workflow `runner-image.yml`: builds and smoke-tests the image on pull requests, pushes it to Vercel Container Registry from `main`.
+- Workflow `runner-image.yml`: on any push that touches `runner/`, builds and smoke-tests the image and pushes it to Vercel Container Registry as `runner:<sha>`; only `main` moves `latest`.
 - Open: pushing needs a VCR OIDC policy on the Vercel team and the repository variables `VERCEL_TEAM_ID` and `VERCEL_TEAM_SLUG`; not yet timed in Vercel Sandbox.
 
 ### 6 Oct 2026 · Phase 1 done

@@ -1,17 +1,16 @@
 name: Runner image
 
-# Builds runner/Dockerfile. Pull requests only check that it builds; main
-# pushes it to Vercel Container Registry, where Vercel Sandbox boots it
-# (docs/notes/decisions.md §5). Convex picks a tag with SANDBOX_IMAGE.
+# Builds runner/Dockerfile, smoke-tests it, and pushes it to Vercel Container
+# Registry as runner:<commit sha>, where Vercel Sandbox boots it
+# (docs/notes/decisions.md §5). Any branch pushes, so an image can be timed in
+# the sandbox before it is merged; only main moves the `latest` tag. Convex
+# picks a tag with SANDBOX_IMAGE.
 #
 # Needs, once: a VCR OIDC policy on the Vercel team, and the repository
 # variables VERCEL_TEAM_ID (team_...) and VERCEL_TEAM_SLUG.
 
 on:
   push:
-    branches: [main]
-    paths: [runner/**, .github/workflows/runner-image.yml]
-  pull_request:
     paths: [runner/**, .github/workflows/runner-image.yml]
   workflow_dispatch:
 
@@ -54,7 +53,6 @@ jobs:
           docker image ls runner:test --format 'Image size: {{.Size}}' | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Log in to VCR
-        if: github.event_name != 'pull_request'
         uses: vercel/vcr-action/login@v1
         with:
           team: ${{ vars.VERCEL_TEAM_ID }}
@@ -62,7 +60,6 @@ jobs:
       # Same build again (all cached), pushed with the zstd compression VCR
       # recommends for Sandbox images.
       - name: Push
-        if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
           context: runner
@@ -71,9 +68,8 @@ jobs:
           cache-from: type=gha
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
-            ${{ env.IMAGE }}:latest
+            ${{ github.ref == 'refs/heads/main' && format('{0}:latest', env.IMAGE) || '' }}
           outputs: type=image,push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true
 
       - name: Summary
-        if: github.event_name != 'pull_request'
         run: echo "Pushed runner:${GITHUB_SHA}. Set SANDBOX_IMAGE=runner:${GITHUB_SHA} in Convex to use it." >> "$GITHUB_STEP_SUMMARY"
