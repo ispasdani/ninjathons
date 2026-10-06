@@ -33,11 +33,12 @@ export const typescript: LanguageSpec = {
   image: "managed",
   starterCode,
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "ts"),
-  program(judge, source) {
+  outOfMemory: /heap out of memory/,
+  program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;
     return {
       files: { "main.ts": code },
-      run: ["node", "main.ts"],
+      run: ["node", `--max-old-space-size=${memoryMb}`, "main.ts"],
     };
   },
 };

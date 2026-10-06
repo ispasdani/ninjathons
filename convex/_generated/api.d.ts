@@ -18,6 +18,7 @@ import type * as judge_languages_csharp from "../judge/languages/csharp.js";
 import type * as judge_languages_index from "../judge/languages/index.js";
 import type * as judge_languages_java from "../judge/languages/java.js";
 import type * as judge_languages_javascript from "../judge/languages/javascript.js";
+import type * as judge_languages_limits from "../judge/languages/limits.js";
 import type * as judge_languages_python from "../judge/languages/python.js";
 import type * as judge_languages_rust from "../judge/languages/rust.js";
 import type * as judge_languages_types from "../judge/languages/types.js";
@@ -55,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   "judge/languages/index": typeof judge_languages_index;
   "judge/languages/java": typeof judge_languages_java;
   "judge/languages/javascript": typeof judge_languages_javascript;
+  "judge/languages/limits": typeof judge_languages_limits;
   "judge/languages/python": typeof judge_languages_python;
   "judge/languages/rust": typeof judge_languages_rust;
   "judge/languages/types": typeof judge_languages_types;

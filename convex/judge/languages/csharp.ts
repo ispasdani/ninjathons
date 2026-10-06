@@ -155,14 +155,16 @@ export const csharp: LanguageSpec = {
   wire: "tokens",
   starterCode,
   cleanError,
-  program(judge, source) {
+  outOfMemory: /System\.OutOfMemoryException|^Out of memory\./m,
+  program(judge, source, memoryMb) {
     const files: Record<string, string> = { "solution.cs": source, "usings.cs": USINGS };
     if (judge.mode === "function") files["driver.cs"] = driver(judge.signature);
     return {
       files,
       // bin/cs-build in the runner image: Roslyn without MSBuild.
       compile: ["cs-build", ...Object.keys(files)],
-      run: ["dotnet", "solution.dll"],
+      // The GC's hard heap limit, in bytes (hex).
+      run: ["sh", "-c", `DOTNET_GCHeapHardLimit=0x${(memoryMb * 1024 * 1024).toString(16)} exec dotnet solution.dll`],
     };
   },
 };

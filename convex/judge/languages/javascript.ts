@@ -75,11 +75,13 @@ export const javascript: LanguageSpec = {
   image: "managed",
   starterCode,
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "js"),
-  program(judge, source) {
+  // V8's own heap limit: running out prints "JavaScript heap out of memory".
+  outOfMemory: /heap out of memory/,
+  program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;
     return {
       files: { "main.js": code },
-      run: ["node", "main.js"],
+      run: ["node", `--max-old-space-size=${memoryMb}`, "main.js"],
     };
   },
 };

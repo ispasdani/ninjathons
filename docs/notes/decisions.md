@@ -301,6 +301,7 @@ problems/two-sum/
 - **Compiled languages read and write a token format** (`convex/judge/wire.ts`), not JSON, so no driver needs a JSON parser. The judge converts both ways, so tests, checkers and the solve view stay JSON.
 - **LeetCode's shapes:** a `Solution` class in Java, C# and C++ and an `impl Solution` in Rust; C# methods are PascalCase and Rust names snake_case. Java and C# drivers are separate files, so error lines match the editor; C++ and Rust drivers are appended after the user's code. C# gets LeetCode's implicit `using` lines.
 - **Fast compiles:** C# compiles with Roslyn directly (`cs-build`), skipping MSBuild; `<bits/stdc++.h>` is precompiled; Rust compiles with plain `rustc -O`, no cargo or crates. Hello world on 2 CPUs: C# 1.2 s, C++ 0.8 s, Java 0.6 s, Rust 0.1 s.
+- **Memory limits** (`limits.memoryMb`) use each runtime's own cap: V8's heap size (JavaScript, TypeScript), `-Xmx` (Java), the GC hard limit (C#), and `ulimit -v` with headroom for the runtime (Python +128 MB, C++ and Rust +64 MB). The judge recognises each runtime's out-of-memory message and gives Memory limit exceeded (`MLE`), also when Node.js spent the time limit collecting garbage first.
 - **Deep recursion works:** Java and C# run the solution on a thread with a 256 MB stack; C++ and Rust get a 1 GB stack.
 - **Time multipliers:** JavaScript, TypeScript, C++, Rust ×1; Java, C# ×1.5 (start-up and JIT); Python ×2.
 - **Stdio mode:** Java programs are `public class Main`; C# can use top-level statements.

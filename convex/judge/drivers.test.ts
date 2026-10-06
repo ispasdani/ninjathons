@@ -188,6 +188,32 @@ describe.concurrent.each(languages)("%s driver", (language) => {
     expect(out.tests[0].status).toBe("time_limit");
   });
 
+  test("enforces the memory limit, and normal programs fit under it", { timeout: TIMEOUT }, async () => {
+    const hog: Record<Language, string> = {
+      javascript: "const a = []; while (true) a.push(new Array(1e6).fill(value + 0.5));",
+      typescript: "const a: number[][] = []; while (true) a.push(new Array(1e6).fill(value + 0.5));",
+      python: "x = [value] * (500 * 1024 * 1024)\n    return len(x)",
+      java: "long[] a = new long[400_000_000]; return (int) a[value];",
+      csharp: "var a = new long[400_000_000]; return (int)a[value];",
+      cpp: "vector<long long> a(400000000); return (int)a[value];",
+      // black_box, or the compiler removes an all-zero vector it can see through.
+      rust: "let a = std::hint::black_box(vec![0i64; 400_000_000]); a[value as usize] as i32",
+    };
+    const small = { timeMs: 5000, memoryMb: 64 };
+    const judge = echo("int");
+    const tests = [{ input: '{"value": 1}', expected: "1", visible: true }];
+    const over = await judgeSubmission(localRunner, {
+      judge, checker: { kind: "exact" }, limits: small, language,
+      source: solve(language, judge, hog[language]), tests, stopAtFirstFailure: true,
+    });
+    expect(over.status, over.tests[0]?.logs).toBe("memory_limit");
+    const fits = await judgeSubmission(localRunner, {
+      judge, checker: { kind: "exact" }, limits: small, language,
+      source: solve(language, judge, returnValue[language]), tests, stopAtFirstFailure: true,
+    });
+    expect(fits.status, fits.tests[0]?.logs ?? fits.compileOutput).toBe("accepted");
+  });
+
   test("starter code compiles and runs as it is", { timeout: TIMEOUT }, async () => {
     const judge = echo("int[]");
     const out = await run(language, judge, LANGUAGES[language].starterCode(signatureOf(judge)), ['{"value": [1]}']);

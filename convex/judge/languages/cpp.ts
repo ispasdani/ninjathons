@@ -1,3 +1,4 @@
+import { underUlimit } from "./limits";
 import type { LanguageSpec } from "./types";
 import type { Signature, ValueType } from "../types";
 
@@ -133,8 +134,8 @@ function cleanError(stderr: string): string {
 
 // Must match the flags the runner image precompiles <bits/stdc++.h> with.
 const COMPILE = ["g++", "-std=gnu++20", "-O2", "-o", "solution", "solution.cpp"];
-// A 1 GB stack, so deep recursion doesn't crash.
-const RUN = ["sh", "-c", "ulimit -s 1048576 2>/dev/null; exec ./solution"];
+// A 1 GB stack, so deep recursion doesn't crash (the memory limit still applies).
+const STACK_KB = 1048576;
 
 export const cpp: LanguageSpec = {
   id: "cpp",
@@ -145,8 +146,9 @@ export const cpp: LanguageSpec = {
   wire: "tokens",
   starterCode,
   cleanError,
-  program(judge, source) {
+  outOfMemory: /std::bad_alloc/,
+  program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;
-    return { files: { "solution.cpp": code }, compile: COMPILE, run: RUN };
+    return { files: { "solution.cpp": code }, compile: COMPILE, run: underUlimit("./solution", memoryMb, 64, STACK_KB) };
   },
 };

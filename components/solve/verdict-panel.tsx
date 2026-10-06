@@ -6,6 +6,7 @@ const LABELS: Record<VerdictStatus, { short: string; long: string; color: string
   wrong_answer: { short: "WA", long: "Wrong answer", color: "text-verdict-wa bg-verdict-wa/10" },
   runtime_error: { short: "RE", long: "Runtime error", color: "text-verdict-re bg-verdict-re/10" },
   time_limit: { short: "TLE", long: "Time limit exceeded", color: "text-verdict-tle bg-verdict-tle/10" },
+  memory_limit: { short: "MLE", long: "Memory limit exceeded", color: "text-verdict-mle bg-verdict-mle/10" },
   output_limit: { short: "OLE", long: "Output limit exceeded", color: "text-verdict-mle bg-verdict-mle/10" },
   compile_error: { short: "CE", long: "Compile error", color: "text-verdict-ce bg-verdict-ce/10" },
 };

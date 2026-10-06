@@ -1,3 +1,4 @@
+import { underUlimit } from "./limits";
 import { snakeCase } from "./python";
 import type { LanguageSpec } from "./types";
 import type { Signature, ValueType } from "../types";
@@ -146,14 +147,16 @@ export const rust: LanguageSpec = {
   wire: "tokens",
   starterCode,
   cleanError,
-  program(judge, source) {
+  outOfMemory: /memory allocation of \d+ bytes failed/,
+  program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;
     return {
       files: { "solution.rs": code },
       // Release mode, so integer overflow wraps instead of panicking, as in C++.
       // Warnings would bury real errors in the compile output.
       compile: ["rustc", "--edition", "2024", "-O", "-A", "warnings", "-o", "solution", "solution.rs"],
-      run: ["sh", "-c", "ulimit -s 1048576 2>/dev/null; exec ./solution"],
+      // A 1 GB stack for deep recursion; the memory limit still applies.
+      run: underUlimit("./solution", memoryMb, 64, 1048576),
     };
   },
 };

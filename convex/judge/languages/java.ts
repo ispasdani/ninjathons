@@ -152,8 +152,10 @@ export const java: LanguageSpec = {
   wire: "tokens",
   starterCode,
   cleanError,
-  program(judge, source): Pick<RunJob, "files" | "compile" | "run"> {
-    const run = ["java", "-XX:+UseSerialGC", "-XX:-UsePerfData", "-cp", "."];
+  outOfMemory: /java\.lang\.OutOfMemoryError/,
+  program(judge, source, memoryMb): Pick<RunJob, "files" | "compile" | "run"> {
+    // The heap is capped at the limit; the JVM's own memory comes on top.
+    const run = ["java", `-Xmx${memoryMb}m`, "-XX:+UseSerialGC", "-XX:-UsePerfData", "-cp", "."];
     if (judge.mode === "stdio") {
       // Full programs are a class Main with a main method.
       return {

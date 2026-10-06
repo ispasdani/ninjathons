@@ -8,6 +8,7 @@ export const verdictStatus = v.union(
   v.literal("wrong_answer"),
   v.literal("runtime_error"),
   v.literal("time_limit"),
+  v.literal("memory_limit"),
   v.literal("output_limit"),
   v.literal("compile_error"),
 );

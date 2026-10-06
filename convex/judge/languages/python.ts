@@ -1,3 +1,4 @@
+import { underUlimit } from "./limits";
 import type { LanguageSpec } from "./types";
 import type { Signature, ValueType } from "../types";
 
@@ -88,11 +89,13 @@ export const python: LanguageSpec = {
   image: "managed",
   starterCode,
   cleanError,
-  program(judge, source) {
+  outOfMemory: /\bMemoryError\b/,
+  program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + driver(judge.signature) : source;
     return {
       files: { "main.py": code },
-      run: ["python3", "main.py"],
+      // Headroom for the interpreter itself.
+      run: underUlimit("python3 main.py", memoryMb, 128),
     };
   },
 };

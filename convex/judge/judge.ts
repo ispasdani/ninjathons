@@ -45,7 +45,7 @@ export async function runCode(
   const { judge } = request;
   const tokens = judge.mode === "function" && spec.wire === "tokens";
   const output = await runner.run({
-    ...spec.program(judge, request.source),
+    ...spec.program(judge, request.source, request.limits.memoryMb),
     tests: tokens ? request.tests.map((input) => encodeArgs(judge.signature, input)) : request.tests,
     timeLimitMs: Math.round(request.limits.timeMs * spec.timeMultiplier),
     // A crash or timeout usually repeats on every test, so stop at the first
@@ -53,6 +53,13 @@ export async function runCode(
     stopOnError: true,
     image: spec.image,
   });
+  // The runtime ran out of memory under the limit. Also when that took until
+  // the time limit: near its heap limit Node.js collects garbage for seconds.
+  for (const test of output.tests) {
+    if ((test.status === "runtime_error" || test.status === "time_limit") && spec.outOfMemory.test(test.stderr)) {
+      test.status = "memory_limit";
+    }
+  }
   if (!tokens) return output;
   // Back to JSON, so checkers and the solve view only ever see JSON.
   return {

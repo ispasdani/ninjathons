@@ -28,6 +28,12 @@ export type LanguageSpec = {
    * `sourceLines` is how many lines the user wrote; later lines are the driver.
    */
   cleanError(stderr: string, sourceLines: number): string;
-  /** The files and commands that run the user's source (plus the driver in function mode). */
-  program(judge: Judge, source: string): Pick<RunJob, "files" | "compile" | "run">;
+  /**
+   * The files and commands that run the user's source (plus the driver in
+   * function mode), with the problem's memory limit applied in the way this
+   * runtime understands (heap flag, GC limit or ulimit).
+   */
+  program(judge: Judge, source: string, memoryMb: number): Pick<RunJob, "files" | "compile" | "run">;
+  /** What the runtime prints when the program runs out of memory under that limit. */
+  outOfMemory: RegExp;
 };

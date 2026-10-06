@@ -47,7 +47,7 @@ export type RunJob = {
 
 export type SandboxImage = "managed" | "runner";
 
-export type TestRunStatus = "ok" | "runtime_error" | "time_limit" | "output_limit";
+export type TestRunStatus = "ok" | "runtime_error" | "time_limit" | "memory_limit" | "output_limit";
 
 export type TestRun = {
   status: TestRunStatus;

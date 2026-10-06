@@ -26,6 +26,10 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 6 Oct 2026 · Phase 2: memory limits
+- Each problem's memory limit is enforced in all 7 languages (decisions §8, as built), with a new verdict, Memory limit exceeded (`MLE`). Tested per language: a program allocating gigabytes gets MLE, a normal one passes under 64 MB. All 30 problems pass under their 256 MB limits.
+- Closes the open item carried over from phase 1.
+
 ### 6 Oct 2026 · Phase 2: 28 new problems (30 in total)
 - 12 easy, 13 medium, 3 hard (fizz-buzz to edit-distance), 4 of them stdio (sum-of-a-list, count-primes, grid-shortest-path, word-frequency).
 - Each has JavaScript and Python references written independently: expected outputs come from the first and the second must agree. Every problem has a wrong solution that must fail, and 15 have a slow one that must time out. Hidden tests come from fixed-seed generators: edge cases plus large inputs.

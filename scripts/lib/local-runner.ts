@@ -52,15 +52,19 @@ function parseOutput(status: number | null, stdout: string, stderr: string): Run
 // --- host -------------------------------------------------------------------
 
 // Windows installs Python as `python`, not `python3`.
+// Commands wrapped in `sh -c "ulimit ...; exec <command>"` (memory limits)
+// run unwrapped here, without the limits: Windows has no sh.
 function hostCommand(argv: string[]): string[] {
+  const wrapped = argv[0] === "sh" && argv[1] === "-c" ? argv[2].match(/exec (.+)$/) : null;
+  if (wrapped) argv = wrapped[1].split(" ");
   if (process.platform === "win32" && argv[0] === "python3") return ["python", ...argv.slice(1)];
   return argv;
 }
 
-const NEEDS_IMAGE = new Set(["javac", "java", "cs-build", "dotnet", "g++", "rustc", "sh"]);
+const NEEDS_IMAGE = new Set(["javac", "java", "cs-build", "dotnet", "g++", "rustc", "./solution"]);
 
 async function runOnHost(job: RunJob): Promise<RunOutput> {
-  const tool = (job.compile ?? job.run)[0];
+  const tool = hostCommand(job.compile ?? job.run)[0];
   if (NEEDS_IMAGE.has(tool)) {
     throw new Error(`${tool} runs in the runner image: build it with \`npm run runner:build\` (needs Docker)`);
   }
