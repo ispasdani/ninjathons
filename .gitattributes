@@ -1,0 +1,2 @@
+# Files copied into the runner image must keep Unix line endings.
+runner/** text eol=lf
