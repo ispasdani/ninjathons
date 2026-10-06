@@ -31,9 +31,9 @@ jobs:
       # Tests and problems:check run code in the runner image, so every
       # language is checked with the compilers the sandbox uses. The layers
       # are shared with the Runner image workflow through the GitHub cache.
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build the runner image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: runner
           platforms: linux/amd64

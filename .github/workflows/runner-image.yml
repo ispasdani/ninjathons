@@ -32,10 +32,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: runner
           platforms: linux/amd64
@@ -60,7 +60,7 @@ jobs:
       # Same build again (all cached), pushed with the zstd compression VCR
       # recommends for Sandbox images.
       - name: Push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: runner
           platforms: linux/amd64
