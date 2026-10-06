@@ -30,11 +30,11 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 - The check passes: a new user signs up, picks a username and solves any of 30 problems in any of the 7 code languages. Username onboarding was checked by hand; every problem's references are Accepted by `problems:check` in the runner image, and Two Sum and Sum of a List in all their languages in the real sandbox.
 - Phase 2 delivered: the 7 code languages with function and stdio mode; the runner image in Vercel Container Registry; memory limits; username onboarding; the problem library; the designed solve view; 30 problems.
 - HTML and CSS moved to phase 7 (decisions §8).
-- Carried into later phases:
-  - Speed of the compiled languages (Java, C#, C++, Rust: Run 2.7–3.8 s, Submit 3.6–7 s): mount the hidden tests instead of uploading them, run all tests in one process; before phase 4's load test. Keeping sandboxes started and waiting is a launch decision (it costs money).
-  - Compile errors caused by a wrong function name point at a driver line instead of the user's code.
-  - The editor has no autocomplete for Java, C#, C++ and Rust.
-  - Redirects from an old username wait for profile pages (phase 8).
+- Carried into later phases (planned in decisions §1, §5 and §8, and the roadmap's phase 4 and 8 rows):
+  - Speed of the compiled languages (Java, C#, C++, Rust: Run 2.7–3.8 s, Submit 3.6–7 s): phase 4.
+  - Compile errors caused by a wrong function name point at a driver line: phase 4.
+  - No autocomplete for Java, C#, C++ and Rust: not scheduled.
+  - Redirects from an old username: phase 8.
 
 ### 6 Oct 2026 · Phase 2: problem library and solve view
 - `/problems` (public): every published problem with search and filters for difficulty, type, topic and, when signed in, status (solved, attempted), plus your solved progress. The dashboard shows progress and where to carry on.
