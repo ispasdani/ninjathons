@@ -2,15 +2,15 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 1, Judging core: the 3-second target is met. **Next step:** get CI green on the branch, then mark phase 1 done and start phase 2.
+**Now:** Phase 2, Foundation. **Next step:** our own runner image with every compiler, and one compiled language timed against the 3-second target.
 
 ## Phases
 
 | # | Phase | Status | Started | Finished |
 |---|---|---|---|---|
 | 0 | Setup | Done | 27 Sept 2026 | 3 Oct 2026 |
-| 1 | Judging core | In progress | 3 Oct 2026 | |
-| 2 | Foundation | Not started | | |
+| 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
+| 2 | Foundation | In progress | 6 Oct 2026 | |
 | 3 | Progression engine | Not started | | |
 | 4 | 1v1 and private alpha | Not started | | |
 | 5 | Daily and weekly challenges | Not started | | |
@@ -26,6 +26,11 @@ Content track: 2 of 150–200 problems (two-sum, add-two-integers), 0 of ~20 tut
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 6 Oct 2026 · Phase 1 done
+- CI green on the phase 1 PR and on `main` after the merge, including `problems:check`. Both checks for phase 1 pass.
+- HTML and CSS moved from phase 2 to phase 7 (decisions §8, §12).
+- Carried into phase 2: memory limits (only the sandbox's own 4 GB today) and our own runner image (still on Vercel's `universal` image).
+
 ### 3 Oct 2026 · Phase 1
 - Problem format in code: `problems/two-sum/` (statement, hints, examples, 10 hand-written and 4 generated hidden tests, references in JS and Python, wrong and slow solutions).
 - Judge in `convex/judge/`: starter-code and driver generators for JavaScript and Python, the runner harness, checkers (`exact`, `float`, `unordered`), verdicts.
@@ -37,7 +42,7 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 - Real sandbox runs on Two Sum, both languages, all verdict kinds correct: Run 1.2 s, Submit 2.1–2.7 s. Got there by saving the verdict before stopping the sandbox, gzipping the job and using iad1 (details in decisions §5).
 - Warm-up problem `add-two-integers` (its wrong solution overflows 32-bit ints) and a problem list on the dashboard linking to `/solve/<slug>`.
 - First hands-on test of the solve view: errors now show only the user's own code (`solution.js:2`, `File "solution.py", line 2`), without Node internals, the driver or temp paths, and Run stops at the first crash or timeout instead of repeating it on every example.
-- Open: CI hasn't run on the branch yet; memory limits aren't enforced (only the sandbox's own 4 GB).
+- Open: memory limits aren't enforced (only the sandbox's own 4 GB).
 
 ### 3 Oct 2026 · Phase 0
 - Phased build plan written into the roadmap and decisions §12; this progress file added.

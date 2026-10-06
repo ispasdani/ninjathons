@@ -16,6 +16,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Pro: about €8/month or €69/year, regional prices, early-bird pricing | [10](#10-pro-price) |
 | 3 Oct 2026 | Keep both World Conquest and Battle royale; pick the order in V2 | [11](#11-world-conquest-and-battle-royale) |
 | 3 Oct 2026 | Build plan: 11 phases with a check that marks each one done; judging core first | [12](#12-build-plan-phases) |
+| 6 Oct 2026 | HTML and CSS move from phase 2 to phase 7 (Learn) | [8](#8-launch-languages), [12](#12-build-plan-phases) |
 
 ---
 
@@ -289,6 +290,7 @@ problems/two-sum/
 - **The 7 code languages are ranked from day one.** They share one image, one runner and the function and stdio modes; each adds a driver generator and a docs set. In a match each player picks their own language; per-language time-limit multipliers keep it fair.
 - **HTML and CSS are practice-only in V1:** tutorials and practice problems, checked in the browser (sandboxed iframe), free and instant, no XP-for-rating or ranked play.
 - **Ranked HTML/CSS arrives in V1.1:** the `visual` judge mode (DOM checks and pixel matching with headless Chromium in Vercel Sandbox) and a duel screen for it. "CSS duels" is the V1.1 launch headline.
+- **HTML and CSS are built in phase 7 (Learn), not phase 2** (6 Oct 2026). Their challenges are "build the same output as this one": a separate judge (render the user's page, compare it with the target) that shares nothing with the runner or the driver generators, and nothing in phases 3 to 6 needs it. They sit best next to the tutorials that teach them. Still in V1.
 - Docs sets needed at launch: MDN (JS, TS, HTML, CSS), Python, Java API, .NET API (C#), cppreference (C++), Rust std. Each keeps its source and license line.
 
 ## 9. Docs in ranked 1v1
@@ -319,12 +321,12 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 |---|---|---|
 | 0 | Setup ✅ | Auth, guardrail wrappers, schema, tests and CI, brand |
 | 1 | Judging core | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
-| 2 | Foundation | All 9 languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
+| 2 | Foundation | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
 | 3 | Progression engine | Solves award XP and badges, and leaderboards update |
 | 4 | 1v1 and private alpha | Runner load test passes; 10 to 20 friends play real matches |
 | 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
-| 7 | Learn | 3 roadmaps and about 20 tutorials live |
+| 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
 | 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
 | 9 | Ninjathons | One event runs from creation to results (first to cut) |
 | 10 | Closed beta and launch | 2 or 3 office teams plus 20 to 50 players; beta issues fixed |
