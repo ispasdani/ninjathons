@@ -12,6 +12,7 @@
     "test:once": "vitest run",
     "problems:check": "tsx scripts/problems-check.ts",
     "problems:seed": "tsx scripts/problems-seed.ts",
+    "sandbox:bench": "tsx scripts/sandbox-bench.ts",
     "runner:build": "docker build --platform linux/amd64 -t ninjathons-runner:local runner"
   },
   "dependencies": {

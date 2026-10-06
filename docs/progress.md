@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 2, Foundation. **Next step:** push the runner image to Vercel Container Registry and time all 7 languages in Vercel Sandbox.
+**Now:** Phase 2, Foundation. **Next step:** bring verdict times back towards 3 s (sandbox start-up with our image, the Submit upload).
 
 ## Phases
 
@@ -25,6 +25,12 @@ Content track: 2 of 150–200 problems (two-sum, add-two-integers), 0 of ~20 tut
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 6 Oct 2026 · Phase 2: runner image live in Vercel Sandbox
+- Runner image pushed to Vercel Container Registry from GitHub Actions (OIDC, no stored secret) and used by the Convex dev deployment (`SANDBOX_IMAGE=runner:<sha>`). Vercel project connected to the repository; Vercel Git deploys off (`vercel.json`) until we host.
+- `npm run sandbox:bench` times every reference solution in the real sandbox (`convex/benchmark.ts`). Two Sum, all 7 languages Accepted. Run 2.2–4.8 s, Submit 2.5–6.9 s; JavaScript, Python and Rust fastest, C++, C# and Java slowest.
+- Where the time goes: starting a sandbox from our image takes ~1.5 s against ~0.3 s for Vercel's managed image (same day, same code); uploading Submit's large tests ~1.2 s; compiling 0.5–1 s.
+- Open: the 3-second target isn't met yet for the compiled languages.
 
 ### 6 Oct 2026 · Phase 2: drivers for all 7 languages
 - Function-mode drivers for TypeScript, Java, C#, C++ and Rust, in LeetCode's shapes (decisions §8, as built). Compiled languages use a token format (`convex/judge/wire.ts`) that the judge converts to and from JSON.

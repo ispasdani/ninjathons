@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as benchmark from "../benchmark.js";
 import type * as http from "../http.js";
 import type * as judge_checker from "../judge/checker.js";
 import type * as judge_harness from "../judge/harness.js";
@@ -43,6 +44,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  benchmark: typeof benchmark;
   http: typeof http;
   "judge/checker": typeof judge_checker;
   "judge/harness": typeof judge_harness;

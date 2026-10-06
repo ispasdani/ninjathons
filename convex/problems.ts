@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
-import { internalAction, internalMutation } from "./_generated/server";
+import { internalAction, internalMutation, internalQuery } from "./_generated/server";
 import { LANGUAGES, problemLanguages } from "./judge/languages";
 import { publicQuery } from "./lib/functions";
 import {
@@ -137,5 +137,22 @@ export const seed = internalMutation({
       await ctx.db.insert("problemTests", { problemId, version: problem.version, ...tests });
     }
     return { problemId, created: !existing };
+  },
+});
+
+/** A problem and its current hidden tests file, for convex/benchmark.ts. */
+export const loadWithTests = internalQuery({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const problem = await ctx.db
+      .query("problems")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    if (!problem) return null;
+    const tests = await ctx.db
+      .query("problemTests")
+      .withIndex("by_problem_version", (q) => q.eq("problemId", problem._id).eq("version", problem.version))
+      .unique();
+    return { problem, testsFile: tests?.file ?? null };
   },
 });
