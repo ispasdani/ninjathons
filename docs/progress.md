@@ -28,7 +28,7 @@ Each entry: date, phase, what was done, and anything left open. One entry per pi
 
 ### 6 Oct 2026 · Phase 2: 28 new problems (30 in total)
 - 12 easy, 13 medium, 3 hard (fizz-buzz to edit-distance), 4 of them stdio (sum-of-a-list, count-primes, grid-shortest-path, word-frequency).
-- Each has JavaScript and Python references written independently: expected outputs come from the first and the second must agree. Every problem has a wrong solution that must fail, and 18 have a slow one that must time out. Hidden tests come from fixed-seed generators: edge cases plus large inputs.
+- Each has JavaScript and Python references written independently: expected outputs come from the first and the second must agree. Every problem has a wrong solution that must fail, and 15 have a slow one that must time out. Hidden tests come from fixed-seed generators: edge cases plus large inputs.
 - All 30 pass `problems:check` and are seeded on the dev deployment; sum-of-a-list (stdio, C++ too) is Accepted in the real sandbox.
 
 ### 6 Oct 2026 · Phase 2: username onboarding
