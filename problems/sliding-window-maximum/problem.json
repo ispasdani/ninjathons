@@ -1,0 +1,37 @@
+{
+  "slug": "sliding-window-maximum",
+  "title": "Sliding Window Maximum",
+  "difficulty": "hard",
+  "tags": [
+    "arrays",
+    "sliding-window",
+    "deque",
+    "monotonic-queue"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "maxSlidingWindow",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      },
+      {
+        "name": "k",
+        "type": "int"
+      }
+    ],
+    "returns": "int[]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

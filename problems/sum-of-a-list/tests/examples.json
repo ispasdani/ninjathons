@@ -1,0 +1,11 @@
+[
+  {
+    "input": "3\n1 2 3\n",
+    "output": "6\n"
+  },
+  {
+    "input": "2\n-1000000000 -1000000000\n",
+    "output": "-2000000000\n",
+    "explanation": "The sum is outside the 32-bit range."
+  }
+]

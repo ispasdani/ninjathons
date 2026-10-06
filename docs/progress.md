@@ -20,11 +20,16 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 23 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 of 6 weekly sets.
+Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 6 Oct 2026 · Phase 2: 28 new problems (30 in total)
+- 12 easy, 13 medium, 3 hard (fizz-buzz to edit-distance), 4 of them stdio (sum-of-a-list, count-primes, grid-shortest-path, word-frequency).
+- Each has JavaScript and Python references written independently: expected outputs come from the first and the second must agree. Every problem has a wrong solution that must fail, and 18 have a slow one that must time out. Hidden tests come from fixed-seed generators: edge cases plus large inputs.
+- All 30 pass `problems:check` and are seeded on the dev deployment; sum-of-a-list (stdio, C++ too) is Accepted in the real sandbox.
 
 ### 6 Oct 2026 · Phase 2: username onboarding
 - Usernames (decisions §1): rules in `convex/lib/usernames.ts`, shared by the server and the form; `user.setUsername` checks uniqueness on the lowercased key in the same transaction; `user.checkUsername` for the form as you type.

@@ -1,0 +1,23 @@
+{
+  "slug": "word-frequency",
+  "title": "Word Frequency",
+  "difficulty": "medium",
+  "tags": [
+    "stdio",
+    "strings",
+    "hash-map",
+    "sorting"
+  ],
+  "mode": "stdio",
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

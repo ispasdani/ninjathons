@@ -1,0 +1,22 @@
+{
+  "slug": "count-primes",
+  "title": "Count Primes",
+  "difficulty": "medium",
+  "tags": [
+    "stdio",
+    "math",
+    "sieve"
+  ],
+  "mode": "stdio",
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}
