@@ -145,6 +145,7 @@ export const cpp: LanguageSpec = {
   image: "runner",
   wire: "tokens",
   starterCode,
+  stdioTemplate: "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    // Read the input with cin, solve it, and print the answer with cout.\n}\n",
   cleanError,
   outOfMemory: /std::bad_alloc/,
   program(judge, source, memoryMb) {

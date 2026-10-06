@@ -22,6 +22,8 @@ export type LanguageSpec = {
   wire?: "json" | "tokens";
   /** What the editor starts with for a function-mode problem. */
   starterCode(signature: Signature): string;
+  /** What the editor starts with for a full-program (stdio) problem: reading the input. */
+  stdioTemplate: string;
   /**
    * Error output as the user should see it: their own code's lines only (no
    * driver or runtime internals), with the file called solution.<ext>.

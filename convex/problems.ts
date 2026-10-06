@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalAction, internalMutation, internalQuery } from "./_generated/server";
 import { LANGUAGES, problemLanguages } from "./judge/languages";
-import { publicQuery } from "./lib/functions";
+import { getCurrentUserOrNull, publicQuery } from "./lib/functions";
 import {
   checker,
   difficulty,
@@ -11,14 +11,37 @@ import {
   language,
 } from "./schemas/problems";
 
-/** Published problems for the list on the dashboard. The full library page comes in phase 2. */
-export const list = publicQuery({
+/**
+ * Every published problem for the library, with the caller's own status on
+ * each when signed in: solved (an accepted Submit) or attempted (any other
+ * Submit). Public: signed-out visitors get the list without statuses.
+ */
+export const library = publicQuery({
   args: {},
   handler: async (ctx) => {
-    const rows = await ctx.db.query("problems").take(200);
-    return rows
-      .filter((p) => p.status !== "draft")
-      .map((p) => ({ slug: p.slug, title: p.title, difficulty: p.difficulty }));
+    const rows = (await ctx.db.query("problems").take(1000)).filter((p) => p.status !== "draft");
+    const status = new Map<string, "solved" | "attempted">();
+    const user = await getCurrentUserOrNull(ctx);
+    if (user) {
+      // Until phase 3 keeps a table of solves, read the user's submissions.
+      const submissions = await ctx.db
+        .query("submissions")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .collect();
+      for (const s of submissions) {
+        if (s.kind !== "submit" || s.status !== "done") continue;
+        if (s.verdict?.status === "accepted") status.set(s.problemId, "solved");
+        else if (!status.has(s.problemId)) status.set(s.problemId, "attempted");
+      }
+    }
+    return rows.map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      difficulty: p.difficulty,
+      tags: p.tags,
+      mode: p.judge.mode,
+      status: status.get(p._id) ?? null,
+    }));
   },
 });
 
@@ -39,7 +62,9 @@ export const getBySlug = publicQuery({
       label: LANGUAGES[id].label,
       version: LANGUAGES[id].version,
       starterCode:
-        problem.judge.mode === "function" ? LANGUAGES[id].starterCode(problem.judge.signature) : "",
+        problem.judge.mode === "function"
+          ? LANGUAGES[id].starterCode(problem.judge.signature)
+          : LANGUAGES[id].stdioTemplate,
       timeLimitMs: Math.round(problem.limits.timeMs * LANGUAGES[id].timeMultiplier),
     }));
     return {

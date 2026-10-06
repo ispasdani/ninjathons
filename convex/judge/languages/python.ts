@@ -88,6 +88,7 @@ export const python: LanguageSpec = {
   timeMultiplier: 2,
   image: "managed",
   starterCode,
+  stdioTemplate: "import sys\n\ndata = sys.stdin.read().split()\n\n# Solve it here and print the answer.\n",
   cleanError,
   outOfMemory: /\bMemoryError\b/,
   program(judge, source, memoryMb) {

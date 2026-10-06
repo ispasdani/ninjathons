@@ -154,6 +154,7 @@ export const csharp: LanguageSpec = {
   image: "runner",
   wire: "tokens",
   starterCode,
+  stdioTemplate: "var input = Console.In.ReadToEnd();\nvar tokens = input.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);\n\n// Solve it here and print the answer with Console.WriteLine.\n",
   cleanError,
   outOfMemory: /System\.OutOfMemoryException|^Out of memory\./m,
   program(judge, source, memoryMb) {

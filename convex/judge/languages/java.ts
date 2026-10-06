@@ -151,6 +151,7 @@ export const java: LanguageSpec = {
   image: "runner",
   wire: "tokens",
   starterCode,
+  stdioTemplate: "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));\n        // Read lines with in.readLine(), solve it, and print the answer with System.out.println.\n    }\n}\n",
   cleanError,
   outOfMemory: /java\.lang\.OutOfMemoryError/,
   program(judge, source, memoryMb): Pick<RunJob, "files" | "compile" | "run"> {

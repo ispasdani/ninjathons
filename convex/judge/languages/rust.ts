@@ -146,6 +146,7 @@ export const rust: LanguageSpec = {
   image: "runner",
   wire: "tokens",
   starterCode,
+  stdioTemplate: "use std::io::{self, Read};\n\nfn main() {\n    let mut input = String::new();\n    io::stdin().read_to_string(&mut input).unwrap();\n    let mut tokens = input.split_ascii_whitespace();\n    // Solve it here and print the answer with println!.\n}\n",
   cleanError,
   outOfMemory: /memory allocation of \d+ bytes failed/,
   program(judge, source, memoryMb) {

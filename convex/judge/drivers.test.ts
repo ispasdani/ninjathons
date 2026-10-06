@@ -225,6 +225,12 @@ describe.concurrent.each(languages)("%s driver", (language) => {
     expect(out.tests[0].stdout.trim()).toBe(typed ? "[]" : "null");
   });
 
+  test("the stdio template compiles and runs as it is", { timeout: TIMEOUT }, async () => {
+    const out = await run(language, { mode: "stdio" }, LANGUAGES[language].stdioTemplate, ["1 2 3\n4 5\n"]);
+    expect(out.compile?.ok ?? true, out.compile?.output).toBe(true);
+    expect(out.tests[0].status, out.tests[0].stderr).toBe("ok");
+  });
+
   test("stdio mode runs the program as written", { timeout: TIMEOUT }, async () => {
     const source: Record<Language, string> = {
       javascript: "const s = require('fs').readFileSync(0, 'utf8'); console.log(s.trim().split(' ').map(Number).reduce((a, b) => a + b));",

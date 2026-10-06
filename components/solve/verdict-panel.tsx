@@ -11,7 +11,7 @@ const LABELS: Record<VerdictStatus, { short: string; long: string; color: string
   compile_error: { short: "CE", long: "Compile error", color: "text-verdict-ce bg-verdict-ce/10" },
 };
 
-function Badge({ status }: { status: VerdictStatus }) {
+export function VerdictBadge({ status }: { status: VerdictStatus }) {
   const label = LABELS[status];
   return (
     <span className={`rounded-xs px-1.5 py-0.5 font-mono text-xs font-medium ${label.color}`}>{label.short}</span>
@@ -58,7 +58,7 @@ export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | 
   return (
     <div className="space-y-4 text-[13px]">
       <div className="flex flex-wrap items-center gap-3">
-        <Badge status={verdict.status} />
+        <VerdictBadge status={verdict.status} />
         <span className="font-medium">{LABELS[verdict.status].long}</span>
         <span className="font-mono text-xs text-muted-foreground tabular-nums">
           {verdict.passed}/{verdict.total} tests · {verdict.timeMs} ms
@@ -73,7 +73,7 @@ export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | 
           test.visible ? (
             <li key={i} className="space-y-2 rounded-md border p-3">
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Badge status={test.status} /> Example {i + 1} · {test.timeMs} ms
+                <VerdictBadge status={test.status} /> Example {i + 1} · {test.timeMs} ms
               </p>
               {test.status !== "accepted" && (
                 <>
@@ -87,7 +87,7 @@ export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | 
           ) : (
             test.status !== "accepted" && (
               <li key={i} className="flex items-center gap-2 rounded-md border p-3 text-xs text-muted-foreground">
-                <Badge status={test.status} /> Hidden test {i + 1} · {test.timeMs} ms · inputs of hidden tests stay hidden
+                <VerdictBadge status={test.status} /> Hidden test {i + 1} · {test.timeMs} ms · inputs of hidden tests stay hidden
               </li>
             )
           ),

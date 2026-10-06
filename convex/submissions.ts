@@ -67,6 +67,39 @@ export const get = userQuery({
   },
 });
 
+/**
+ * The caller's own submissions to one problem, newest first, for the
+ * Submissions tab: a summary per row; the code comes from `get` when opened.
+ */
+export const mine = userQuery({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const problem = await ctx.db
+      .query("problems")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    if (!problem) return [];
+    const rows = await ctx.db
+      .query("submissions")
+      .withIndex("by_user_problem", (q) => q.eq("userId", ctx.user._id).eq("problemId", problem._id))
+      .order("desc")
+      .take(50);
+    return rows.map((s) => ({
+      _id: s._id,
+      _creationTime: s._creationTime,
+      kind: s.kind,
+      language: s.language,
+      status: s.status,
+      verdict: s.verdict && {
+        status: s.verdict.status,
+        passed: s.verdict.passed,
+        total: s.verdict.total,
+        timeMs: s.verdict.timeMs,
+      },
+    }));
+  },
+});
+
 // --- Used by the judging action ---
 
 /** Everything the action needs, including where the hidden tests are. Never public. */

@@ -74,6 +74,7 @@ export const javascript: LanguageSpec = {
   timeMultiplier: 1,
   image: "managed",
   starterCode,
+  stdioTemplate: "const input = require(\"fs\").readFileSync(0, \"utf8\");\nconst lines = input.trim().split(\"\\n\");\n\n// Solve it here and print the answer with console.log.\n",
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "js"),
   // V8's own heap limit: running out prints "JavaScript heap out of memory".
   outOfMemory: /heap out of memory/,

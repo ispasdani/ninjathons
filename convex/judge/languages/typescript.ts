@@ -32,6 +32,7 @@ export const typescript: LanguageSpec = {
   timeMultiplier: 1,
   image: "managed",
   starterCode,
+  stdioTemplate: "const input: string = process.getBuiltinModule(\"fs\").readFileSync(0, \"utf8\");\nconst lines = input.trim().split(\"\\n\");\n\n// Solve it here and print the answer with console.log.\n",
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "ts"),
   outOfMemory: /heap out of memory/,
   program(judge, source, memoryMb) {
