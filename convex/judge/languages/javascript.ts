@@ -72,6 +72,7 @@ export const javascript: LanguageSpec = {
   // Node.js 24, the same major in Vercel Sandbox and locally.
   version: "Node.js 24",
   timeMultiplier: 1,
+  image: "managed",
   starterCode,
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "js"),
   program(judge, source) {

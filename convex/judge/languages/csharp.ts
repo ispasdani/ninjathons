@@ -151,6 +151,7 @@ export const csharp: LanguageSpec = {
   version: ".NET 10",
   // Runtime start-up and JIT.
   timeMultiplier: 1.5,
+  image: "runner",
   wire: "tokens",
   starterCode,
   cleanError,

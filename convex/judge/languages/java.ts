@@ -148,6 +148,7 @@ export const java: LanguageSpec = {
   version: "Java 25",
   // JVM start-up and warm-up.
   timeMultiplier: 1.5,
+  image: "runner",
   wire: "tokens",
   starterCode,
   cleanError,

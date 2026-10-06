@@ -85,6 +85,7 @@ export const python: LanguageSpec = {
   version: "Python 3.14",
   // CPython is roughly 2x slower than Node on typical problems.
   timeMultiplier: 2,
+  image: "managed",
   starterCode,
   cleanError,
   program(judge, source) {

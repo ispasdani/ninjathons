@@ -30,6 +30,7 @@ export const typescript: LanguageSpec = {
   label: "TypeScript",
   version: "TypeScript (Node.js 24)",
   timeMultiplier: 1,
+  image: "managed",
   starterCode,
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "ts"),
   program(judge, source) {

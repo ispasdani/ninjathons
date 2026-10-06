@@ -141,6 +141,7 @@ export const cpp: LanguageSpec = {
   label: "C++",
   version: "C++20 (GCC 15)",
   timeMultiplier: 1,
+  image: "runner",
   wire: "tokens",
   starterCode,
   cleanError,

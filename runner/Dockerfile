@@ -25,7 +25,14 @@ RUN apt-get update && \
       g++ \
       openjdk-25-jdk-headless \
       dotnet-sdk-10.0 && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    # Smaller image, faster sandbox start-up. Removed in this layer, or it
+    # wouldn't shrink: of the .NET SDK only its Roslyn compiler is used (no
+    # MSBuild, NuGet or templates), no ASP.NET, no jlink modules, no docs.
+    find /usr/lib/dotnet/sdk/* -mindepth 1 -maxdepth 1 ! -name Roslyn -exec rm -rf {} + && \
+    rm -rf /usr/lib/dotnet/templates /usr/lib/dotnet/library-packs \
+      /usr/lib/dotnet/shared/Microsoft.AspNetCore.App /usr/lib/dotnet/packs/Microsoft.AspNetCore.App.Ref \
+      /usr/lib/jvm/*/jmods /usr/share/doc /usr/share/man /usr/share/info
 
 # Node.js 24, also the runtime for TypeScript (Node strips the types itself).
 ARG NODE_VERSION=24.21.0

@@ -37,7 +37,15 @@ export type RunJob = {
   timeLimitMs: number;
   /** Stop after the first test that crashes or times out. */
   stopOnError: boolean;
+  /**
+   * Which image the job needs in Vercel Sandbox: Vercel's managed image
+   * (Node.js and Python, starts fastest) or our runner image with every
+   * compiler. Local runners always use the runner image.
+   */
+  image: SandboxImage;
 };
+
+export type SandboxImage = "managed" | "runner";
 
 export type TestRunStatus = "ok" | "runtime_error" | "time_limit" | "output_limit";
 

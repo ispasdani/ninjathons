@@ -51,6 +51,7 @@ export async function runCode(
     // A crash or timeout usually repeats on every test, so stop at the first
     // one even on Run. Wrong answers are found here, after the run.
     stopOnError: true,
+    image: spec.image,
   });
   if (!tokens) return output;
   // Back to JSON, so checkers and the solve view only ever see JSON.

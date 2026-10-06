@@ -142,6 +142,7 @@ export const rust: LanguageSpec = {
   label: "Rust",
   version: "Rust 1.99",
   timeMultiplier: 1,
+  image: "runner",
   wire: "tokens",
   starterCode,
   cleanError,

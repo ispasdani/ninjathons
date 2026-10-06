@@ -1,4 +1,4 @@
-import type { Judge, Language, RunJob, Signature } from "../types";
+import type { Judge, Language, RunJob, SandboxImage, Signature } from "../types";
 
 /** What a language adds to the judge. One per language, written once and tested heavily. */
 export type LanguageSpec = {
@@ -8,6 +8,12 @@ export type LanguageSpec = {
   version: string;
   /** The problem's base time limit is multiplied by this, so slower languages stay fair. */
   timeMultiplier: number;
+  /**
+   * The Vercel Sandbox image it runs in. Vercel keeps its managed image cached
+   * on every machine, so a sandbox from it starts in ~0.3 s against ~1.5 s
+   * for ours (measured 6 Oct 2026); languages that need nothing more use it.
+   */
+  image: SandboxImage;
   /**
    * How the function-mode driver reads arguments and prints the result: JSON
    * (the default), or the token format in ../wire.ts for languages without a
