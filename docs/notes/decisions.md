@@ -333,8 +333,8 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | # | Phase | Done when |
 |---|---|---|
 | 0 | Setup ✅ | Auth, guardrail wrappers, schema, tests and CI, brand |
-| 1 | Judging core | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
-| 2 | Foundation | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
+| 1 | Judging core ✅ | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
+| 2 | Foundation ✅ | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
 | 3 | Progression engine | Solves award XP and badges, and leaderboards update |
 | 4 | 1v1 and private alpha | Runner load test passes; 10 to 20 friends play real matches |
 | 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |

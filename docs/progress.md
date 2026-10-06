@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 2, Foundation. **Next step:** bring verdict times back towards 3 s (sandbox start-up with our image, the Submit upload).
+**Now:** Phase 2, Foundation, is done. **Next step:** start phase 3, the progression engine (XP ledger, levels, badges, ratings, leaderboards).
 
 ## Phases
 
@@ -10,7 +10,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 |---|---|---|---|---|
 | 0 | Setup | Done | 27 Sept 2026 | 3 Oct 2026 |
 | 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
-| 2 | Foundation | In progress | 6 Oct 2026 | |
+| 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
 | 3 | Progression engine | Not started | | |
 | 4 | 1v1 and private alpha | Not started | | |
 | 5 | Daily and weekly challenges | Not started | | |
@@ -25,6 +25,21 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 6 Oct 2026 · Phase 2 done
+- The check passes: a new user signs up, picks a username and solves any of 30 problems in any of the 7 code languages. Username onboarding was checked by hand; every problem's references are Accepted by `problems:check` in the runner image, and Two Sum and Sum of a List in all their languages in the real sandbox.
+- Phase 2 delivered: the 7 code languages with function and stdio mode; the runner image in Vercel Container Registry; memory limits; username onboarding; the problem library; the designed solve view; 30 problems.
+- HTML and CSS moved to phase 7 (decisions §8).
+- Carried into later phases:
+  - Speed of the compiled languages (Java, C#, C++, Rust: Run 2.7–3.8 s, Submit 3.6–7 s): mount the hidden tests instead of uploading them, run all tests in one process; before phase 4's load test. Keeping sandboxes started and waiting is a launch decision (it costs money).
+  - Compile errors caused by a wrong function name point at a driver line instead of the user's code.
+  - The editor has no autocomplete for Java, C#, C++ and Rust.
+  - Redirects from an old username wait for profile pages (phase 8).
+
+### 6 Oct 2026 · Phase 2: problem library and solve view
+- `/problems` (public): every published problem with search and filters for difficulty, type, topic and, when signed in, status (solved, attempted), plus your solved progress. The dashboard shows progress and where to carry on.
+- The solve view per design.md 5.2: a resizable split (drag or arrow keys, sizes remembered) with Description and Submissions tabs, the editor, and results docked under it. Catppuccin Latte and Mocha editor themes. Opening a past submission loads its code. Full-program problems start from a template per language.
+- Checked: production build, library in the browser (filters, phone width). The signed-in solve view still needs a look by hand.
 
 ### 6 Oct 2026 · Phase 2: memory limits
 - Each problem's memory limit is enforced in all 7 languages (decisions §8, as built), with a new verdict, Memory limit exceeded (`MLE`). Tested per language: a program allocating gigabytes gets MLE, a normal one passes under 64 MB. All 30 problems pass under their 256 MB limits.
