@@ -64,6 +64,7 @@ jobs:
       # Same build again (all cached), pushed with the zstd compression VCR
       # recommends for Sandbox images.
       - name: Push
+        id: push
         uses: docker/build-push-action@v7
         with:
           context: runner
@@ -83,4 +84,8 @@ jobs:
           timeout-seconds: 900
 
       - name: Summary
-        run: echo "Pushed runner:${GITHUB_SHA}, ready for Sandbox. Set SANDBOX_IMAGE=runner:${GITHUB_SHA} in Convex to use it." >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          echo "Pushed runner:${GITHUB_SHA} (${DIGEST}), ready for Sandbox." >> "$GITHUB_STEP_SUMMARY"
+          echo "Set SANDBOX_IMAGE=runner:${GITHUB_SHA} in Convex to use it." >> "$GITHUB_STEP_SUMMARY"
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
