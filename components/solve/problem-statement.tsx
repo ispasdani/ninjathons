@@ -1,6 +1,8 @@
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { Difficulty } from "@/components/problem/difficulty";
+
 type Props = {
   title: string;
   difficulty: "easy" | "medium" | "hard";
@@ -10,8 +12,6 @@ type Props = {
   examples: { input: string; output: string; explanation?: string }[];
   hints: string[];
 };
-
-const DIFFICULTY_DOTS = { easy: 1, medium: 2, hard: 3 };
 
 /** Function-mode inputs are JSON objects of arguments; show them as `name = value`. */
 function formatInput(input: string, mode: Props["mode"]): string {
@@ -31,17 +31,7 @@ export function ProblemStatement({ title, difficulty, tags, mode, statement, exa
       <header className="space-y-3">
         <h1 className="text-2xl">{title}</h1>
         <div className="flex flex-wrap items-center gap-3 text-[13px] text-muted-foreground">
-          <span className="flex items-center gap-1.5 capitalize">
-            {difficulty}
-            <span className="flex gap-0.5" aria-hidden>
-              {[1, 2, 3].map((i) => (
-                <span
-                  key={i}
-                  className={`size-1.5 rounded-full ${i <= DIFFICULTY_DOTS[difficulty] ? "bg-foreground" : "bg-border"}`}
-                />
-              ))}
-            </span>
-          </span>
+          <Difficulty level={difficulty} />
           <span className="font-mono text-xs tracking-[0.12em] uppercase">
             {mode === "function" ? "Function" : "Full program"}
           </span>

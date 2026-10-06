@@ -1,3 +1,4 @@
+import { underUlimit } from "./limits";
 import type { LanguageSpec } from "./types";
 import type { Signature, ValueType } from "../types";
 
@@ -85,13 +86,17 @@ export const python: LanguageSpec = {
   version: "Python 3.14",
   // CPython is roughly 2x slower than Node on typical problems.
   timeMultiplier: 2,
+  image: "managed",
   starterCode,
+  stdioTemplate: "import sys\n\ndata = sys.stdin.read().split()\n\n# Solve it here and print the answer.\n",
   cleanError,
-  program(judge, source) {
+  outOfMemory: /\bMemoryError\b/,
+  program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + driver(judge.signature) : source;
     return {
       files: { "main.py": code },
-      run: ["python3", "main.py"],
+      // Headroom for the interpreter itself.
+      run: underUlimit("python3 main.py", memoryMb, 128),
     };
   },
 };

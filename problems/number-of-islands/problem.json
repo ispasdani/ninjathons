@@ -1,0 +1,33 @@
+{
+  "slug": "number-of-islands",
+  "title": "Number of Islands",
+  "difficulty": "medium",
+  "tags": [
+    "graphs",
+    "bfs",
+    "dfs",
+    "matrix"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "numIslands",
+    "params": [
+      {
+        "name": "grid",
+        "type": "string[]"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

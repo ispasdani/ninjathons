@@ -1,0 +1,16 @@
+[
+  {
+    "input": "10\n",
+    "output": "4\n",
+    "explanation": "2, 3, 5 and 7."
+  },
+  {
+    "input": "13\n",
+    "output": "6\n",
+    "explanation": "13 itself is prime, so it counts."
+  },
+  {
+    "input": "1\n",
+    "output": "0\n"
+  }
+]

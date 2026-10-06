@@ -1,0 +1,22 @@
+{
+  "slug": "sum-of-a-list",
+  "title": "Sum of a List",
+  "difficulty": "easy",
+  "tags": [
+    "stdio",
+    "warm-up",
+    "math"
+  ],
+  "mode": "stdio",
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

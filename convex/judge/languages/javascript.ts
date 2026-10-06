@@ -29,7 +29,7 @@ function starterCode(signature: Signature): string {
  * driver then reads the arguments from stdin, sends anything the solution
  * prints to stderr, and writes only the JSON result to stdout.
  */
-function driver(signature: Signature): string {
+export function driver(signature: Signature): string {
   const args = signature.params.map((p) => `__args[${JSON.stringify(p.name)}]`).join(", ");
   return `
 ;(() => {
@@ -47,21 +47,22 @@ function driver(signature: Signature): string {
  * Drops Node's internal stack frames, frames in the driver and the "Node.js
  * vXX" footer. When the error is thrown inside the driver (the function is
  * missing), the code snippet Node prints above the message is the driver's,
- * so it goes too.
+ * so it goes too. The program is main.<ext>: js here, ts for TypeScript.
  */
-function cleanError(stderr: string, sourceLines: number): string {
+export function nodeCleanError(stderr: string, sourceLines: number, ext: "js" | "ts"): string {
   const lines = stderr.replace(/\r\n/g, "\n").split("\n");
-  const header = lines[0]?.match(/main\.js:(\d+)$/);
+  const header = lines[0]?.match(new RegExp(`main\\.${ext}:(\\d+)$`));
   if (header && Number(header[1]) > sourceLines) lines.splice(0, 3);
+  const frame = new RegExp(`main\\.${ext}:(\\d+):\\d+`);
   return lines
     .filter((line) => {
       if (/^Node\.js v\d/.test(line)) return false;
       if (!/^\s+at\s/.test(line)) return true;
-      const frame = line.match(/main\.js:(\d+):\d+/);
-      return frame !== null && Number(frame[1]) <= sourceLines;
+      const match = line.match(frame);
+      return match !== null && Number(match[1]) <= sourceLines;
     })
     .join("\n")
-    .replace(/[^\s()]*main\.js/g, "solution.js")
+    .replace(new RegExp(`[^\\s()]*main\\.${ext}`, "g"), `solution.${ext}`)
     .trim();
 }
 
@@ -71,13 +72,17 @@ export const javascript: LanguageSpec = {
   // Node.js 24, the same major in Vercel Sandbox and locally.
   version: "Node.js 24",
   timeMultiplier: 1,
+  image: "managed",
   starterCode,
-  cleanError,
-  program(judge, source) {
+  stdioTemplate: "const input = require(\"fs\").readFileSync(0, \"utf8\");\nconst lines = input.trim().split(\"\\n\");\n\n// Solve it here and print the answer with console.log.\n",
+  cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "js"),
+  // V8's own heap limit: running out prints "JavaScript heap out of memory".
+  outOfMemory: /heap out of memory/,
+  program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;
     return {
       files: { "main.js": code },
-      run: ["node", "main.js"],
+      run: ["node", `--max-old-space-size=${memoryMb}`, "main.js"],
     };
   },
 };

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { HeaderAuth } from "./header-auth";
 import { ThemeToggle } from "./theme-toggle";
@@ -12,6 +13,11 @@ export function SiteHeader() {
         <Link href="/" className="text-[15px] font-medium tracking-tight">
           {site.name}
         </Link>
+        <nav aria-label="Main" className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/problems">Problems</Link>
+          </Button>
+        </nav>
 
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />

@@ -1,0 +1,12 @@
+[
+  {
+    "input": "The cat and the hat.\nThe END\n",
+    "output": "the 3\nand 1\ncat 1\nend 1\nhat 1\n",
+    "explanation": "\"The\", \"the\" and \"The\" are one word. The ties at 1 are sorted alphabetically."
+  },
+  {
+    "input": "don't stop: rock'n'roll!\n",
+    "output": "don 1\nn 1\nrock 1\nroll 1\nstop 1\nt 1\n",
+    "explanation": "Apostrophes separate words: don, t, stop, rock, n, roll."
+  }
+]

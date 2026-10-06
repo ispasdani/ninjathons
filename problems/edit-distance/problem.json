@@ -1,0 +1,35 @@
+{
+  "slug": "edit-distance",
+  "title": "Edit Distance",
+  "difficulty": "hard",
+  "tags": [
+    "strings",
+    "dynamic-programming"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "minDistance",
+    "params": [
+      {
+        "name": "word1",
+        "type": "string"
+      },
+      {
+        "name": "word2",
+        "type": "string"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

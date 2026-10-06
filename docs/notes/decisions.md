@@ -16,6 +16,8 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Pro: about €8/month or €69/year, regional prices, early-bird pricing | [10](#10-pro-price) |
 | 3 Oct 2026 | Keep both World Conquest and Battle royale; pick the order in V2 | [11](#11-world-conquest-and-battle-royale) |
 | 3 Oct 2026 | Build plan: 11 phases with a check that marks each one done; judging core first | [12](#12-build-plan-phases) |
+| 6 Oct 2026 | HTML and CSS move from phase 2 to phase 7 (Learn) | [8](#8-launch-languages), [12](#12-build-plan-phases) |
+| 6 Oct 2026 | Runner speed work for the compiled languages happens in phase 4, before the load test | [5](#5-code-runner-vercel-sandbox) |
 
 ---
 
@@ -28,7 +30,7 @@ Every user picks a unique username. It lives in Convex, not Clerk. Clerk only ha
 - **Rules.** 3 to 20 characters, `a-z`, `0-9`, `_` and `-`, starting with a letter.
 - **Reserved names.** Route and system words (`admin`, `api`, `dashboard`, `settings`, `u`, `support`, `help`, `login`, `signup`…) and the brand name are blocked.
 - **When it's chosen.** In an onboarding step right after sign-up, before the first match. Until then the user can't be challenged by name.
-- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for 90 days (and redirects to the new one), so nobody can grab a well-known player's old name right after they change it. The same 90 days apply to the username of a deleted account.
+- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for 90 days (and redirects to the new one, once profile pages exist in phase 8; the cooldown and reservations are built), so nobody can grab a well-known player's old name right after they change it. The same 90 days apply to the username of a deleted account.
 
 ## 2. Payments: Stripe
 
@@ -166,6 +168,9 @@ JavaScript, TypeScript, Python, Java, C#, C++, Rust, plus HTML and CSS. HTML and
 - **Everything goes through one interface,** `runCode({ language, source, tests, limits })`. Vercel Sandbox is the first implementation; a browser runner and a local desktop runner plug in beside it.
 - **Exercises can be written and checked before the hosted runner exists:** the same Docker image runs locally in Docker Desktop, and a check script runs every reference solution against its tests.
 - **Measured 3 Oct 2026** (Two Sum, dev deployment in eu-west-1, sandboxes in **iad1**): Run 1.2 s, Submit 2.1–2.7 s for 17 tests including 1.5 MB of gzipped large tests; a time-limit verdict about 4 s, since it waits out the limit. Sandboxes in dub1 were slower despite being nearer (create ~650 ms against ~280 ms, verdicts 2–4.4 s), so iad1 is the default (`SANDBOX_REGION` overrides it). What made the difference: saving the verdict before stopping the sandbox (stopping takes 3 s), gzipping the job, and the region. Next levers if needed: run all function-mode tests in one process (currently ~60 ms of start-up per test), and moving Convex to a US region.
+- **Measured 6 Oct 2026, with the compiled languages** (Two Sum, same set-up): JavaScript, TypeScript and Python run on the managed image: Run 1.0–1.2 s, Submit 2.2–3.3 s. Java, C#, C++ and Rust run on our runner image: Run 2.7–3.8 s, Submit 3.6–7 s. Where the time goes: a sandbox from our image takes 1.2–1.9 s to start against ~0.3 s for the managed one (slimming the image from 3.2 to 2.45 GB didn't help; Vercel caches its managed images on every machine), uploading Submit's large tests ~1.2 s, compiling 0.5–1.2 s.
+- **Plan for the compiled languages, in phase 4 before the load test:** mount each problem's hidden tests from a Vercel Sandbox drive instead of uploading them with every Submit (up to ~1 s off every Submit, in every language), and run all function-mode tests in one process (mostly helps Java and TypeScript). Expected result: Java, C#, C++ and Rust around 3–4 s, since compiling alone takes 0.5–1.2 s.
+- **Launch decision, not before:** keep one or two fresh sandboxes from our image started and waiting, which hides their start-up completely while every submission still gets a never-used machine. It costs the idle machines' time, roughly tens of dollars a month each.
 - **Phase 1 uses Vercel's managed `universal` image** (Node.js 24, Python 3.14), since JavaScript and Python are all it needs; `SANDBOX_IMAGE` switches to our own image when phase 2 adds the compiled languages. Locally, `problems:check` runs code with the installed Node.js and Python through the same harness (Docker isn't required yet).
 
 ### Where code runs
@@ -185,7 +190,7 @@ JavaScript, TypeScript, Python, Java, C#, C++, Rust, plus HTML and CSS. HTML and
 ### Revisit when
 
 - Submissions pass about 30,000–40,000 a month: a flat-price server (Hetzner VM) becomes cheaper. The `runCode` interface keeps that a contained change.
-- The prototype shows verdicts slower than the 3-second target.
+- Verdicts stay slower than the 3-second target after the phase 4 speed work (measured 6 Oct 2026: met for JavaScript, TypeScript and Python Run; not yet for Submit or the compiled languages).
 
 **When to prototype:** right after the pieces that let us test it properly exist: the problem file format, a handful of sample problems with reference solutions, the language Docker image, and the local check script that runs them in Docker Desktop. Then the prototype pushes that same image to Vercel Sandbox and runs the same sample problems from a Convex action, with the network blocked, and measures real cold and warm verdict times. Passing locally and in the sandbox on the same problems is the proof.
 
@@ -289,7 +294,24 @@ problems/two-sum/
 - **The 7 code languages are ranked from day one.** They share one image, one runner and the function and stdio modes; each adds a driver generator and a docs set. In a match each player picks their own language; per-language time-limit multipliers keep it fair.
 - **HTML and CSS are practice-only in V1:** tutorials and practice problems, checked in the browser (sandboxed iframe), free and instant, no XP-for-rating or ranked play.
 - **Ranked HTML/CSS arrives in V1.1:** the `visual` judge mode (DOM checks and pixel matching with headless Chromium in Vercel Sandbox) and a duel screen for it. "CSS duels" is the V1.1 launch headline.
+- **HTML and CSS are built in phase 7 (Learn), not phase 2** (6 Oct 2026). Their challenges are "build the same output as this one": a separate judge (render the user's page, compare it with the target) that shares nothing with the runner or the driver generators, and nothing in phases 3 to 6 needs it. They sit best next to the tutorials that teach them. Still in V1.
 - Docs sets needed at launch: MDN (JS, TS, HTML, CSS), Python, Java API, .NET API (C#), cppreference (C++), Rust std. Each keeps its source and license line.
+
+### As built in phase 2 (6 Oct 2026)
+
+- **Two images in Vercel Sandbox:** JavaScript, TypeScript and Python run on Vercel's managed `universal` image, which Vercel keeps cached, so a sandbox starts in ~0.3 s; Java, C#, C++ and Rust on our runner image, whose sandboxes take 1.2–1.9 s to start (measured 6 Oct 2026; slimming it from 3.2 to 2.45 GB made no difference). Each language declares its image (`image` in `convex/judge/languages`).
+- **One runner image** (`runner/Dockerfile`, Ubuntu 26.04): Node.js 24, Python 3.14, Java 25, .NET 10, GCC 15 (C++20), Rust 1.99. The same image runs in Vercel Sandbox, in CI and locally (`npm run runner:build`); tests and `problems:check` use it whenever it exists (`RUNNER=docker|host` forces one).
+- **TypeScript runs on Node.js's type stripping**: no compile step, so it starts as fast as JavaScript. Types aren't checked, and `enum` and `namespace` are syntax errors, as in Node.
+- **Compiled languages read and write a token format** (`convex/judge/wire.ts`), not JSON, so no driver needs a JSON parser. The judge converts both ways, so tests, checkers and the solve view stay JSON.
+- **LeetCode's shapes:** a `Solution` class in Java, C# and C++ and an `impl Solution` in Rust; C# methods are PascalCase and Rust names snake_case. Java and C# drivers are separate files, so error lines match the editor; C++ and Rust drivers are appended after the user's code. C# gets LeetCode's implicit `using` lines.
+- **Fast compiles:** C# compiles with Roslyn directly (`cs-build`), skipping MSBuild; `<bits/stdc++.h>` is precompiled; Rust compiles with plain `rustc -O`, no cargo or crates. Hello world on 2 CPUs: C# 1.2 s, C++ 0.8 s, Java 0.6 s, Rust 0.1 s.
+- **Memory limits** (`limits.memoryMb`) use each runtime's own cap: V8's heap size (JavaScript, TypeScript), `-Xmx` (Java), the GC hard limit (C#), and `ulimit -v` with headroom for the runtime (Python +128 MB, C++ and Rust +64 MB). The judge recognises each runtime's out-of-memory message and gives Memory limit exceeded (`MLE`), also when Node.js spent the time limit collecting garbage first.
+- **Deep recursion works:** Java and C# run the solution on a thread with a 256 MB stack; C++ and Rust get a 1 GB stack.
+- **Time multipliers:** JavaScript, TypeScript, C++, Rust ×1; Java, C# ×1.5 (start-up and JIT); Python ×2.
+- **Stdio mode:** Java programs are `public class Main`; C# can use top-level statements.
+- **Known gaps:**
+  - A compile error caused by a wrong function or method name (`twosum` instead of `twoSum`) points at a line in the driver, not the user's code. Fix in phase 4, before the private alpha: when a compile error is on a driver line, show "Your code needs a function named …" with the expected signature instead.
+  - The editor has syntax colouring for every language but autocomplete only for JavaScript and TypeScript (Monaco's built-in). Java, C#, C++ and Rust would need language servers; not scheduled, decide after the private alpha.
 
 ## 9. Docs in ranked 1v1
 
@@ -318,13 +340,13 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | # | Phase | Done when |
 |---|---|---|
 | 0 | Setup ✅ | Auth, guardrail wrappers, schema, tests and CI, brand |
-| 1 | Judging core | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
-| 2 | Foundation | All 9 languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
+| 1 | Judging core ✅ | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
+| 2 | Foundation ✅ | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
 | 3 | Progression engine | Solves award XP and badges, and leaderboards update |
 | 4 | 1v1 and private alpha | Runner load test passes; 10 to 20 friends play real matches |
 | 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
-| 7 | Learn | 3 roadmaps and about 20 tutorials live |
+| 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
 | 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
 | 9 | Ninjathons | One event runs from creation to results (first to cut) |
 | 10 | Closed beta and launch | 2 or 3 office teams plus 20 to 50 players; beta issues fixed |

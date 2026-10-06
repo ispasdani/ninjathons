@@ -1,0 +1,23 @@
+{
+  "slug": "grid-shortest-path",
+  "title": "Grid Shortest Path",
+  "difficulty": "medium",
+  "tags": [
+    "stdio",
+    "graphs",
+    "bfs",
+    "matrix"
+  ],
+  "mode": "stdio",
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

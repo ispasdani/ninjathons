@@ -1,0 +1,32 @@
+{
+  "slug": "container-with-most-water",
+  "title": "Container With Most Water",
+  "difficulty": "medium",
+  "tags": [
+    "arrays",
+    "two-pointers",
+    "greedy"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "maxArea",
+    "params": [
+      {
+        "name": "height",
+        "type": "int[]"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

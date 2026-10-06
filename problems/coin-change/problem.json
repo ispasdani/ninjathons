@@ -1,0 +1,34 @@
+{
+  "slug": "coin-change",
+  "title": "Coin Change",
+  "difficulty": "medium",
+  "tags": [
+    "dynamic-programming"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "coinChange",
+    "params": [
+      {
+        "name": "coins",
+        "type": "int[]"
+      },
+      {
+        "name": "amount",
+        "type": "int"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

@@ -3,7 +3,6 @@
  * one shape the check and seed scripts share. Only scripts import this; a
  * lint rule keeps problems/ out of app/ and components/.
  */
-import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
 
@@ -15,7 +14,7 @@ import { EXTENSIONS, problemLanguages } from "../../convex/judge/languages";
 import type { Judge, Language } from "../../convex/judge/types";
 import { checkFunctionInput, checkFunctionTest } from "../../convex/judge/values";
 import { checker, difficulty, language, signature } from "../../convex/schemas/problems";
-import { localRunner } from "./local-runner";
+import { localRunner, runPythonScript } from "./local-runner";
 
 export const PROBLEMS_DIR = "problems";
 
@@ -118,10 +117,7 @@ function readSolutions(dir: string): Solution[] {
 function runGenerator(dir: string): string[] {
   const script = join(dir, "tests", "generate.py");
   if (!existsSync(script)) return [];
-  const python = process.platform === "win32" ? "python" : "python3";
-  const result = spawnSync(python, [script], { encoding: "utf8", maxBuffer: 512 * 1024 * 1024 });
-  if (result.status !== 0) throw new Error(`${script} failed: ${result.stderr || result.error}`);
-  const inputs = JSON.parse(result.stdout);
+  const inputs = JSON.parse(runPythonScript(script));
   if (!Array.isArray(inputs)) throw new Error(`${script} should print a JSON array of inputs`);
   return inputs.map((input) => (typeof input === "string" ? input : JSON.stringify(input)));
 }

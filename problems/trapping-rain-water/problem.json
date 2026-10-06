@@ -1,0 +1,32 @@
+{
+  "slug": "trapping-rain-water",
+  "title": "Trapping Rain Water",
+  "difficulty": "hard",
+  "tags": [
+    "arrays",
+    "two-pointers",
+    "stack"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "trap",
+    "params": [
+      {
+        "name": "height",
+        "type": "int[]"
+      }
+    ],
+    "returns": "long"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

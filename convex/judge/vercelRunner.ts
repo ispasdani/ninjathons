@@ -4,9 +4,11 @@
  * microVM per job, network blocked, stopped as soon as the harness returns.
  *
  * Needs VERCEL_TOKEN, VERCEL_TEAM_ID and VERCEL_PROJECT_ID in the Convex
- * environment. SANDBOX_IMAGE overrides the image; the default managed image
- * has Node.js 24 and Python 3.14, enough for phase 1. The custom image with
- * every compiler comes in phase 2. SANDBOX_REGION overrides the region. The
+ * environment, and SANDBOX_IMAGE for the compiled languages: our runner image
+ * in Vercel Container Registry (runner:<commit sha>, pushed by
+ * .github/workflows/runner-image.yml). JavaScript, TypeScript and Python run
+ * in Vercel's managed image (Node.js 24, Python 3.14), which starts faster.
+ * SANDBOX_REGION overrides the region. The
  * default is iad1: measured from our eu-west-1 Convex deployment on 3 Oct
  * 2026, iad1 created sandboxes in ~280 ms and verdicts came in 1.2–2.7 s;
  * dub1, though nearer, took ~650 ms to create and 2–4.4 s per verdict.
@@ -22,6 +24,19 @@ import type { CodeRunner, RunJob, RunOutput } from "./types";
 const DIR = "/tmp";
 
 export class RunnerNotConfiguredError extends Error {}
+
+const MANAGED_IMAGE = "vercel/sandbox/universal";
+
+function imageFor(job: RunJob): string {
+  if (job.image === "managed") return MANAGED_IMAGE;
+  const image = process.env.SANDBOX_IMAGE;
+  if (!image) {
+    throw new RunnerNotConfiguredError(
+      "Compiled languages need the runner image: set SANDBOX_IMAGE=runner:<commit sha> in the Convex dashboard.",
+    );
+  }
+  return image;
+}
 
 export function vercelRunner(): CodeRunner {
   const token = process.env.VERCEL_TOKEN;
@@ -43,7 +58,7 @@ export function vercelRunner(): CodeRunner {
         token,
         teamId,
         projectId,
-        image: process.env.SANDBOX_IMAGE || "vercel/sandbox/universal",
+        image: imageFor(job),
         region: (process.env.SANDBOX_REGION || "iad1") as "iad1",
         networkPolicy: "deny-all",
         persistent: false,

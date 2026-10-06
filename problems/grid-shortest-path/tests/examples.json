@@ -1,0 +1,15 @@
+[
+  {
+    "input": "3 4\nS..#\n.#..\n...E\n",
+    "output": "5\n"
+  },
+  {
+    "input": "2 3\nS#E\n.#.\n",
+    "output": "-1\n",
+    "explanation": "The wall column cuts E off."
+  },
+  {
+    "input": "1 2\nSE\n",
+    "output": "1\n"
+  }
+]

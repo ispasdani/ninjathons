@@ -1,4 +1,4 @@
-import type { Judge, Language, RunJob, Signature } from "../types";
+import type { Judge, Language, RunJob, SandboxImage, Signature } from "../types";
 
 /** What a language adds to the judge. One per language, written once and tested heavily. */
 export type LanguageSpec = {
@@ -8,14 +8,34 @@ export type LanguageSpec = {
   version: string;
   /** The problem's base time limit is multiplied by this, so slower languages stay fair. */
   timeMultiplier: number;
+  /**
+   * The Vercel Sandbox image it runs in. Vercel keeps its managed image cached
+   * on every machine, so a sandbox from it starts in ~0.3 s against ~1.5 s
+   * for ours (measured 6 Oct 2026); languages that need nothing more use it.
+   */
+  image: SandboxImage;
+  /**
+   * How the function-mode driver reads arguments and prints the result: JSON
+   * (the default), or the token format in ../wire.ts for languages without a
+   * built-in JSON parser. The judge converts either way, so tests stay JSON.
+   */
+  wire?: "json" | "tokens";
   /** What the editor starts with for a function-mode problem. */
   starterCode(signature: Signature): string;
+  /** What the editor starts with for a full-program (stdio) problem: reading the input. */
+  stdioTemplate: string;
   /**
    * Error output as the user should see it: their own code's lines only (no
    * driver or runtime internals), with the file called solution.<ext>.
    * `sourceLines` is how many lines the user wrote; later lines are the driver.
    */
   cleanError(stderr: string, sourceLines: number): string;
-  /** The files and commands that run the user's source (plus the driver in function mode). */
-  program(judge: Judge, source: string): Pick<RunJob, "files" | "compile" | "run">;
+  /**
+   * The files and commands that run the user's source (plus the driver in
+   * function mode), with the problem's memory limit applied in the way this
+   * runtime understands (heap flag, GC limit or ulimit).
+   */
+  program(judge: Judge, source: string, memoryMb: number): Pick<RunJob, "files" | "compile" | "run">;
+  /** What the runtime prints when the program runs out of memory under that limit. */
+  outOfMemory: RegExp;
 };

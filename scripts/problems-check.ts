@@ -4,7 +4,8 @@
  * For every problem folder: validates problem.json and the tests, runs each
  * reference solution through the generated drivers and requires Accepted, and
  * requires every wrong-* solution to fail and every slow-* one to time out.
- * Runs code with the local Node.js and Python (scripts/lib/local-runner.ts).
+ * Runs code in the runner image, or with the local Node.js and Python
+ * (scripts/lib/local-runner.ts).
  */
 import { judgeSubmission } from "../convex/judge/judge";
 import { LANGUAGES, problemLanguages } from "../convex/judge/languages";

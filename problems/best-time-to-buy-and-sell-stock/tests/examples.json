@@ -1,0 +1,29 @@
+[
+  {
+    "input": {
+      "prices": [
+        7,
+        1,
+        5,
+        3,
+        6,
+        4
+      ]
+    },
+    "output": 5,
+    "explanation": "Buy on day 1 (price 1) and sell on day 4 (price 6)."
+  },
+  {
+    "input": {
+      "prices": [
+        7,
+        6,
+        4,
+        3,
+        1
+      ]
+    },
+    "output": 0,
+    "explanation": "Prices only fall, so the best is not to trade."
+  }
+]

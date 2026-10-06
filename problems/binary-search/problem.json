@@ -1,0 +1,35 @@
+{
+  "slug": "binary-search",
+  "title": "Binary Search",
+  "difficulty": "easy",
+  "tags": [
+    "arrays",
+    "binary-search"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "search",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      },
+      {
+        "name": "queries",
+        "type": "int[]"
+      }
+    ],
+    "returns": "int[]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

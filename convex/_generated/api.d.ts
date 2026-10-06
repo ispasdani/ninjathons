@@ -8,19 +8,28 @@
  * @module
  */
 
+import type * as benchmark from "../benchmark.js";
 import type * as http from "../http.js";
 import type * as judge_checker from "../judge/checker.js";
 import type * as judge_harness from "../judge/harness.js";
 import type * as judge_judge from "../judge/judge.js";
+import type * as judge_languages_cpp from "../judge/languages/cpp.js";
+import type * as judge_languages_csharp from "../judge/languages/csharp.js";
 import type * as judge_languages_index from "../judge/languages/index.js";
+import type * as judge_languages_java from "../judge/languages/java.js";
 import type * as judge_languages_javascript from "../judge/languages/javascript.js";
+import type * as judge_languages_limits from "../judge/languages/limits.js";
 import type * as judge_languages_python from "../judge/languages/python.js";
+import type * as judge_languages_rust from "../judge/languages/rust.js";
 import type * as judge_languages_types from "../judge/languages/types.js";
+import type * as judge_languages_typescript from "../judge/languages/typescript.js";
 import type * as judge_types from "../judge/types.js";
 import type * as judge_values from "../judge/values.js";
 import type * as judge_vercelRunner from "../judge/vercelRunner.js";
+import type * as judge_wire from "../judge/wire.js";
 import type * as judging from "../judging.js";
 import type * as lib_functions from "../lib/functions.js";
+import type * as lib_usernames from "../lib/usernames.js";
 import type * as lib_xp from "../lib/xp.js";
 import type * as problems from "../problems.js";
 import type * as schemas_problems from "../schemas/problems.js";
@@ -37,19 +46,28 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  benchmark: typeof benchmark;
   http: typeof http;
   "judge/checker": typeof judge_checker;
   "judge/harness": typeof judge_harness;
   "judge/judge": typeof judge_judge;
+  "judge/languages/cpp": typeof judge_languages_cpp;
+  "judge/languages/csharp": typeof judge_languages_csharp;
   "judge/languages/index": typeof judge_languages_index;
+  "judge/languages/java": typeof judge_languages_java;
   "judge/languages/javascript": typeof judge_languages_javascript;
+  "judge/languages/limits": typeof judge_languages_limits;
   "judge/languages/python": typeof judge_languages_python;
+  "judge/languages/rust": typeof judge_languages_rust;
   "judge/languages/types": typeof judge_languages_types;
+  "judge/languages/typescript": typeof judge_languages_typescript;
   "judge/types": typeof judge_types;
   "judge/values": typeof judge_values;
   "judge/vercelRunner": typeof judge_vercelRunner;
+  "judge/wire": typeof judge_wire;
   judging: typeof judging;
   "lib/functions": typeof lib_functions;
+  "lib/usernames": typeof lib_usernames;
   "lib/xp": typeof lib_xp;
   problems: typeof problems;
   "schemas/problems": typeof schemas_problems;

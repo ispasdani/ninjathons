@@ -7,9 +7,17 @@ export const difficulty = v.union(
   v.literal("hard"),
 );
 
-// Languages the runner supports so far. Phase 1 ships JavaScript and Python;
-// the other code languages join in phase 2 (docs/progress.md).
-export const language = v.union(v.literal("javascript"), v.literal("python"));
+// The 7 code languages (docs/notes/decisions.md §8). HTML and CSS have their
+// own judge, built in phase 7.
+export const language = v.union(
+  v.literal("javascript"),
+  v.literal("typescript"),
+  v.literal("python"),
+  v.literal("java"),
+  v.literal("csharp"),
+  v.literal("cpp"),
+  v.literal("rust"),
+);
 
 // Types a function-mode signature can use. Every driver generator supports
 // exactly these. ListNode and TreeNode come later.
