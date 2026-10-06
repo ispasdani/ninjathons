@@ -71,5 +71,12 @@ jobs:
             ${{ github.ref == 'refs/heads/main' && format('{0}:latest', env.IMAGE) || '' }}
           outputs: type=image,push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true
 
+      # Sandbox can only boot the image once VCR has prepared it.
+      - name: Wait until Sandbox can use it
+        uses: vercel/vcr-action/wait-for-optimized-image@v1
+        with:
+          image: ${{ env.IMAGE }}:${{ github.sha }}
+          timeout-seconds: 900
+
       - name: Summary
-        run: echo "Pushed runner:${GITHUB_SHA}. Set SANDBOX_IMAGE=runner:${GITHUB_SHA} in Convex to use it." >> "$GITHUB_STEP_SUMMARY"
+        run: echo "Pushed runner:${GITHUB_SHA}, ready for Sandbox. Set SANDBOX_IMAGE=runner:${GITHUB_SHA} in Convex to use it." >> "$GITHUB_STEP_SUMMARY"
