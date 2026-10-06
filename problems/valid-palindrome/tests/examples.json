@@ -1,0 +1,23 @@
+[
+  {
+    "input": {
+      "s": "A man, a plan, a canal: Panama"
+    },
+    "output": true,
+    "explanation": "\"amanaplanacanalpanama\" reads the same both ways."
+  },
+  {
+    "input": {
+      "s": "race a car"
+    },
+    "output": false,
+    "explanation": "\"raceacar\" is not a palindrome."
+  },
+  {
+    "input": {
+      "s": " "
+    },
+    "output": true,
+    "explanation": "With nothing left to compare, the phrase is a palindrome."
+  }
+]

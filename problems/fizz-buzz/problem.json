@@ -1,0 +1,31 @@
+{
+  "slug": "fizz-buzz",
+  "title": "FizzBuzz",
+  "difficulty": "easy",
+  "tags": [
+    "strings",
+    "math"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "fizzBuzz",
+    "params": [
+      {
+        "name": "n",
+        "type": "int"
+      }
+    ],
+    "returns": "string[]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "input": {
+      "nums": [
+        -1,
+        0,
+        3,
+        5,
+        9,
+        12
+      ],
+      "queries": [
+        9,
+        2
+      ]
+    },
+    "output": [
+      4,
+      -1
+    ],
+    "explanation": "9 is at index 4; 2 isn't in nums."
+  },
+  {
+    "input": {
+      "nums": [
+        5
+      ],
+      "queries": [
+        5,
+        -5,
+        6
+      ]
+    },
+    "output": [
+      0,
+      -1,
+      -1
+    ]
+  }
+]
