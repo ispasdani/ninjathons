@@ -295,6 +295,7 @@ problems/two-sum/
 
 ### As built in phase 2 (6 Oct 2026)
 
+- **Two images in Vercel Sandbox:** JavaScript, TypeScript and Python run on Vercel's managed `universal` image, which Vercel keeps cached, so a sandbox starts in ~0.3 s; Java, C#, C++ and Rust on our runner image, whose sandboxes take 1.2–1.9 s to start (measured 6 Oct 2026; slimming it from 3.2 to 2.45 GB made no difference). Each language declares its image (`image` in `convex/judge/languages`).
 - **One runner image** (`runner/Dockerfile`, Ubuntu 26.04): Node.js 24, Python 3.14, Java 25, .NET 10, GCC 15 (C++20), Rust 1.99. The same image runs in Vercel Sandbox, in CI and locally (`npm run runner:build`); tests and `problems:check` use it whenever it exists (`RUNNER=docker|host` forces one).
 - **TypeScript runs on Node.js's type stripping**: no compile step, so it starts as fast as JavaScript. Types aren't checked, and `enum` and `namespace` are syntax errors, as in Node.
 - **Compiled languages read and write a token format** (`convex/judge/wire.ts`), not JSON, so no driver needs a JSON parser. The judge converts both ways, so tests, checkers and the solve view stay JSON.

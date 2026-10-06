@@ -26,6 +26,12 @@ Content track: 2 of 150–200 problems (two-sum, add-two-integers), 0 of ~20 tut
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 6 Oct 2026 · Phase 2: faster verdicts
+- JavaScript, TypeScript and Python run on Vercel's managed image again (same Node.js 24 and Python 3.14): Run 1.0–1.2 s, Submit 2.2–3.3 s on Two Sum in the real sandbox.
+- Runner image slimmed from 3.2 to 2.45 GB (only Roslyn from the .NET SDK, no ASP.NET, jlink modules or docs). Its sandboxes still take 1.2–1.9 s to start, so size isn't the cause; Vercel caches its managed images on every machine.
+- Java, C#, C++, Rust: Run 2.7–3.8 s, Submit 3.6–7 s.
+- Open: the compiled languages are over the 3-second target; Submit's test upload (~1.2 s) affects every language.
+
 ### 6 Oct 2026 · Phase 2: runner image live in Vercel Sandbox
 - Runner image pushed to Vercel Container Registry from GitHub Actions (OIDC, no stored secret) and used by the Convex dev deployment (`SANDBOX_IMAGE=runner:<sha>`). Vercel project connected to the repository; Vercel Git deploys off (`vercel.json`) until we host.
 - `npm run sandbox:bench` times every reference solution in the real sandbox (`convex/benchmark.ts`). Two Sum, all 7 languages Accepted. Run 2.2–4.8 s, Submit 2.5–6.9 s; JavaScript, Python and Rust fastest, C++, C# and Java slowest.
