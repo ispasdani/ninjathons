@@ -1,0 +1,35 @@
+[
+  {
+    "input": {
+      "grid": [
+        "11110",
+        "11010",
+        "11000",
+        "00000"
+      ]
+    },
+    "output": 1
+  },
+  {
+    "input": {
+      "grid": [
+        "11000",
+        "11000",
+        "00100",
+        "00011"
+      ]
+    },
+    "output": 3
+  },
+  {
+    "input": {
+      "grid": [
+        "101",
+        "010",
+        "101"
+      ]
+    },
+    "output": 5,
+    "explanation": "Diagonal neighbours don't connect."
+  }
+]

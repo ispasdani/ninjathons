@@ -1,0 +1,22 @@
+[
+  {
+    "input": {
+      "s": "abcabcbb"
+    },
+    "output": 3,
+    "explanation": "\"abc\" is the longest without a repeat."
+  },
+  {
+    "input": {
+      "s": "bbbbb"
+    },
+    "output": 1
+  },
+  {
+    "input": {
+      "s": "pwwkew"
+    },
+    "output": 3,
+    "explanation": "\"wke\". \"pwke\" is not a substring: its letters are not next to each other."
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "slug": "rotate-image",
+  "title": "Rotate Image",
+  "difficulty": "medium",
+  "tags": [
+    "arrays",
+    "matrix"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "rotate",
+    "params": [
+      {
+        "name": "matrix",
+        "type": "int[][]"
+      }
+    ],
+    "returns": "int[][]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "longest-substring-without-repeats",
+  "title": "Longest Substring Without Repeats",
+  "difficulty": "medium",
+  "tags": [
+    "strings",
+    "sliding-window",
+    "hash-map"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "lengthOfLongestSubstring",
+    "params": [
+      {
+        "name": "s",
+        "type": "string"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}
