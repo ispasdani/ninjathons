@@ -6,8 +6,12 @@ name: Runner image
 # the sandbox before it is merged; only main moves the `latest` tag. Convex
 # picks a tag with SANDBOX_IMAGE.
 #
-# Needs, once: a VCR OIDC policy on the Vercel team, and the repository
-# variables VERCEL_TEAM_ID (team_...) and VERCEL_TEAM_SLUG.
+# Needs, once:
+# - a VCR OIDC policy on the Vercel team: GitHub Actions, claim
+#   repository = ispasdani/ninjathons, read and write, project ninjathons;
+# - the VCR repository `runner` in the ninjathons project (Images → Create
+#   Repository): the OIDC token can push but not create repositories;
+# - the repository variables VERCEL_TEAM_ID (team_...) and VERCEL_TEAM_SLUG.
 
 on:
   push:
