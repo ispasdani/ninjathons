@@ -26,6 +26,12 @@ Content track: 2 of 150–200 problems (two-sum, add-two-integers), 0 of ~20 tut
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 6 Oct 2026 · Phase 2
+- Runner image `runner/Dockerfile` (Ubuntu 26.04): Node.js 24 (also runs TypeScript), Python 3.14, Java 25, .NET 10, GCC 15, Rust 1.99. 3.2 GB. C# compiles with Roslyn directly (`cs-build`) instead of `dotnet build`; `<bits/stdc++.h>` is precompiled.
+- Smoke test `runner/smoke/` builds and runs hello world in all 7 languages. Locally in Docker with 2 CPUs: compile C# 1.2 s, C++ 0.8 s, Java 0.6 s, Rust 0.1 s; every run under 100 ms.
+- Workflow `runner-image.yml`: builds and smoke-tests the image on pull requests, pushes it to Vercel Container Registry from `main`.
+- Open: pushing needs a VCR OIDC policy on the Vercel team and the repository variables `VERCEL_TEAM_ID` and `VERCEL_TEAM_SLUG`; not yet timed in Vercel Sandbox.
+
 ### 6 Oct 2026 · Phase 1 done
 - CI green on the phase 1 PR and on `main` after the merge, including `problems:check`. Both checks for phase 1 pass.
 - HTML and CSS moved from phase 2 to phase 7 (decisions §8, §12).

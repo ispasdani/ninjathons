@@ -5,5 +5,5 @@
 # options and reference assemblies are found once, when the image is built.
 set -e
 out="${1%.cs}"
-dotnet "$(cat /opt/cs/csc-path)" @/opt/cs/csc.rsp -out:"$out.dll" "$1"
+dotnet "$(cat /opt/cs/csc-path)" -noconfig @/opt/cs/csc.rsp -out:"$out.dll" "$1"
 cp /opt/cs/runtimeconfig.json "$out.runtimeconfig.json"

@@ -58,7 +58,7 @@ RUN mkdir -p /opt/cs && \
     runtime="$(ls /usr/lib/dotnet/shared/Microsoft.NETCore.App | head -n1)" && \
     test -f "$csc" && test -d "$refs" && test -n "$runtime" && \
     printf '%s' "$csc" > /opt/cs/csc-path && \
-    { printf '%s\n' -nologo -nostdlib -noconfig -optimize+ -langversion:latest -nullable:disable -target:exe; \
+    { printf '%s\n' -nologo -nostdlib -optimize+ -langversion:latest -nullable:disable -target:exe; \
       ls "$refs"/*.dll | sed 's/^/-r:/'; } > /opt/cs/csc.rsp && \
     printf '{"runtimeOptions":{"tfm":"net10.0","framework":{"name":"Microsoft.NETCore.App","version":"%s"}}}' "$runtime" \
       > /opt/cs/runtimeconfig.json
