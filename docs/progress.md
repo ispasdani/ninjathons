@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 2, Foundation. **Next step:** our own runner image with every compiler, and one compiled language timed against the 3-second target.
+**Now:** Phase 2, Foundation. **Next step:** push the runner image to Vercel Container Registry and time all 7 languages in Vercel Sandbox.
 
 ## Phases
 
@@ -26,7 +26,13 @@ Content track: 2 of 150–200 problems (two-sum, add-two-integers), 0 of ~20 tut
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
-### 6 Oct 2026 · Phase 2
+### 6 Oct 2026 · Phase 2: drivers for all 7 languages
+- Function-mode drivers for TypeScript, Java, C#, C++ and Rust, in LeetCode's shapes (decisions §8, as built). Compiled languages use a token format (`convex/judge/wire.ts`) that the judge converts to and from JSON.
+- Native crashes say what happened (segmentation fault, division by zero) instead of nothing.
+- Tests and `problems:check` run in the runner image (`npm run runner:build`), locally and in CI. Driver tests: every signature type, crashes, error lines, time limits, starter code and stdio mode, in all 7 languages (183 tests).
+- Reference solutions in all 7 languages for two-sum and add-two-integers, plus 32-bit-overflow wrong solutions in Java and Rust and an O(n²) C++ one that times out. `problems:check` passes.
+
+### 6 Oct 2026 · Phase 2: runner image
 - Runner image `runner/Dockerfile` (Ubuntu 26.04): Node.js 24 (also runs TypeScript), Python 3.14, Java 25, .NET 10, GCC 15, Rust 1.99. 3.2 GB. C# compiles with Roslyn directly (`cs-build`) instead of `dotnet build`; `<bits/stdc++.h>` is precompiled.
 - Smoke test `runner/smoke/` builds and runs hello world in all 7 languages. Locally in Docker with 2 CPUs: compile C# 1.2 s, C++ 0.8 s, Java 0.6 s, Rust 0.1 s; every run under 100 ms.
 - Workflow `runner-image.yml`: on any push that touches `runner/`, builds and smoke-tests the image and pushes it to Vercel Container Registry as `runner:<sha>`; only `main` moves `latest`.

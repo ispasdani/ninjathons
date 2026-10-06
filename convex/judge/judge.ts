@@ -8,6 +8,7 @@ import type { TestResult, Verdict, VerdictStatus } from "../schemas/submissions"
 import { outputMatches } from "./checker";
 import { LANGUAGES } from "./languages";
 import type { Checker, CodeRunner, Judge, Language, Limits, RunOutput, TestRun } from "./types";
+import { decodeResult, encodeArgs } from "./wire";
 
 export type JudgeTest = {
   input: string;
@@ -41,14 +42,31 @@ export async function runCode(
   },
 ): Promise<RunOutput> {
   const spec = LANGUAGES[request.language];
-  return await runner.run({
-    ...spec.program(request.judge, request.source),
-    tests: request.tests,
+  const { judge } = request;
+  const tokens = judge.mode === "function" && spec.wire === "tokens";
+  const output = await runner.run({
+    ...spec.program(judge, request.source),
+    tests: tokens ? request.tests.map((input) => encodeArgs(judge.signature, input)) : request.tests,
     timeLimitMs: Math.round(request.limits.timeMs * spec.timeMultiplier),
     // A crash or timeout usually repeats on every test, so stop at the first
     // one even on Run. Wrong answers are found here, after the run.
     stopOnError: true,
   });
+  if (!tokens) return output;
+  // Back to JSON, so checkers and the solve view only ever see JSON.
+  return {
+    ...output,
+    tests: output.tests.map((test) => {
+      if (test.status !== "ok") return test;
+      try {
+        return { ...test, stdout: decodeResult(judge.signature.returns, test.stdout) + "\n" };
+      } catch (error) {
+        // Shown as a wrong answer, with the reason in the logs.
+        const reason = `The driver couldn't read the return value: ${(error as Error).message}`;
+        return { ...test, stdout: "", stderr: test.stderr ? `${test.stderr}\n${reason}` : reason };
+      }
+    }),
+  };
 }
 
 export async function judgeSubmission(runner: CodeRunner, request: JudgeRequest): Promise<Verdict> {

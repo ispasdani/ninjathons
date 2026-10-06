@@ -1,9 +1,11 @@
 #!/bin/sh
-# Compiles one C# file with Roslyn directly: `dotnet build` spends seconds on
-# MSBuild for a one-file program. `cs-build main.cs` writes main.dll and
-# main.runtimeconfig.json; `dotnet main.dll` then runs it. The compiler path,
-# options and reference assemblies are found once, when the image is built.
+# Compiles C# with Roslyn directly: `dotnet build` spends seconds on MSBuild
+# for a one-file program. `cs-build solution.cs other.cs...` writes
+# solution.dll (named after the first file), its .pdb for line numbers in
+# stack traces, and solution.runtimeconfig.json; `dotnet solution.dll` then
+# runs it. The compiler path, options and reference assemblies are found once,
+# when the image is built.
 set -e
 out="${1%.cs}"
-dotnet "$(cat /opt/cs/csc-path)" -noconfig @/opt/cs/csc.rsp -out:"$out.dll" "$1"
+dotnet "$(cat /opt/cs/csc-path)" -noconfig @/opt/cs/csc.rsp -out:"$out.dll" "$@"
 cp /opt/cs/runtimeconfig.json "$out.runtimeconfig.json"

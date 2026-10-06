@@ -8,6 +8,12 @@ export type LanguageSpec = {
   version: string;
   /** The problem's base time limit is multiplied by this, so slower languages stay fair. */
   timeMultiplier: number;
+  /**
+   * How the function-mode driver reads arguments and prints the result: JSON
+   * (the default), or the token format in ../wire.ts for languages without a
+   * built-in JSON parser. The judge converts either way, so tests stay JSON.
+   */
+  wire?: "json" | "tokens";
   /** What the editor starts with for a function-mode problem. */
   starterCode(signature: Signature): string;
   /**

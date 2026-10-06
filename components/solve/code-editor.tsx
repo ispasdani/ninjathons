@@ -7,7 +7,15 @@ import { useEffect, useRef } from "react";
 import type { Language } from "@/convex/judge/types";
 
 // Monaco's own language ids.
-const MONACO_LANGUAGE: Record<Language, string> = { javascript: "javascript", python: "python" };
+const MONACO_LANGUAGE: Record<Language, string> = {
+  javascript: "javascript",
+  typescript: "typescript",
+  python: "python",
+  java: "java",
+  csharp: "csharp",
+  cpp: "cpp",
+  rust: "rust",
+};
 
 type Props = {
   language: Language;
@@ -40,7 +48,7 @@ export function CodeEditor({ language, value, onChange, onRun, onSubmit }: Props
         lineHeight: 20,
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
-        tabSize: language === "python" ? 4 : 2,
+        tabSize: language === "python" || language === "rust" || language === "java" || language === "csharp" || language === "cpp" ? 4 : 2,
         automaticLayout: true,
         padding: { top: 12 },
       }}

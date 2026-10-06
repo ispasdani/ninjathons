@@ -19,6 +19,13 @@ const job = JSON.parse(zlib.gunzipSync(fs.readFileSync(process.argv[2])).toStrin
 const MAX_BUFFER = 16 * 1024 * 1024;
 const MAX_STDERR = 8 * 1024;
 
+const SIGNALS = {
+  SIGSEGV: "Segmentation fault: invalid memory access, or a stack overflow",
+  SIGBUS: "Bus error: invalid memory access",
+  SIGFPE: "Floating point exception: usually an integer division by zero",
+  SIGILL: "Illegal instruction",
+};
+
 function clip(text, max) {
   return text.length > max ? text.slice(0, max) + "\n... (truncated)" : text;
 }
@@ -54,10 +61,12 @@ for (const stdin of job.tests) {
   if (code === "ETIMEDOUT") status = "time_limit";
   else if (code === "ENOBUFS") status = "output_limit";
   else if (r.error || r.status !== 0) status = "runtime_error";
+  // Native programs that crash print nothing themselves.
+  const signal = status === "runtime_error" && SIGNALS[r.signal] ? "\n" + SIGNALS[r.signal] : "";
   output.tests.push({
     status,
     stdout: status === "ok" ? r.stdout : "",
-    stderr: clip((r.stderr || "") + (r.error && status === "runtime_error" ? String(r.error) : ""), MAX_STDERR),
+    stderr: clip((r.stderr || "") + (r.error && status === "runtime_error" ? String(r.error) : "") + signal, MAX_STDERR),
     timeMs,
     exitCode: r.status,
   });
