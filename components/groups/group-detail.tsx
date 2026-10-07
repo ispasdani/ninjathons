@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { Check, Copy } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,7 +17,9 @@ import { errorMessage } from "@/lib/errors";
  */
 export function GroupDetail({ groupId }: { groupId: string }) {
   const router = useRouter();
-  const group = useQuery(api.groups.get, { groupId });
+  // Signed-in only: wait for Convex to have the token, or the query throws.
+  const { isAuthenticated } = useConvexAuth();
+  const group = useQuery(api.groups.get, isAuthenticated ? { groupId } : "skip");
   const rename = useMutation(api.groups.rename);
   const regenerate = useMutation(api.groups.regenerateInvite);
   const removeMember = useMutation(api.groups.removeMember);

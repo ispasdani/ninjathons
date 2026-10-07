@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine: engine and pages built, deployed to Convex dev. **Next step:** check the signed-in pages by hand (dashboard, solve rewards, groups, settings), then close the phase.
+**Now:** Phase 3, Progression engine, is done. **Next step:** start phase 4, 1v1 and the private alpha.
 
 ## Phases
 
@@ -11,7 +11,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 0 | Setup | Done | 27 Sept 2026 | 3 Oct 2026 |
 | 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
-| 3 | Progression engine | In progress | 7 Oct 2026 | |
+| 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 4 | 1v1 and private alpha | Not started | | |
 | 5 | Daily and weekly challenges | Not started | | |
 | 6 | Territory | Not started | | |
@@ -25,6 +25,12 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3 done
+- The check passes, by hand in the browser on Convex dev: an accepted Submit showed +10 XP and the First solve badge, a repeat solve explained why there was no XP, and the dashboard and the Level board (Global, Country, Group) updated after the next rebuild.
+- Also checked signed in: settings (country set and cleared), creating a group, its page and board, leaving it.
+- Fixed while checking: `/groups` and `/groups/[id]` crashed on load, because their signed-in queries ran before Convex had the sign-in token; they (and the Submissions tab) now wait for it. The leaderboard no longer flashes the signed-out message while sign-in loads. Edge has no name for Western Sahara (EH), so it has a fallback.
+- Open: solves from before phase 3 gave no XP or badges (only on dev; there are no real users yet).
 
 ### 7 Oct 2026 · Phase 3: progression in the app
 - Dashboard: level card with the XP bar, your Level board rank, badges earned, groups.

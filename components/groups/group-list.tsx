@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -83,7 +83,9 @@ function InlineForm({
 /** Your groups, plus forms to create one or join one by invite code. */
 export function GroupList() {
   const router = useRouter();
-  const groups = useQuery(api.groups.mine);
+  // Signed-in only: wait for Convex to have the token, or the query throws.
+  const { isAuthenticated } = useConvexAuth();
+  const groups = useQuery(api.groups.mine, isAuthenticated ? {} : "skip");
   const create = useMutation(api.groups.create);
   const join = useMutation(api.groups.join);
   const restore = useMutation(api.groups.restore);

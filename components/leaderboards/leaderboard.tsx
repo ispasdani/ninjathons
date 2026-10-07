@@ -44,7 +44,7 @@ function updatedAgo(builtAt: number | null, now: number) {
 export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope: Scope; groupId: string | null }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated } = useConvexAuth();
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const user = useQuery(api.user.getCurrentUser);
   const groups = useQuery(api.groups.mine, isAuthenticated ? {} : "skip");
   const liveGroups = groups?.filter((g) => g.deletedAt === null) ?? [];
@@ -119,7 +119,13 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
       </div>
 
       {args === null ? (
-        <Empty scope={scope} signedIn={isAuthenticated} />
+        // Until sign-in settles (and the user row loads) we can't tell which
+        // empty state applies, so don't flash the signed-out one.
+        authLoading || (isAuthenticated && (user === undefined || (scope === "group" && groups === undefined))) ? (
+          <p className="mt-6 text-[13px] text-muted-foreground">Loading…</p>
+        ) : (
+          <Empty scope={scope} signedIn={isAuthenticated} />
+        )
       ) : (
         <>
           {me && (

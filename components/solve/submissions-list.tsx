@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -27,7 +27,9 @@ export function SubmissionsList({
   labels: Partial<Record<Language, string>>;
   onOpen: (id: Id<"submissions">) => void;
 }) {
-  const rows = useQuery(api.submissions.mine, { slug });
+  // Signed-in only: wait for Convex to have the token, or the query throws.
+  const { isAuthenticated } = useConvexAuth();
+  const rows = useQuery(api.submissions.mine, isAuthenticated ? { slug } : "skip");
 
   if (rows === undefined) return <p className="text-[13px] text-muted-foreground">Loading…</p>;
   if (rows.length === 0) {
