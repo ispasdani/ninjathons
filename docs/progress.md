@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine is built. **Next step:** matchmaking (the queue and the pairing pass).
+**Now:** Phase 4, 1v1 and private alpha: the match engine and matchmaking are built. **Next step:** the duel screen (`/duel/[id]`), then challenges.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: matchmaking
+- Find a match: `matchQueue` (one row per player, with language and rating) and a pairing pass (`queue.pass`) that runs as soon as someone joins, then every 2 s while anyone waits. The rating range starts at ±100 and widens by 50 every 5 s; after a minute anyone is a fair opponent. Longest waiting first, closest rating wins.
+- The page sends a heartbeat every 10 s; a row not seen for 30 s is dropped, so nobody is matched after closing the tab. A single `matchmaking` row keeps two pass loops from running at once.
+- `/play` page: language picker (remembered in this browser), Find a match, waiting time, players waiting, your 1v1 rating, Cancel. "Play" is first in the nav. When matched it opens `/duel/[id]`.
+- 10 new tests. Production build passes; 325 tests. Deployed to Convex dev.
+- Open: `/duel/[id]` doesn't exist yet (next step), and the page hasn't been checked signed in.
 
 ### 7 Oct 2026 · Phase 4: match engine
 - Match rules agreed and written down in [decisions §14](notes/decisions.md#14-1v1-matches): difficulty and time limit from the players' average rating, each player's own language, first accepted Submit wins by the time it was sent, best Submit wins at time up, 10 s between Submits.

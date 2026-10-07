@@ -122,6 +122,12 @@ export async function createMatch(
     endsAt,
   });
   for (const [i, player] of game.players.entries()) {
+    // Out of the queue, however this match was made.
+    const queued = await ctx.db
+      .query("matchQueue")
+      .withIndex("by_user", (q) => q.eq("userId", player.userId))
+      .unique();
+    if (queued) await ctx.db.delete(queued._id);
     await ctx.db.insert("matchPlayers", {
       matchId,
       userId: player.userId,

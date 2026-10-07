@@ -3,7 +3,7 @@ import { defineSchema } from "convex/server";
 import { problems, problemTests } from "./schemas/problems";
 import { groupMembers, groups } from "./schemas/groups";
 import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboards";
-import { matchEvents, matches, matchPlayers } from "./schemas/matches";
+import { matchEvents, matches, matchmaking, matchPlayers, matchQueue } from "./schemas/matches";
 import { badgeCounts, userBadges, xpLedger, xpMonths } from "./schemas/progression";
 import { ratingHistory, ratings } from "./schemas/ratings";
 import { submissions } from "./schemas/submissions";
@@ -30,4 +30,6 @@ export default defineSchema({
   matches,
   matchPlayers,
   matchEvents,
+  matchQueue,
+  matchmaking,
 });

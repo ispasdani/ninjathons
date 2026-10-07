@@ -234,6 +234,12 @@ export const deleteFromClerk = internalMutation({
       for (const row of rows) await ctx.db.delete(row._id);
     }
 
+    const queued = await ctx.db
+      .query("matchQueue")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .unique();
+    if (queued) await ctx.db.delete(queued._id);
+
     // Their side of each match and their feed events; opponents keep their own.
     const played = await ctx.db
       .query("matchPlayers")

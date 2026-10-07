@@ -70,3 +70,23 @@ export const matchEvents = defineTable({
   total: v.optional(v.number()),
   accepted: v.optional(v.boolean()),
 }).index("by_match", ["matchId"]);
+
+// Players looking for a ranked 1v1 match (decisions §14). One row per player,
+// removed when they're matched, leave, or stop sending heartbeats.
+export const matchQueue = defineTable({
+  userId: v.id("users"),
+  language,
+  // Their 1v1 rating when they joined.
+  rating: v.number(),
+  joinedAt: v.number(),
+  // The page pings while it's open; stale rows are dropped by the pass.
+  lastSeenAt: v.number(),
+})
+  .index("by_user", ["userId"])
+  .index("by_joined", ["joinedAt"]);
+
+// A single row: when the next pairing pass is due. The pass keeps itself
+// scheduled while anyone is queued, and this stops two loops running at once.
+export const matchmaking = defineTable({
+  nextPassAt: v.number(),
+});

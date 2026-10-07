@@ -6,6 +6,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 // (problems, profiles, leaderboards) stay open for search engines.
 const isAppRoute = createRouteMatcher([
   "/dashboard(.*)",
+  "/play(.*)",
   "/duel(.*)",
   "/solve(.*)",
   "/courses(.*)",

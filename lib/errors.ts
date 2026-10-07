@@ -10,6 +10,11 @@ const MESSAGES: Record<string, string> = {
   NOT_GROUP_OWNER: "Only the group's owner can do that.",
   OWNER_CANNOT_REMOVE_SELF: "To leave your own group, use Leave group.",
   UNKNOWN_COUNTRY: "Pick a country from the list.",
+  USERNAME_REQUIRED: "Pick a username first.",
+  ALREADY_IN_MATCH: "You're already in a match.",
+  MATCH_NOT_FOUND: "That match doesn't exist, or you're not in it.",
+  MATCH_OVER: "This match isn't taking Submits.",
+  SUBMIT_COOLDOWN: "Wait 10 seconds between Submits.",
 };
 
 export function errorMessage(error: unknown) {
