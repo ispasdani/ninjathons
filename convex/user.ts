@@ -10,6 +10,9 @@ import {
   userMutation,
   userQuery,
 } from "./lib/functions";
+import { isCountryCode } from "./lib/countries";
+import { leaveGroup } from "./lib/groups";
+import { levelProgress } from "./lib/levels";
 import {
   checkUsernameRules,
   USERNAME_COOLDOWN_MS,
@@ -29,7 +32,7 @@ export const getCurrentUser = publicQuery({
     const user = await getCurrentUserOrNull(ctx);
     if (!user) return null;
     const { tier } = await getPlan(ctx, user);
-    return { ...user, tier };
+    return { ...user, tier, progress: levelProgress(user.xp ?? 0) };
   },
 });
 
@@ -148,6 +151,19 @@ export const setUsername = userMutation({
   },
 });
 
+/**
+ * The country shown on leaderboards and used for the Country scope, or null
+ * to show none (and leave the Country boards). Takes effect on the next
+ * leaderboard rebuild.
+ */
+export const setCountry = userMutation({
+  args: { country: v.union(v.string(), v.null()) },
+  handler: async (ctx, { country }) => {
+    if (country !== null && !isCountryCode(country)) throw new ConvexError("UNKNOWN_COUNTRY");
+    await ctx.db.patch(ctx.user._id, { country: country ?? undefined });
+  },
+});
+
 // Called by the Clerk webhook for user.created and user.updated. Clerk retries
 // deliveries, so this has to be safe to run more than once.
 export const upsertFromClerk = internalMutation({
@@ -194,6 +210,53 @@ export const deleteFromClerk = internalMutation({
       .withIndex("by_user_key", (q) => q.eq("userId", user._id))
       .collect();
     for (const entry of xp) await ctx.db.delete(entry._id);
+
+    // Badges go too, and stop counting toward rarity.
+    const badges = await ctx.db
+      .query("userBadges")
+      .withIndex("by_user_badge", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const badge of badges) {
+      const count = await ctx.db
+        .query("badgeCounts")
+        .withIndex("by_badge", (q) => q.eq("badgeId", badge.badgeId))
+        .unique();
+      if (count) await ctx.db.patch(count._id, { holders: Math.max(0, count.holders - 1) });
+      await ctx.db.delete(badge._id);
+    }
+
+    // Their ratings and history go; opponents keep their own rating changes.
+    for (const table of ["ratings", "ratingHistory"] as const) {
+      const rows = await ctx.db
+        .query(table)
+        .withIndex("by_user_area", (q) => q.eq("userId", user._id))
+        .collect();
+      for (const row of rows) await ctx.db.delete(row._id);
+    }
+
+    const months = await ctx.db
+      .query("xpMonths")
+      .withIndex("by_user_month", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of months) await ctx.db.delete(row._id);
+
+    // Off the leaderboards now; the ranks close up on the next rebuild.
+    const snapshots = await ctx.db
+      .query("leaderboardSnapshots")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of snapshots) await ctx.db.delete(row._id);
+
+    // Owned groups pass to the member who joined first, or go if left empty.
+    const memberships = await ctx.db
+      .query("groupMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const m of memberships) {
+      const group = await ctx.db.get(m.groupId);
+      if (group) await leaveGroup(ctx, group, user._id);
+      else await ctx.db.delete(m._id);
+    }
 
     // The name stays reserved for 90 days after the account is gone.
     if (user.usernameKey) {

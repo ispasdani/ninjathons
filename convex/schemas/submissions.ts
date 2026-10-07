@@ -63,6 +63,13 @@ export const submissions = defineTable({
   verdict: v.optional(verdict),
   error: v.optional(v.string()),
   finishedAt: v.optional(v.number()),
+  // XP this submission earned: set on an accepted Submit that was the first
+  // solve of the problem in this language.
+  xpAwarded: v.optional(v.number()),
+  // The level this submission's XP took the user to, when it crossed one.
+  levelReached: v.optional(v.number()),
+  // Badges first earned by this submission (ids from lib/badges.ts).
+  badgesEarned: v.optional(v.array(v.string())),
 })
   .index("by_user", ["userId"])
   .index("by_user_problem", ["userId", "problemId"])

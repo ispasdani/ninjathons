@@ -14,7 +14,7 @@ export const xpSource = v.union(
 );
 
 // Append-only XP ledger. `key` is unique per user and awarded action (for
-// example "solve:<problemId>:<lang>"), enforced by awardXp in lib/xp.ts, so a
+// example "solve:<slug>:<lang>"), enforced by awardXp in lib/xp.ts, so a
 // retried request can never award XP twice. Levels, titles and badges are
 // computed from this table.
 export const xpLedger = defineTable({
@@ -23,3 +23,31 @@ export const xpLedger = defineTable({
   source: xpSource,
   amount: v.number(),
 }).index("by_user_key", ["userId", "key"]);
+
+// XP earned per user per calendar month (UTC, "2026-10"), for the monthly
+// Level board. Kept by awardXp next to the ledger entry; `tieBreak` works as
+// on users.
+export const xpMonths = defineTable({
+  userId: v.id("users"),
+  month: v.string(),
+  xp: v.number(),
+  tieBreak: v.number(),
+})
+  .index("by_user_month", ["userId", "month"])
+  .index("by_month_xp", ["month", "xp", "tieBreak"]);
+
+// Badges a user has earned. `badgeId` is an id from BADGES in lib/badges.ts;
+// one row per user and badge, written only by grantBadge there. Earned badges
+// are permanent, even if the badge is later retired.
+export const userBadges = defineTable({
+  userId: v.id("users"),
+  badgeId: v.string(),
+}).index("by_user_badge", ["userId", "badgeId"]);
+
+// How many users hold each badge, for rarity. Kept by grantBadge and by
+// account deletion. Rarity is holders / holders of "first-solve" (players with
+// at least one solve, decisions §13).
+export const badgeCounts = defineTable({
+  badgeId: v.string(),
+  holders: v.number(),
+}).index("by_badge", ["badgeId"]);

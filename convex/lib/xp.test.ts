@@ -56,4 +56,17 @@ describe("awardXp", () => {
 
     expect(java.awarded).toBe(true);
   });
+
+  it("keeps the user's total XP equal to the ledger", async () => {
+    const t = setup();
+    const userId = await insertUser(t, "user_1");
+    const entry = { userId, source: "solve" as const };
+
+    await t.run((ctx) => awardXp(ctx, { ...entry, key: "solve:p1:python", amount: 20 }));
+    await t.run((ctx) => awardXp(ctx, { ...entry, key: "solve:p1:python", amount: 20 }));
+    await t.run((ctx) => awardXp(ctx, { ...entry, key: "solve:p2:python", amount: 40 }));
+
+    const user = await t.run((ctx) => ctx.db.get(userId));
+    expect(user?.xp).toBe(60);
+  });
 });

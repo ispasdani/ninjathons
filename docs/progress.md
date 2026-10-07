@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 2, Foundation, is done. **Next step:** start phase 3, the progression engine (XP ledger, levels, badges, ratings, leaderboards).
+**Now:** Phase 3, Progression engine, is done. **Next step:** start phase 4, 1v1 and the private alpha.
 
 ## Phases
 
@@ -11,7 +11,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 0 | Setup | Done | 27 Sept 2026 | 3 Oct 2026 |
 | 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
-| 3 | Progression engine | Not started | | |
+| 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 4 | 1v1 and private alpha | Not started | | |
 | 5 | Daily and weekly challenges | Not started | | |
 | 6 | Territory | Not started | | |
@@ -25,6 +25,55 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3 done
+- The check passes, by hand in the browser on Convex dev: an accepted Submit showed +10 XP and the First solve badge, a repeat solve explained why there was no XP, and the dashboard and the Level board (Global, Country, Group) updated after the next rebuild.
+- Also checked signed in: settings (country set and cleared), creating a group, its page and board, leaving it.
+- Fixed while checking: `/groups` and `/groups/[id]` crashed on load, because their signed-in queries ran before Convex had the sign-in token; they (and the Submissions tab) now wait for it. The leaderboard no longer flashes the signed-out message while sign-in loads. Edge has no name for Western Sahara (EH), so it has a fallback.
+- Open: solves from before phase 3 gave no XP or badges (only on dev; there are no real users yet).
+
+### 7 Oct 2026 · Phase 3: progression in the app
+- Dashboard: level card with the XP bar, your Level board rank, badges earned, groups.
+- Solve view: an accepted Submit shows +XP, a new level and new badges; a repeat solve says why there's no XP. Submissions record `levelReached`.
+- New pages: `/leaderboards` (Level, This month, 1v1; Global, Country, Group; your row pinned, Jump to me, paging), `/badges` (by area, rarity, yours), `/groups` and `/groups/[id]` (create, join, invite code, members, owner controls, restore), `/settings` (country, or none).
+- Header: Leaderboards and Badges links; on phones the nav folds into a menu so the header no longer scrolls sideways at 375 px. Groups and Settings are in the account menu.
+- `user.setCountry` (ISO codes, `convex/lib/countries.ts`); a group page or board you can't see returns nothing instead of an error.
+- Deployed to Convex dev; the leaderboard cron runs there. Checked in the browser signed out: leaderboards (all scopes), badges, light and dark, phone width. Production build passes; 306 tests.
+- Open: the signed-in pages haven't been checked by hand yet.
+
+### 7 Oct 2026 · Phase 3: leaderboards and groups
+- Boards: Level (all time and this month) and 1v1 (decisions §13). Scopes: Global and Country from `leaderboardSnapshots`, rebuilt every 5 minutes by a cron (`convex/crons.ts`) page by page; Group computed live for members. `leaderboards.board` returns rows from any rank plus your live position.
+- Ties go to whoever got there first; 1v1 shows only players with 10 ranked games who played in the last 30 days. Old snapshot versions and monthly boards older than last month are deleted.
+- Groups (`convex/groups.ts`): create, join by invite code, leave, rename, new code, remove members, soft delete with 30-day restore and a daily purge. 100 members, 10 groups per user.
+- Account deletion removes monthly XP and snapshot rows, and hands owned groups to the earliest member.
+- 18 new tests, including the phase check end to end: a real solve puts the player on both Level boards.
+- Open: no country input yet, so the Country scope stays empty until step 6; join attempts by code aren't rate-limited.
+
+### 7 Oct 2026 · Phase 3: ratings
+- Glicko-2 in `convex/lib/glicko2.ts`, matching the worked example in Glickman's paper; one rating period per game (decisions §13).
+- Tables `ratings` (one row per user and area: `1v1`, `territory`) and `ratingHistory`. `recordDuel` in `convex/lib/ratings.ts` rates both players of a 1v1 game from their ratings before it and keeps wins, losses and draws.
+- Tiers from design.md 2.5; provisional until 10 ranked games. `ratings.mine` returns your ratings with tier and record.
+- Account deletion removes ratings and history.
+- 15 new tests.
+- Open: nothing calls `recordDuel` until 1v1 (phase 4), which also adds the ranked-game limits. Territory's OpenSkill comes in phase 6.
+
+### 7 Oct 2026 · Phase 3: badges
+- 21 badges from solves and levels (decisions §13): first solve, 10/50/100/500 problems, first hard, 50 in each language, Polyglot, one per title band. Later badges are listed there with their phase.
+- `convex/lib/badges.ts`: definitions and rules. Level badges are checked on every XP award, solve badges on every accepted Submit, in the same transaction. The submission records new badges (`badgesEarned`).
+- Tables `userBadges` and `badgeCounts`; `badges.list` returns every badge with its rarity (share of players with a solve) and, signed in, when you earned it. Account deletion removes badges and lowers the counts.
+- 14 new tests.
+
+### 7 Oct 2026 · Phase 3: levels and titles
+- Total XP on the user row (`users.xp`), updated by `awardXp` in the same transaction as the ledger entry.
+- `convex/lib/levels.ts`: level from total XP (start at 1; level n + 1 at 100 × n^1.5, so level 2 at 100 XP, 50 at 34,300) and the roadmap's placeholder titles, Initiate to Legend (decisions §13).
+- `user.getCurrentUser` returns `progress` (XP, level, title, where this level starts and the next begins) for the XP bar.
+- 7 tests: thresholds, title bands, slower levels as you go, the total matching the ledger.
+
+### 7 Oct 2026 · Phase 3: solves award XP
+- An accepted Submit writes to the XP ledger: 10 easy, 20 medium, 40 hard (roadmap, XP sources), first solve per problem per language only. Run and failed Submits give nothing.
+- Ledger key `solve:<slug>:<language>` (the slug never changes, decisions §7); `awardXp` keeps it to once even on retries.
+- The submission row records what it earned (`xpAwarded`), also returned by `submissions.mine`, for the solve view to show later.
+- 4 tests in `convex/submissions.test.ts` (first solve, Run and failures, once per language and per user, difficulty).
 
 ### 6 Oct 2026 · Phase 2 done
 - The check passes: a new user signs up, picks a username and solves any of 30 problems in any of the 7 code languages. Username onboarding was checked by hand; every problem's references are Accepted by `problems:check` in the runner image, and Two Sum and Sum of a List in all their languages in the real sandbox.

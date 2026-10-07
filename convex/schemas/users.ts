@@ -19,10 +19,18 @@ export const users = defineTable({
   usernameChangedAt: v.optional(v.number()),
   // ISO 3166-1 alpha-2, for the Country leaderboard scope.
   country: v.optional(v.string()),
+  // Total XP, the sum of this user's xpLedger rows. Written only by awardXp
+  // in lib/xp.ts; absent means 0. Level and title are computed from it.
+  xp: v.optional(v.number()),
+  // Minus the time `xp` last changed. On equal XP whoever got there first
+  // ranks higher, and a descending index on ["xp", "xpTieBreak"] reads them in
+  // exactly that order.
+  xpTieBreak: v.optional(v.number()),
 })
   .index("by_clerkId", ["clerkId"])
   .index("by_email", ["email"])
-  .index("by_usernameKey", ["usernameKey"]);
+  .index("by_usernameKey", ["usernameKey"])
+  .index("by_xp", ["xp", "xpTieBreak"]);
 
 // One row per user (organizations come in V2). Written only by the payment
 // webhook; read by the pro* wrappers in lib/functions.ts. No row means the

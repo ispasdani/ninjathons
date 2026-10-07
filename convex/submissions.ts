@@ -4,6 +4,8 @@ import { internal } from "./_generated/api";
 import { internalMutation, internalQuery } from "./_generated/server";
 import { problemLanguages } from "./judge/languages";
 import { userMutation, userQuery } from "./lib/functions";
+import { checkSolveBadges } from "./lib/badges";
+import { awardXp, SOLVE_XP, solveKey } from "./lib/xp";
 import { language } from "./schemas/problems";
 import { submissionKind, verdict } from "./schemas/submissions";
 
@@ -90,6 +92,7 @@ export const mine = userQuery({
       kind: s.kind,
       language: s.language,
       status: s.status,
+      xpAwarded: s.xpAwarded,
       verdict: s.verdict && {
         status: s.verdict.status,
         passed: s.verdict.passed,
@@ -139,6 +142,25 @@ export const finish = internalMutation({
       verdict,
       error,
       finishedAt: Date.now(),
+    });
+
+    // Only a Submit counts as a solve; Run judges the examples only.
+    const submission = await ctx.db.get(submissionId);
+    if (submission?.kind !== "submit" || verdict?.status !== "accepted") return;
+    const problem = await ctx.db.get(submission.problemId);
+    if (!problem) return;
+    const amount = SOLVE_XP[problem.difficulty];
+    const xp = await awardXp(ctx, {
+      userId: submission.userId,
+      key: solveKey(problem.slug, submission.language),
+      source: "solve",
+      amount,
+    });
+    const badges = [...xp.badges, ...(await checkSolveBadges(ctx, submission.userId, problem))];
+    await ctx.db.patch(submissionId, {
+      xpAwarded: xp.awarded ? amount : undefined,
+      levelReached: xp.awarded ? xp.levelUp : undefined,
+      badgesEarned: badges.length ? badges : undefined,
     });
   },
 });

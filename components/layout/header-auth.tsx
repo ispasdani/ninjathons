@@ -1,6 +1,7 @@
 "use client";
 
 import { Show, UserButton } from "@clerk/nextjs";
+import { Settings, Users } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,8 @@ export function HeaderAuth() {
         <Button variant="ghost" asChild>
           <Link href="/sign-in">Sign in</Link>
         </Button>
-        <Button asChild>
+        {/* On phones Sign in alone fits; the sign-in page links to sign-up. */}
+        <Button className="hidden sm:inline-flex" asChild>
           <Link href="/sign-up">Get started</Link>
         </Button>
       </Show>
@@ -21,7 +23,12 @@ export function HeaderAuth() {
         <Button variant="ghost" asChild>
           <Link href="/dashboard">Dashboard</Link>
         </Button>
-        <UserButton />
+        <UserButton>
+          <UserButton.MenuItems>
+            <UserButton.Link label="Groups" labelIcon={<Users className="size-4" />} href="/groups" />
+            <UserButton.Link label="Settings" labelIcon={<Settings className="size-4" />} href="/settings" />
+          </UserButton.MenuItems>
+        </UserButton>
       </Show>
     </>
   );

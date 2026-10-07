@@ -1,6 +1,8 @@
 import type { Doc } from "@/convex/_generated/dataModel";
 import type { VerdictStatus } from "@/convex/schemas/submissions";
 
+import { Rewards } from "./rewards";
+
 const LABELS: Record<VerdictStatus, { short: string; long: string; color: string }> = {
   accepted: { short: "AC", long: "Accepted", color: "text-verdict-ac bg-verdict-ac/10" },
   wrong_answer: { short: "WA", long: "Wrong answer", color: "text-verdict-wa bg-verdict-wa/10" },
@@ -65,6 +67,8 @@ export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | 
           {seconds !== null && ` · verdict in ${seconds.toFixed(1)} s`}
         </span>
       </div>
+
+      {submission.kind === "submit" && verdict.status === "accepted" && <Rewards submission={submission} />}
 
       {verdict.compileOutput && <Block label="Compiler output" text={verdict.compileOutput} />}
 

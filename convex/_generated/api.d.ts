@@ -8,7 +8,10 @@
  * @module
  */
 
+import type * as badges from "../badges.js";
 import type * as benchmark from "../benchmark.js";
+import type * as crons from "../crons.js";
+import type * as groups from "../groups.js";
 import type * as http from "../http.js";
 import type * as judge_checker from "../judge/checker.js";
 import type * as judge_harness from "../judge/harness.js";
@@ -28,12 +31,24 @@ import type * as judge_values from "../judge/values.js";
 import type * as judge_vercelRunner from "../judge/vercelRunner.js";
 import type * as judge_wire from "../judge/wire.js";
 import type * as judging from "../judging.js";
+import type * as leaderboards from "../leaderboards.js";
+import type * as lib_badges from "../lib/badges.js";
+import type * as lib_countries from "../lib/countries.js";
 import type * as lib_functions from "../lib/functions.js";
+import type * as lib_glicko2 from "../lib/glicko2.js";
+import type * as lib_groups from "../lib/groups.js";
+import type * as lib_leaderboards from "../lib/leaderboards.js";
+import type * as lib_levels from "../lib/levels.js";
+import type * as lib_ratings from "../lib/ratings.js";
 import type * as lib_usernames from "../lib/usernames.js";
 import type * as lib_xp from "../lib/xp.js";
 import type * as problems from "../problems.js";
+import type * as ratings from "../ratings.js";
+import type * as schemas_groups from "../schemas/groups.js";
+import type * as schemas_leaderboards from "../schemas/leaderboards.js";
 import type * as schemas_problems from "../schemas/problems.js";
 import type * as schemas_progression from "../schemas/progression.js";
+import type * as schemas_ratings from "../schemas/ratings.js";
 import type * as schemas_submissions from "../schemas/submissions.js";
 import type * as schemas_users from "../schemas/users.js";
 import type * as submissions from "../submissions.js";
@@ -46,7 +61,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  badges: typeof badges;
   benchmark: typeof benchmark;
+  crons: typeof crons;
+  groups: typeof groups;
   http: typeof http;
   "judge/checker": typeof judge_checker;
   "judge/harness": typeof judge_harness;
@@ -66,12 +84,24 @@ declare const fullApi: ApiFromModules<{
   "judge/vercelRunner": typeof judge_vercelRunner;
   "judge/wire": typeof judge_wire;
   judging: typeof judging;
+  leaderboards: typeof leaderboards;
+  "lib/badges": typeof lib_badges;
+  "lib/countries": typeof lib_countries;
   "lib/functions": typeof lib_functions;
+  "lib/glicko2": typeof lib_glicko2;
+  "lib/groups": typeof lib_groups;
+  "lib/leaderboards": typeof lib_leaderboards;
+  "lib/levels": typeof lib_levels;
+  "lib/ratings": typeof lib_ratings;
   "lib/usernames": typeof lib_usernames;
   "lib/xp": typeof lib_xp;
   problems: typeof problems;
+  ratings: typeof ratings;
+  "schemas/groups": typeof schemas_groups;
+  "schemas/leaderboards": typeof schemas_leaderboards;
   "schemas/problems": typeof schemas_problems;
   "schemas/progression": typeof schemas_progression;
+  "schemas/ratings": typeof schemas_ratings;
   "schemas/submissions": typeof schemas_submissions;
   "schemas/users": typeof schemas_users;
   submissions: typeof submissions;

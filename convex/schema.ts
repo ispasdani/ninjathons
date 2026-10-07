@@ -1,7 +1,10 @@
 import { defineSchema } from "convex/server";
 
 import { problems, problemTests } from "./schemas/problems";
-import { xpLedger } from "./schemas/progression";
+import { groupMembers, groups } from "./schemas/groups";
+import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboards";
+import { badgeCounts, userBadges, xpLedger, xpMonths } from "./schemas/progression";
+import { ratingHistory, ratings } from "./schemas/ratings";
 import { submissions } from "./schemas/submissions";
 import { entitlements, usernameReservations, users } from "./schemas/users";
 
@@ -14,4 +17,13 @@ export default defineSchema({
   problemTests,
   submissions,
   xpLedger,
+  xpMonths,
+  userBadges,
+  badgeCounts,
+  ratings,
+  ratingHistory,
+  leaderboardSnapshots,
+  leaderboardVersions,
+  groups,
+  groupMembers,
 });

@@ -18,6 +18,10 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Build plan: 11 phases with a check that marks each one done; judging core first | [12](#12-build-plan-phases) |
 | 6 Oct 2026 | HTML and CSS move from phase 2 to phase 7 (Learn) | [8](#8-launch-languages), [12](#12-build-plan-phases) |
 | 6 Oct 2026 | Runner speed work for the compiled languages happens in phase 4, before the load test | [5](#5-code-runner-vercel-sandbox) |
+| 7 Oct 2026 | Levels start at 1; total XP is kept on the user row | [13](#13-xp-and-levels) |
+| 7 Oct 2026 | 21 badges from solves and levels; rarity among players with a solve | [13](#badges) |
+| 7 Oct 2026 | Ratings per area; 1v1 uses Glicko-2 with one rating period per game | [13](#ratings) |
+| 7 Oct 2026 | Level and 1v1 boards with Global, Country and Group scopes; free private groups | [13](#leaderboards-and-groups) |
 
 ---
 
@@ -362,3 +366,52 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 - **A private alpha follows 1v1,** so problems with the runner and judging are found early, not only in the closed beta.
 - **The runner load test moves to 1v1,** when many people first submit code at the same moment.
 - **Unchanged:** the cut order if time runs short (ninjathons, then weekly challenges, then courses beyond the first roadmap), and never cutting judging quality.
+
+## 13. XP and levels
+
+Decided 7 Oct 2026, in phase 3.
+
+- **Everyone starts at level 1, and level n + 1 takes 100 × n^1.5 XP in total** (rounded): level 2 at 100, level 3 at 283, level 5 at 800, level 50 at 34,300. Read literally, the roadmap's "level n needs 100 × n^1.5" would start new players at level 0, below the first title band.
+- **Titles are the roadmap's placeholder names** (Initiate to Legend) until the brand names are chosen (§6).
+- **Total XP is kept on the user row** (`users.xp`), updated in the same transaction as each ledger entry, so levels and leaderboards never sum the ledger. Level and title are computed from it on read, never stored.
+- **Solve XP is keyed by slug** (`solve:<slug>:<language>`), since the slug never changes (§7).
+
+### Badges
+
+Agreed 7 Oct 2026. Names are placeholders, like the titles. Badges give no XP and are permanent once earned.
+
+| Group | Badges (built in phase 3, 21 in all) |
+|---|---|
+| Milestones | First solve; 10, 50, 100 and 500 different problems solved (500 stays locked until the library is that big) |
+| Difficulty | First hard problem |
+| Languages | 50 problems in one language (one per language, 7); Polyglot: problems solved in 5 languages |
+| Levels | One per title band from Coder (level 5) to Legend (50); Initiate has none, since everyone starts there |
+
+Built with their phase: first ranked win, comeback win and rating tiers (4); 7-, 30- and 100-day streaks, daily challenge streaks and weekly top 10% (5); holding the Core (6); first tutorial and each finished roadmap (7); ninjathon participant and winner (9).
+
+- **Solve counts are different problems in any language;** the language badges count per language.
+- **Checked in the same transaction as the XP award:** level badges on every award, solve badges on every accepted Submit (so a rule change catches up on the user's next solve).
+- **Rarity** is holders ÷ players with at least one solve (the holders of First solve), from per-badge counts kept as badges are granted and accounts deleted.
+
+### Ratings
+
+Decided 7 Oct 2026, in phase 3.
+
+- **One rating per area** (`ratings`, keyed by user and area): `1v1` with Glicko-2, and `territory`, whose OpenSkill maths comes with Territory in phase 6. Ratings never mix with XP.
+- **Glicko-2, one rating period per game,** as most online games run it (`convex/lib/glicko2.ts`, checked against the worked example in Glickman's paper). New players start at 1500, deviation 350, volatility 0.06, τ = 0.5. Deviation never goes above 350.
+- **Provisional until 10 ranked games:** the owner sees it; leaderboards and other players don't (the plan's trust rules). No rating decay.
+- **Tiers** are the placeholder bands in design.md 2.5 (Newbie below 1200 to Grandmaster from 2200). A new player's 1500 is Specialist, which stays hidden while provisional.
+- **Every rated game writes `ratingHistory`** (rating after, change, opponent) for the profile chart.
+- **Which games count is the caller's job:** ranked only, both players with 10 ranked games, a gap under 400, at most 3 counted games per pair per day. Built with 1v1 in phase 4, where the matches are.
+
+### Leaderboards and groups
+
+Agreed 7 Oct 2026, in phase 3.
+
+- **Built now: Level (total XP, all time and per calendar month in UTC, resetting on the 1st) and 1v1.** Daily and Weekly come in phase 5, Territory in 6, Learning in 7, Ninjathons in 9. The monthly total is kept in `xpMonths` by `awardXp`.
+- **Scopes now: Global, Country and Group.** Friends comes with follows in phase 8. Players set a country (with a "hide my country" option) from step 6 of this phase; until then the Country scope is empty.
+- **Global and Country come from `leaderboardSnapshots`,** rebuilt every 5 minutes by a cron, page by page, with every eligible player ranked. Readers only see a finished version; old versions are deleted after each build. Last month's monthly board is kept; older ones are deleted. Fine up to about 10,000 players; past that, move to Convex's aggregate component.
+- **Group boards are computed live** and list every member, 0 XP included. **Your own value is always live;** your Global and Country rank catches up on the next rebuild.
+- **Ties go to whoever reached the score first** (`users.xpTieBreak`, `xpMonths.tieBreak`).
+- **1v1 trust rules:** shown only after 10 ranked games and hidden after 30 days without one, with no rating decay.
+- **Groups:** free and private, joined by an 8-character invite code (no look-alike characters, case-insensitive) that every member can see and share. At most 100 members per group and 10 groups per user. The owner renames, regenerates the code (the old one stops working) and removes members. A deleted group is restorable by its owner for 30 days, then purged by a daily cron. When the owner leaves or deletes their account, the member who joined first becomes owner; an empty group is deleted.
