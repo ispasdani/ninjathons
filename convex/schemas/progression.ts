@@ -14,7 +14,7 @@ export const xpSource = v.union(
 );
 
 // Append-only XP ledger. `key` is unique per user and awarded action (for
-// example "solve:<problemId>:<lang>"), enforced by awardXp in lib/xp.ts, so a
+// example "solve:<slug>:<lang>"), enforced by awardXp in lib/xp.ts, so a
 // retried request can never award XP twice. Levels, titles and badges are
 // computed from this table.
 export const xpLedger = defineTable({

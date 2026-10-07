@@ -63,6 +63,9 @@ export const submissions = defineTable({
   verdict: v.optional(verdict),
   error: v.optional(v.string()),
   finishedAt: v.optional(v.number()),
+  // XP this submission earned: set on an accepted Submit that was the first
+  // solve of the problem in this language.
+  xpAwarded: v.optional(v.number()),
 })
   .index("by_user", ["userId"])
   .index("by_user_problem", ["userId", "problemId"])

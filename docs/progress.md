@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 2, Foundation, is done. **Next step:** start phase 3, the progression engine (XP ledger, levels, badges, ratings, leaderboards).
+**Now:** Phase 3, Progression engine: solves award XP. **Next step:** levels and titles from total XP.
 
 ## Phases
 
@@ -11,7 +11,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 0 | Setup | Done | 27 Sept 2026 | 3 Oct 2026 |
 | 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
-| 3 | Progression engine | Not started | | |
+| 3 | Progression engine | In progress | 7 Oct 2026 | |
 | 4 | 1v1 and private alpha | Not started | | |
 | 5 | Daily and weekly challenges | Not started | | |
 | 6 | Territory | Not started | | |
@@ -25,6 +25,12 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3: solves award XP
+- An accepted Submit writes to the XP ledger: 10 easy, 20 medium, 40 hard (roadmap, XP sources), first solve per problem per language only. Run and failed Submits give nothing.
+- Ledger key `solve:<slug>:<language>` (the slug never changes, decisions §7); `awardXp` keeps it to once even on retries.
+- The submission row records what it earned (`xpAwarded`), also returned by `submissions.mine`, for the solve view to show later.
+- 4 tests in `convex/submissions.test.ts` (first solve, Run and failures, once per language and per user, difficulty).
 
 ### 6 Oct 2026 · Phase 2 done
 - The check passes: a new user signs up, picks a username and solves any of 30 problems in any of the 7 code languages. Username onboarding was checked by hand; every problem's references are Accepted by `problems:check` in the runner image, and Two Sum and Sum of a List in all their languages in the real sandbox.

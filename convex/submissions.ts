@@ -4,6 +4,7 @@ import { internal } from "./_generated/api";
 import { internalMutation, internalQuery } from "./_generated/server";
 import { problemLanguages } from "./judge/languages";
 import { userMutation, userQuery } from "./lib/functions";
+import { awardXp, SOLVE_XP, solveKey } from "./lib/xp";
 import { language } from "./schemas/problems";
 import { submissionKind, verdict } from "./schemas/submissions";
 
@@ -90,6 +91,7 @@ export const mine = userQuery({
       kind: s.kind,
       language: s.language,
       status: s.status,
+      xpAwarded: s.xpAwarded,
       verdict: s.verdict && {
         status: s.verdict.status,
         passed: s.verdict.passed,
@@ -140,5 +142,19 @@ export const finish = internalMutation({
       error,
       finishedAt: Date.now(),
     });
+
+    // Only a Submit counts as a solve; Run judges the examples only.
+    const submission = await ctx.db.get(submissionId);
+    if (submission?.kind !== "submit" || verdict?.status !== "accepted") return;
+    const problem = await ctx.db.get(submission.problemId);
+    if (!problem) return;
+    const amount = SOLVE_XP[problem.difficulty];
+    const { awarded } = await awardXp(ctx, {
+      userId: submission.userId,
+      key: solveKey(problem.slug, submission.language),
+      source: "solve",
+      amount,
+    });
+    if (awarded) await ctx.db.patch(submissionId, { xpAwarded: amount });
   },
 });

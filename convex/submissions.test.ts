@@ -144,3 +144,64 @@ describe("submissions", () => {
     expect(await t.query(api.problems.getBySlug, { slug: "add" })).toBeNull();
   });
 });
+
+describe("solve XP", () => {
+  const correct = {
+    python: "def add(a, b):\n    return a + b\n",
+    javascript: "function add(a, b) { return a + b; }",
+  };
+
+  async function submit(
+    t: ReturnType<typeof setup>,
+    as: ReturnType<ReturnType<typeof setup>["withIdentity"]>,
+    args: { language: "python" | "javascript"; source: string; kind?: "run" | "submit" },
+  ) {
+    const id = await as.mutation(api.submissions.create, { slug: "add", kind: "submit", ...args });
+    await judged(t);
+    return await as.query(api.submissions.get, { id });
+  }
+
+  const ledger = (t: ReturnType<typeof setup>) => t.run((ctx) => ctx.db.query("xpLedger").collect());
+
+  it("awards XP by difficulty on the first accepted Submit", async () => {
+    const { t, users, asAda } = await seeded();
+    const row = await submit(t, asAda, { language: "python", source: correct.python });
+    expect(row?.xpAwarded).toBe(10);
+    expect(await ledger(t)).toEqual([
+      expect.objectContaining({ userId: users[0], key: "solve:add:python", source: "solve", amount: 10 }),
+    ]);
+  });
+
+  it("gives nothing for Run or a failed Submit", async () => {
+    const { t, asAda } = await seeded();
+    const run = await submit(t, asAda, { language: "python", source: correct.python, kind: "run" });
+    const wrong = await submit(t, asAda, { language: "python", source: "def add(a, b):\n    return 3\n" });
+    expect(run?.verdict?.status).toBe("accepted");
+    expect(wrong?.verdict?.status).toBe("wrong_answer");
+    expect(run?.xpAwarded).toBeUndefined();
+    expect(wrong?.xpAwarded).toBeUndefined();
+    expect(await ledger(t)).toHaveLength(0);
+  });
+
+  it("counts each problem once per language and once per user", async () => {
+    const { t, asAda, asBob } = await seeded();
+    await submit(t, asAda, { language: "python", source: correct.python });
+    const again = await submit(t, asAda, { language: "python", source: correct.python });
+    const js = await submit(t, asAda, { language: "javascript", source: correct.javascript });
+    const bob = await submit(t, asBob, { language: "python", source: correct.python });
+    expect(again?.xpAwarded).toBeUndefined();
+    expect(js?.xpAwarded).toBe(10);
+    expect(bob?.xpAwarded).toBe(10);
+    expect(await ledger(t)).toHaveLength(3);
+  });
+
+  it("uses the problem's difficulty", async () => {
+    const { t, asAda } = await seeded();
+    await t.run(async (ctx) => {
+      const row = await ctx.db.query("problems").first();
+      await ctx.db.patch(row!._id, { difficulty: "hard" });
+    });
+    const row = await submit(t, asAda, { language: "python", source: correct.python });
+    expect(row?.xpAwarded).toBe(40);
+  });
+});

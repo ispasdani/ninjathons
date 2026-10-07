@@ -7,7 +7,21 @@ import type { Infer } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
+import type { difficulty } from "../schemas/problems";
 import type { xpSource } from "../schemas/progression";
+
+// Starting values from the roadmap (docs/01, XP sources), tuned during the beta.
+export const SOLVE_XP: Record<Infer<typeof difficulty>, number> = {
+  easy: 10,
+  medium: 20,
+  hard: 40,
+};
+
+// First solve per problem per language only. Keyed by slug, which never
+// changes once published (decisions §7).
+export function solveKey(slug: string, language: string) {
+  return `solve:${slug}:${language}`;
+}
 
 export async function awardXp(
   ctx: MutationCtx,
