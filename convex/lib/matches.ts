@@ -55,7 +55,7 @@ export async function currentRating(ctx: QueryCtx, userId: Id<"users">) {
 }
 
 /** Slugs the user has solved in any language, from their solve XP entries. */
-async function solvedSlugs(ctx: QueryCtx, userId: Id<"users">) {
+export async function solvedSlugs(ctx: QueryCtx, userId: Id<"users">) {
   const entries = await ctx.db
     .query("xpLedger")
     .withIndex("by_user_key", (q) => q.eq("userId", userId).gte("key", "solve:").lt("key", "solve;"))
@@ -164,6 +164,8 @@ export async function openMatchOf(ctx: QueryCtx, userId: Id<"users">) {
     .order("desc")
     .take(5);
   for (const row of rows) {
+    // A ghost row is someone else racing your recording, not your match.
+    if (row.ghost) continue;
     const match = await ctx.db.get(row.matchId);
     if (match && (match.status === "countdown" || match.status === "active")) return match;
   }
@@ -312,6 +314,8 @@ export async function finishMatch(
   const comeback = outcome.winnerId ? await wasComeback(ctx, match._id, outcome.winnerId) : false;
 
   for (const player of players) {
+    // A ghost has no account in this match: nothing to award.
+    if (player.ghost) continue;
     const result = !outcome.winnerId ? "draw" : outcome.winnerId === player.userId ? "win" : "loss";
     const change = changes.find((c) => c.userId === player.userId);
     let xpAwarded: number | undefined;

@@ -27,6 +27,7 @@ const MESSAGES: Record<string, string> = {
   CHALLENGE_EXPIRED: "That challenge has expired.",
   OWN_CHALLENGE: "That's your own challenge.",
   OPPONENT_IN_MATCH: "They're in another match right now. Try again in a bit.",
+  NO_GHOSTS: "No recorded solves to race yet.",
   NO_PROBLEMS: "No problems are available for a match right now.",
 };
 

@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen and challenges are built. **Next step:** play real matches by hand with two accounts (queue and challenge), then ghost races.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges and ghost races are built. **Next step:** play real matches by hand with two accounts (queue, challenge, ghost), then share cards.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: ghost races
+- `convex/lib/ghosts.ts` and `convex/ghosts.ts`: a ghost is a real player's solve from a finished match, as the times and test counts of their Submits. `ghosts.start` makes an unranked match (`source: "ghost"`) with a ghost player row (`matchPlayers.ghost`), and `ghosts.step` replays each Submit at the same moment after the start, so the progress bars, feed, toasts and "earliest send wins" all work as in a live match.
+- The pick: someone else's solve of a problem you haven't solved if possible, among the 5 closest to your rating, from the last 200 finished matches. The recorded player isn't in the race (ghost rows never count as their open match). No rating change and no match XP.
+- Play offers "Race a ghost" when nobody is waiting, or after 20 s in the queue. The duel screen labels it "Ghost of @name" and "Ghost race · no rating change", with a fainter progress bar; the result says "You beat the ghost" or "The ghost won".
+- 3 new tests. Production build passes; 335 tests. Deployed to Convex dev.
+- Open: not checked in the browser yet; there are no ghosts on dev until someone wins a real match there. `ghosts.available` reads up to 200 matches, fine for the alpha, to revisit with more players.
 
 ### 7 Oct 2026 · Phase 4: challenges
 - `challenges` table and `convex/challenges.ts`: challenge by username or make a link (`/challenge/<code>`, the 8-character codes groups use, now in `convex/lib/codes.ts`). Ranked or unranked; unranked may fix the difficulty. Expires after 15 minutes; at most 5 open, one per opponent. Clear errors for an unknown player, yourself, a duplicate.

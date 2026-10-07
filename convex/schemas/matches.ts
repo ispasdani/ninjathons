@@ -11,7 +11,8 @@ export const matches = defineTable({
   // Ranked games may change ratings; whether one actually counts is decided
   // when it ends (the daily pair limit) and kept on each player row.
   ranked: v.boolean(),
-  source: v.union(v.literal("queue"), v.literal("challenge")),
+  // ghost: one real player racing a recorded solve (decisions §14); never ranked.
+  source: v.union(v.literal("queue"), v.literal("challenge"), v.literal("ghost")),
   status: v.union(
     v.literal("countdown"),
     v.literal("active"),
@@ -42,6 +43,9 @@ export const matchPlayers = defineTable({
   language,
   // Their 1v1 rating when the match was made (1500 before a first game).
   ratingBefore: v.number(),
+  // A recorded run replayed by the server: `userId` is the player who made
+  // it, who isn't in this match and never sees it as theirs.
+  ghost: v.optional(v.boolean()),
   submits: v.number(),
   // For the cooldown between Submits.
   lastSubmitAt: v.optional(v.number()),

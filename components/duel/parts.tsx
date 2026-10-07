@@ -22,6 +22,17 @@ export function clock(ms: number) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
+/** A ghost is labelled as one everywhere, never as the live player. */
+export function displayName(player: Player) {
+  return player.ghost ? `Ghost of @${player.username}` : player.username;
+}
+
+/** Ghost race, Ranked or Unranked. */
+export function modeLabel(match: Match) {
+  if (match.source === "ghost") return "Ghost race";
+  return match.ranked ? "Ranked" : "Unranked";
+}
+
 export function languageLabel(match: Match, id: string) {
   return match.problem?.languages.find((l) => l.id === id)?.label ?? LANGUAGE_NAMES[id] ?? id;
 }
@@ -43,7 +54,7 @@ function PlayerName({ player, side }: { player: Player; side: "you" | "opponent"
         aria-hidden
         className={cn("size-2 shrink-0 rounded-full", side === "you" ? "bg-duel-you" : "bg-duel-opponent")}
       />
-      <span className="truncate font-medium">{side === "you" ? "You" : player.username}</span>
+      <span className="truncate font-medium">{side === "you" ? "You" : displayName(player)}</span>
     </span>
   );
 }
@@ -64,7 +75,7 @@ function Progress({ player, side, tests }: { player: Player; side: "you" | "oppo
       <div
         className="mt-1.5 h-1.5 overflow-hidden rounded-sm bg-bg-tertiary"
         role="progressbar"
-        aria-label={`${side === "you" ? "Your" : `${player.username}'s`} tests passed`}
+        aria-label={`${side === "you" ? "Your" : `${displayName(player)}'s`} tests passed`}
         aria-valuemin={0}
         aria-valuemax={total}
         aria-valuenow={player.bestPassed}
@@ -73,6 +84,7 @@ function Progress({ player, side, tests }: { player: Player; side: "you" | "oppo
           className={cn(
             "h-full transition-[width] duration-500 ease-out-quad",
             side === "you" ? "bg-duel-you" : "bg-duel-opponent",
+            player.ghost && "opacity-50",
           )}
           style={{ width: `${share * 100}%` }}
         />
@@ -99,7 +111,7 @@ export function DuelHud({ match, now, onForfeit }: { match: Match; now: number; 
           {match.timeUp ? "0:00" : clock(left)}
         </span>
         <span className="hidden font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase sm:inline">
-          {match.ranked ? "Ranked" : "Unranked"}
+          {modeLabel(match)}
         </span>
       </div>
       <div className="flex min-w-0 flex-[1_1_28rem] flex-col gap-2 sm:flex-row sm:gap-6">
@@ -119,7 +131,7 @@ function PlayerCard({ match, player }: { match: Match; player: Player }) {
   return (
     <div className="flex-1 rounded-md border p-4">
       <PlayerName player={player} side={player.you ? "you" : "opponent"} />
-      {!player.you && <p className="sr-only">Opponent: {player.username}</p>}
+      {!player.you && <p className="sr-only">Opponent: {displayName(player)}</p>}
       <p className="mt-2 font-mono text-xs text-muted-foreground">
         {player.rating !== null ? `${player.rating} · ${player.tier}` : "Rating provisional"}
       </p>
@@ -134,7 +146,7 @@ export function DuelCountdown({ match, now, onLeave }: { match: Match; now: numb
   const them = match.players.find((p) => !p.you);
   return (
     <div className="mx-auto w-full max-w-xl px-4 py-12">
-      <p className={eyebrow}>{match.ranked ? "Ranked match" : "Unranked match"}</p>
+      <p className={eyebrow}>{match.source === "ghost" ? "Ghost race · no rating change" : `${modeLabel(match)} match`}</p>
       <h1 className="mt-2 text-3xl sm:text-4xl">Match found</h1>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
         <PlayerCard match={match} player={me} />
@@ -166,8 +178,13 @@ const REASONS = {
 
 function headline(match: Match, me: Player) {
   if (match.status === "cancelled") return { title: "Match cancelled", detail: "Left before the start. No result." };
+  if (match.source === "ghost" && match.reason === "solved") {
+    return me.result === "win"
+      ? { title: "You beat the ghost", detail: "You passed every test before the recording did." }
+      : { title: "The ghost won", detail: "The recording passed every test first." };
+  }
   const them = match.players.find((p) => !p.you);
-  const name = them?.username ?? "Your opponent";
+  const name = them ? displayName(them) : "Your opponent";
   if (me.result === "draw") return { title: "Draw", detail: "Time ran out with no Submit ahead." };
   const won = me.result === "win";
   const reason = match.reason ?? "solved";
@@ -208,7 +225,11 @@ export function DuelResult({ match }: { match: Match }) {
           {match.ranked && !me.counted && (
             <span className="text-muted-foreground">Not rated: you&apos;ve played 3 rated games against them today.</span>
           )}
-          {!match.ranked && <span className="text-muted-foreground">Unranked: no rating change.</span>}
+          {!match.ranked && (
+            <span className="text-muted-foreground">
+              {match.source === "ghost" ? "Ghost race: no rating change." : "Unranked: no rating change."}
+            </span>
+          )}
           {names.length > 0 && (
             <Link href="/badges" className="text-text-secondary hover:underline">
               {names.length === 1 ? "Badge earned" : "Badges earned"}: {names.join(", ")}
@@ -230,7 +251,7 @@ export function DuelResult({ match }: { match: Match }) {
 
 /** The match feed: Submits as counts, never code. */
 export function DuelFeed({ match }: { match: Match }) {
-  const names = new Map(match.players.map((p) => [p.userId, p.you ? "You" : p.username]));
+  const names = new Map(match.players.map((p) => [p.userId, p.you ? "You" : displayName(p)]));
   const yours = new Set(match.players.filter((p) => p.you).map((p) => p.userId));
   if (match.events.length === 0) {
     return <p className="text-[13px] text-muted-foreground">No Submits yet. Each one shows here as tests passed.</p>;

@@ -16,6 +16,8 @@ const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-fore
 // The queue drops rows not seen for 30 s (convex/queue.ts).
 const HEARTBEAT_MS = 10_000;
 const LANGUAGE_KEY = "play:language";
+// Offer a ghost race after this long in the queue, or at once when nobody waits.
+const GHOST_AFTER_MS = 20_000;
 
 function readLanguage(): Language | null {
   try {
@@ -42,6 +44,8 @@ export function FindMatch() {
   const join = useMutation(api.queue.join);
   const leave = useMutation(api.queue.leave);
   const heartbeat = useMutation(api.queue.heartbeat);
+  const ghostAvailable = useQuery(api.ghosts.available, isAuthenticated ? {} : "skip");
+  const startGhost = useMutation(api.ghosts.start);
   const router = useRouter();
   const now = useNow(1000);
 
@@ -87,6 +91,11 @@ export function FindMatch() {
   }
 
   if (status === undefined) return <p className="text-[13px] text-muted-foreground">Loading…</p>;
+
+  const offerGhost =
+    ghostAvailable === true &&
+    current === null &&
+    (queued ? now - queued.joinedAt >= GHOST_AFTER_MS : status.waiting === 0);
 
   return (
     <div className="max-w-4xl">
@@ -161,6 +170,17 @@ export function FindMatch() {
               </>
             )}
           </div>
+          {offerGhost && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t pt-4 text-[13px]">
+              <span className="text-muted-foreground">
+                {queued ? "Still waiting?" : "Nobody to play right now?"} Race a recorded solve by a player near your
+                rating. No rating change.
+              </span>
+              <Button variant="outline" size="sm" disabled={busy} onClick={() => run(() => startGhost({ language }))}>
+                Race a ghost
+              </Button>
+            </div>
+          )}
           {error && (
             <p role="alert" className="mt-3 text-[13px] text-destructive">
               {error}

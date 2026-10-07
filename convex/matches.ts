@@ -76,6 +76,8 @@ export const get = userQuery({
           return {
             userId: p.userId,
             you,
+            // A recorded run replayed by the server, not a live player.
+            ghost: p.ghost ?? false,
             username: user?.username ?? "Deleted player",
             imageUrl: user?.imageUrl,
             language: p.language,

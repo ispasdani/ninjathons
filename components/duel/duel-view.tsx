@@ -16,7 +16,7 @@ import type { Language } from "@/convex/judge/types";
 import { errorMessage } from "@/lib/errors";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
-import { clock, DuelCountdown, DuelFeed, DuelHud, DuelResult, type Match } from "./parts";
+import { clock, displayName, DuelCountdown, DuelFeed, DuelHud, DuelResult, type Match } from "./parts";
 
 // Wrong Submits cost nothing, but 10 s apart (convex/lib/matches.ts).
 const SUBMIT_COOLDOWN_MS = 10_000;
@@ -63,7 +63,8 @@ function useOpponentToast(match: Match | null | undefined) {
     }
     if (seen.current === latest._id) return;
     seen.current = latest._id;
-    const name = match.players.find((p) => p.userId === latest.userId)?.username ?? "Your opponent";
+    const player = match.players.find((p) => p.userId === latest.userId);
+    const name = player ? displayName(player) : "Your opponent";
     setToast(
       latest.kind === "forfeit"
         ? `${name} gave up`
