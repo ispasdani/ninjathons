@@ -19,6 +19,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 6 Oct 2026 | HTML and CSS move from phase 2 to phase 7 (Learn) | [8](#8-launch-languages), [12](#12-build-plan-phases) |
 | 6 Oct 2026 | Runner speed work for the compiled languages happens in phase 4, before the load test | [5](#5-code-runner-vercel-sandbox) |
 | 7 Oct 2026 | Levels start at 1; total XP is kept on the user row | [13](#13-xp-and-levels) |
+| 7 Oct 2026 | 21 badges from solves and levels; rarity among players with a solve | [13](#badges) |
 
 ---
 
@@ -372,3 +373,20 @@ Decided 7 Oct 2026, in phase 3.
 - **Titles are the roadmap's placeholder names** (Initiate to Legend) until the brand names are chosen (§6).
 - **Total XP is kept on the user row** (`users.xp`), updated in the same transaction as each ledger entry, so levels and leaderboards never sum the ledger. Level and title are computed from it on read, never stored.
 - **Solve XP is keyed by slug** (`solve:<slug>:<language>`), since the slug never changes (§7).
+
+### Badges
+
+Agreed 7 Oct 2026. Names are placeholders, like the titles. Badges give no XP and are permanent once earned.
+
+| Group | Badges (built in phase 3, 21 in all) |
+|---|---|
+| Milestones | First solve; 10, 50, 100 and 500 different problems solved (500 stays locked until the library is that big) |
+| Difficulty | First hard problem |
+| Languages | 50 problems in one language (one per language, 7); Polyglot: problems solved in 5 languages |
+| Levels | One per title band from Coder (level 5) to Legend (50); Initiate has none, since everyone starts there |
+
+Built with their phase: first ranked win, comeback win and rating tiers (4); 7-, 30- and 100-day streaks, daily challenge streaks and weekly top 10% (5); holding the Core (6); first tutorial and each finished roadmap (7); ninjathon participant and winner (9).
+
+- **Solve counts are different problems in any language;** the language badges count per language.
+- **Checked in the same transaction as the XP award:** level badges on every award, solve badges on every accepted Submit (so a rule change catches up on the user's next solve).
+- **Rarity** is holders ÷ players with at least one solve (the holders of First solve), from per-badge counts kept as badges are granted and accounts deleted.

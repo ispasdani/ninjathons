@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as badges from "../badges.js";
 import type * as benchmark from "../benchmark.js";
 import type * as http from "../http.js";
 import type * as judge_checker from "../judge/checker.js";
@@ -28,7 +29,9 @@ import type * as judge_values from "../judge/values.js";
 import type * as judge_vercelRunner from "../judge/vercelRunner.js";
 import type * as judge_wire from "../judge/wire.js";
 import type * as judging from "../judging.js";
+import type * as lib_badges from "../lib/badges.js";
 import type * as lib_functions from "../lib/functions.js";
+import type * as lib_levels from "../lib/levels.js";
 import type * as lib_usernames from "../lib/usernames.js";
 import type * as lib_xp from "../lib/xp.js";
 import type * as problems from "../problems.js";
@@ -46,6 +49,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  badges: typeof badges;
   benchmark: typeof benchmark;
   http: typeof http;
   "judge/checker": typeof judge_checker;
@@ -66,7 +70,9 @@ declare const fullApi: ApiFromModules<{
   "judge/vercelRunner": typeof judge_vercelRunner;
   "judge/wire": typeof judge_wire;
   judging: typeof judging;
+  "lib/badges": typeof lib_badges;
   "lib/functions": typeof lib_functions;
+  "lib/levels": typeof lib_levels;
   "lib/usernames": typeof lib_usernames;
   "lib/xp": typeof lib_xp;
   problems: typeof problems;

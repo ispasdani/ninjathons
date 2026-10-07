@@ -167,6 +167,9 @@ describe("solve XP", () => {
     const { t, users, asAda } = await seeded();
     const row = await submit(t, asAda, { language: "python", source: correct.python });
     expect(row?.xpAwarded).toBe(10);
+    expect(row?.badgesEarned).toEqual(["first-solve"]);
+    const again = await submit(t, asAda, { language: "python", source: correct.python });
+    expect(again?.badgesEarned).toBeUndefined();
     expect(await ledger(t)).toEqual([
       expect.objectContaining({ userId: users[0], key: "solve:add:python", source: "solve", amount: 10 }),
     ]);

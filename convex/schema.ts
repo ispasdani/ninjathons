@@ -1,7 +1,7 @@
 import { defineSchema } from "convex/server";
 
 import { problems, problemTests } from "./schemas/problems";
-import { xpLedger } from "./schemas/progression";
+import { badgeCounts, userBadges, xpLedger } from "./schemas/progression";
 import { submissions } from "./schemas/submissions";
 import { entitlements, usernameReservations, users } from "./schemas/users";
 
@@ -14,4 +14,6 @@ export default defineSchema({
   problemTests,
   submissions,
   xpLedger,
+  userBadges,
+  badgeCounts,
 });

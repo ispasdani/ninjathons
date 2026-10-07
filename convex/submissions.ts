@@ -4,6 +4,7 @@ import { internal } from "./_generated/api";
 import { internalMutation, internalQuery } from "./_generated/server";
 import { problemLanguages } from "./judge/languages";
 import { userMutation, userQuery } from "./lib/functions";
+import { checkSolveBadges } from "./lib/badges";
 import { awardXp, SOLVE_XP, solveKey } from "./lib/xp";
 import { language } from "./schemas/problems";
 import { submissionKind, verdict } from "./schemas/submissions";
@@ -149,12 +150,16 @@ export const finish = internalMutation({
     const problem = await ctx.db.get(submission.problemId);
     if (!problem) return;
     const amount = SOLVE_XP[problem.difficulty];
-    const { awarded } = await awardXp(ctx, {
+    const xp = await awardXp(ctx, {
       userId: submission.userId,
       key: solveKey(problem.slug, submission.language),
       source: "solve",
       amount,
     });
-    if (awarded) await ctx.db.patch(submissionId, { xpAwarded: amount });
+    const badges = [...xp.badges, ...(await checkSolveBadges(ctx, submission.userId, problem))];
+    await ctx.db.patch(submissionId, {
+      xpAwarded: xp.awarded ? amount : undefined,
+      badgesEarned: badges.length ? badges : undefined,
+    });
   },
 });

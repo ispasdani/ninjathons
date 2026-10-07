@@ -9,6 +9,7 @@ import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import type { difficulty } from "../schemas/problems";
 import type { xpSource } from "../schemas/progression";
+import { checkLevelBadges } from "./badges";
 
 // Starting values from the roadmap (docs/01, XP sources), tuned during the beta.
 export const SOLVE_XP: Record<Infer<typeof difficulty>, number> = {
@@ -38,12 +39,14 @@ export async function awardXp(
       q.eq("userId", entry.userId).eq("key", entry.key),
     )
     .unique();
-  if (existing) return { awarded: false as const };
+  if (existing) return { awarded: false as const, badges: [] };
 
   await ctx.db.insert("xpLedger", entry);
   // The running total on the user row, kept in the same transaction, so levels
   // and leaderboards never sum the ledger.
   const user = await ctx.db.get(entry.userId);
-  if (user) await ctx.db.patch(user._id, { xp: (user.xp ?? 0) + entry.amount });
-  return { awarded: true as const };
+  if (!user) return { awarded: true as const, badges: [] };
+  const xp = (user.xp ?? 0) + entry.amount;
+  await ctx.db.patch(user._id, { xp });
+  return { awarded: true as const, badges: await checkLevelBadges(ctx, user._id, xp) };
 }

@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine: solves award XP, levels and titles work. **Next step:** badge rules.
+**Now:** Phase 3, Progression engine: solves award XP and badges; levels and titles work. **Next step:** ratings per area.
 
 ## Phases
 
@@ -25,6 +25,12 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3: badges
+- 21 badges from solves and levels (decisions §13): first solve, 10/50/100/500 problems, first hard, 50 in each language, Polyglot, one per title band. Later badges are listed there with their phase.
+- `convex/lib/badges.ts`: definitions and rules. Level badges are checked on every XP award, solve badges on every accepted Submit, in the same transaction. The submission records new badges (`badgesEarned`).
+- Tables `userBadges` and `badgeCounts`; `badges.list` returns every badge with its rarity (share of players with a solve) and, signed in, when you earned it. Account deletion removes badges and lowers the counts.
+- 14 new tests.
 
 ### 7 Oct 2026 · Phase 3: levels and titles
 - Total XP on the user row (`users.xp`), updated by `awardXp` in the same transaction as the ledger entry.

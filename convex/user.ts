@@ -196,6 +196,20 @@ export const deleteFromClerk = internalMutation({
       .collect();
     for (const entry of xp) await ctx.db.delete(entry._id);
 
+    // Badges go too, and stop counting toward rarity.
+    const badges = await ctx.db
+      .query("userBadges")
+      .withIndex("by_user_badge", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const badge of badges) {
+      const count = await ctx.db
+        .query("badgeCounts")
+        .withIndex("by_badge", (q) => q.eq("badgeId", badge.badgeId))
+        .unique();
+      if (count) await ctx.db.patch(count._id, { holders: Math.max(0, count.holders - 1) });
+      await ctx.db.delete(badge._id);
+    }
+
     // The name stays reserved for 90 days after the account is gone.
     if (user.usernameKey) {
       await ctx.db.insert("usernameReservations", {

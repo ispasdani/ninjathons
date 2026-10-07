@@ -23,3 +23,19 @@ export const xpLedger = defineTable({
   source: xpSource,
   amount: v.number(),
 }).index("by_user_key", ["userId", "key"]);
+
+// Badges a user has earned. `badgeId` is an id from BADGES in lib/badges.ts;
+// one row per user and badge, written only by grantBadge there. Earned badges
+// are permanent, even if the badge is later retired.
+export const userBadges = defineTable({
+  userId: v.id("users"),
+  badgeId: v.string(),
+}).index("by_user_badge", ["userId", "badgeId"]);
+
+// How many users hold each badge, for rarity. Kept by grantBadge and by
+// account deletion. Rarity is holders / holders of "first-solve" (players with
+// at least one solve, decisions §13).
+export const badgeCounts = defineTable({
+  badgeId: v.string(),
+  holders: v.number(),
+}).index("by_badge", ["badgeId"]);

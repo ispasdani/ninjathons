@@ -5,7 +5,7 @@
  */
 
 // Placeholder names (roadmap); they avoid the rating-tier words on purpose.
-const TITLES = [
+export const TITLES = [
   { from: 1, title: "Initiate" },
   { from: 5, title: "Coder" },
   { from: 10, title: "Debugger" },

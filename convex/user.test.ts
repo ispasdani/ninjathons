@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { api, internal } from "./_generated/api";
+import { grantBadge } from "./lib/badges";
 import { identity, setup } from "./test.setup";
 
 const clerkFields = {
@@ -121,6 +122,8 @@ describe("deleteFromClerk", () => {
         source: "solve",
         amount: 10,
       });
+      await grantBadge(ctx, userId, "first-solve");
+      await grantBadge(ctx, otherId, "first-solve");
     });
 
     await t.mutation(internal.user.deleteFromClerk, { clerkId: "user_1" });
@@ -129,10 +132,14 @@ describe("deleteFromClerk", () => {
       users: await ctx.db.query("users").collect(),
       entitlements: await ctx.db.query("entitlements").collect(),
       xp: await ctx.db.query("xpLedger").collect(),
+      badges: await ctx.db.query("userBadges").collect(),
+      counts: await ctx.db.query("badgeCounts").collect(),
     }));
     expect(left.users.map((u) => u.clerkId)).toEqual(["user_2"]);
     expect(left.entitlements).toHaveLength(0);
     expect(left.xp.map((x) => x.userId)).toEqual([otherId]);
+    expect(left.badges.map((b) => b.userId)).toEqual([otherId]);
+    expect(left.counts).toEqual([expect.objectContaining({ badgeId: "first-solve", holders: 1 })]);
   });
 
   it("treats a missing user as already deleted", async () => {
