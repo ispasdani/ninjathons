@@ -128,6 +128,12 @@ export async function createMatch(
       .withIndex("by_user", (q) => q.eq("userId", player.userId))
       .unique();
     if (queued) await ctx.db.delete(queued._id);
+    // And their other challenges are off: they're busy now.
+    const sent = await ctx.db
+      .query("challenges")
+      .withIndex("by_from_status", (q) => q.eq("fromId", player.userId).eq("status", "pending"))
+      .collect();
+    for (const c of sent) await ctx.db.patch(c._id, { status: "cancelled" });
     await ctx.db.insert("matchPlayers", {
       matchId,
       userId: player.userId,

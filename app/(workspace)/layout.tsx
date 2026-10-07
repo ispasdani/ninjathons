@@ -1,5 +1,6 @@
 import { RequireUsername } from "@/components/layout/require-username";
 import { SiteHeader } from "@/components/layout/site-header";
+import { MatchBanner } from "@/components/play/match-banner";
 
 // Full-screen workspaces (the solve view, later duels): the same header as the
 // app, but the page gets the whole width and, on large screens, exactly the
@@ -9,6 +10,7 @@ export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <SiteHeader />
+      <MatchBanner />
       <RequireUsername />
       <main className="flex min-h-0 flex-1 flex-col lg:h-[calc(100dvh-4rem)]">{children}</main>
     </>

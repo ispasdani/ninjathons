@@ -10,6 +10,7 @@
 
 import type * as badges from "../badges.js";
 import type * as benchmark from "../benchmark.js";
+import type * as challenges from "../challenges.js";
 import type * as crons from "../crons.js";
 import type * as groups from "../groups.js";
 import type * as http from "../http.js";
@@ -33,6 +34,7 @@ import type * as judge_wire from "../judge/wire.js";
 import type * as judging from "../judging.js";
 import type * as leaderboards from "../leaderboards.js";
 import type * as lib_badges from "../lib/badges.js";
+import type * as lib_codes from "../lib/codes.js";
 import type * as lib_countries from "../lib/countries.js";
 import type * as lib_functions from "../lib/functions.js";
 import type * as lib_glicko2 from "../lib/glicko2.js";
@@ -69,6 +71,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   badges: typeof badges;
   benchmark: typeof benchmark;
+  challenges: typeof challenges;
   crons: typeof crons;
   groups: typeof groups;
   http: typeof http;
@@ -92,6 +95,7 @@ declare const fullApi: ApiFromModules<{
   judging: typeof judging;
   leaderboards: typeof leaderboards;
   "lib/badges": typeof lib_badges;
+  "lib/codes": typeof lib_codes;
   "lib/countries": typeof lib_countries;
   "lib/functions": typeof lib_functions;
   "lib/glicko2": typeof lib_glicko2;

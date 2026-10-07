@@ -7,6 +7,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 const isAppRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/play(.*)",
+  "/challenge(.*)",
   "/duel(.*)",
   "/solve(.*)",
   "/courses(.*)",

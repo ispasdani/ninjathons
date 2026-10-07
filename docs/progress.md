@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking and the duel screen are built. **Next step:** play a real match by hand with two accounts, then challenges.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen and challenges are built. **Next step:** play real matches by hand with two accounts (queue and challenge), then ghost races.
 
 ## Phases
 
@@ -26,13 +26,22 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 7 Oct 2026 · Phase 4: challenges
+- `challenges` table and `convex/challenges.ts`: challenge by username or make a link (`/challenge/<code>`, the 8-character codes groups use, now in `convex/lib/codes.ts`). Ranked or unranked; unranked may fix the difficulty. Expires after 15 minutes; at most 5 open, one per opponent. Clear errors for an unknown player, yourself, a duplicate.
+- Ranked limits: 10 ranked games each and a gap under 400, checked when sent (for a link, the sender only) and again on accept; the daily pair limit applies when the match ends, as for every ranked game.
+- Accepting makes the match at once; both players' other sent challenges are cancelled when their match starts.
+- `/play` is now Play: language picker, challenges for you (Accept, Decline) and yours (Copy link, Cancel), then Find a match and Challenge someone side by side. `/challenge/[code]` shows the sender, ranked or not, difficulty, expiry, and why you can't accept when you can't.
+- A banner under the header on every signed-in page: "You're in a match · Back to it", or "@ada challenges you · See challenge". A match in its countdown opens by itself, so a challenger who wandered off doesn't miss it.
+- 7 new tests. Production build passes; 332 tests. Deployed to Convex dev.
+- Open: not checked in the browser yet (needs two signed-in accounts).
+
 ### 7 Oct 2026 · Phase 4: duel screen
 - `/duel/[matchId]`: a countdown card (you vs them, ratings when not provisional, languages, difficulty and time limit, seconds to the start, Leave), then the HUD (server timer, red in the last minute; both progress bars in the duel colours with tests passed and Submits; Give up) over the solve layout, then a result banner (won, lost or draw and why, rating change, match XP, badges, a note when the pair limit stopped the game counting, Find another match).
 - The editor opens in the language picked before the match; code is kept per match and language in this browser. Submit shows the 10 s cooldown; Run and Submit stop at time up. No hints in matches.
 - Left panel: Description and a Match feed (Submits as tests passed, never code). A toast bottom-right when the opponent submits or gives up.
 - `matches.get` takes any string (a bad link shows "not found") and returns the test count for the progress bars. The verdict panel can leave out practice XP, since a match shows its rewards with the result.
 - Production build passes; 325 tests. Deployed to Convex dev.
-- Open: not checked in the browser yet (needs two signed-in accounts); the client clock isn't corrected against the server's, so a wrong computer clock shows a wrong timer (the server still decides); no way back to a running match from other pages except `/play`.
+- Open: not checked in the browser yet (needs two signed-in accounts); the client clock isn't corrected against the server's, so a wrong computer clock shows a wrong timer (the server still decides). (The way back to a running match came with challenges: a banner on every page.)
 
 ### 7 Oct 2026 · Phase 4: matchmaking
 - Find a match: `matchQueue` (one row per player, with language and rating) and a pairing pass (`queue.pass`) that runs as soon as someone joins, then every 2 s while anyone waits. The rating range starts at ±100 and widens by 50 every 5 s; after a minute anyone is a fair opponent. Longest waiting first, closest rating wins.

@@ -10,6 +10,7 @@ import type { Language } from "@/convex/judge/types";
 import { errorMessage } from "@/lib/errors";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
+import { ChallengeForm, ChallengeLists } from "./challenges";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 // The queue drops rows not seen for 30 s (convex/queue.ts).
@@ -30,8 +31,8 @@ function clock(ms: number) {
 }
 
 /**
- * Find a match: pick a language, join the ranked queue, and go to the duel
- * screen as soon as the pairing pass finds an opponent.
+ * The Play page: pick a language, then Find a match (the ranked queue) or
+ * challenge someone. Goes to the duel screen as soon as a match is made.
  */
 export function FindMatch() {
   const { isAuthenticated } = useConvexAuth();
@@ -88,15 +89,14 @@ export function FindMatch() {
   if (status === undefined) return <p className="text-[13px] text-muted-foreground">Loading…</p>;
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-4xl">
       <p className={eyebrow}>1v1 race</p>
-      <h1 className="mt-2 text-3xl sm:text-4xl">Find a match</h1>
+      <h1 className="mt-2 text-3xl sm:text-4xl">Play</h1>
       <p className="mt-2 text-[15px] text-muted-foreground">
-        Ranked. Same problem, first to pass every test wins. You&apos;re matched by 1v1 rating, and the range widens the
-        longer you wait.
+        Same problem for both players; the first to pass every test wins.
       </p>
 
-      <section className="mt-8 rounded-md border p-6">
+      <section className="mt-8">
         <p className="text-[13px] font-medium" id="language-label">
           Your language
         </p>
@@ -121,40 +121,58 @@ export function FindMatch() {
         <p className="mt-3 text-[13px] text-muted-foreground">
           Your opponent may pick another; slower languages get more time per test.
         </p>
-
-        <div className="mt-6 flex flex-wrap items-center gap-3 border-t pt-6">
-          {queued ? (
-            <>
-              <div role="status" className="flex items-center gap-3">
-                <span className="size-2 animate-pulse rounded-full bg-brand" aria-hidden />
-                <span className="text-[13px]">Looking for an opponent…</span>
-                <span className="font-mono text-[13px] text-muted-foreground tabular-nums">
-                  {clock(now - queued.joinedAt)}
-                </span>
-              </div>
-              <Button variant="outline" className="ml-auto" disabled={busy} onClick={() => run(() => leave())}>
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="brand" size="lg" disabled={busy || current !== null} onClick={() => run(() => join({ language }))}>
-                Find a match
-              </Button>
-              <span className="text-[13px] text-muted-foreground">
-                {status.waiting === 0
-                  ? "Nobody is waiting right now."
-                  : `${status.waiting} ${status.waiting === 1 ? "player is" : "players are"} waiting.`}
-              </span>
-            </>
-          )}
-        </div>
-        {error && (
-          <p role="alert" className="mt-3 text-[13px] text-destructive">
-            {error}
-          </p>
-        )}
       </section>
+
+      <div className="mt-8">
+        <ChallengeLists language={language} />
+      </div>
+
+      {/* Two choices of equal weight (plan, Play modes). */}
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <section className="flex flex-col rounded-md border p-6">
+          <h2 className="text-lg font-medium">Find a match</h2>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            Ranked. You&apos;re matched by 1v1 rating, and the range widens the longer you wait.
+          </p>
+          <div className="mt-auto flex flex-wrap items-center gap-3 pt-6">
+            {queued ? (
+              <>
+                <div role="status" className="flex items-center gap-3">
+                  <span className="size-2 animate-pulse rounded-full bg-brand" aria-hidden />
+                  <span className="text-[13px]">Looking for an opponent…</span>
+                  <span className="font-mono text-[13px] text-muted-foreground tabular-nums">
+                    {clock(now - queued.joinedAt)}
+                  </span>
+                </div>
+                <Button variant="outline" className="ml-auto" disabled={busy} onClick={() => run(() => leave())}>
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="brand" disabled={busy || current !== null} onClick={() => run(() => join({ language }))}>
+                  Find a match
+                </Button>
+                <span className="text-[13px] text-muted-foreground">
+                  {status.waiting === 0
+                    ? "Nobody is waiting right now."
+                    : `${status.waiting} ${status.waiting === 1 ? "player is" : "players are"} waiting.`}
+                </span>
+              </>
+            )}
+          </div>
+          {error && (
+            <p role="alert" className="mt-3 text-[13px] text-destructive">
+              {error}
+            </p>
+          )}
+        </section>
+        <section className="rounded-md border p-6">
+          <h2 className="text-lg font-medium">Challenge someone</h2>
+          <p className="mt-1 mb-4 text-[13px] text-muted-foreground">By username, or as a link to share.</p>
+          <ChallengeForm language={language} />
+        </section>
+      </div>
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-md border bg-bg-secondary p-6">

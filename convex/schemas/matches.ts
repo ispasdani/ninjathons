@@ -90,3 +90,29 @@ export const matchQueue = defineTable({
 export const matchmaking = defineTable({
   nextPassAt: v.number(),
 });
+
+// A challenge to a 1v1 match: sent to a username, or as a link anyone signed
+// in can open (decisions §14). Accepting makes the match at once. Expiry is
+// read from `expiresAt`; nothing rewrites old rows.
+export const challenges = defineTable({
+  fromId: v.id("users"),
+  // Absent for a link challenge until someone accepts it.
+  toId: v.optional(v.id("users")),
+  // For the link, /challenge/<code>.
+  code: v.string(),
+  ranked: v.boolean(),
+  // Unranked challenges may fix the difficulty; ranked ones follow the ratings.
+  difficulty: v.optional(difficulty),
+  fromLanguage: language,
+  status: v.union(
+    v.literal("pending"),
+    v.literal("accepted"),
+    v.literal("declined"),
+    v.literal("cancelled"),
+  ),
+  expiresAt: v.number(),
+  matchId: v.optional(v.id("matches")),
+})
+  .index("by_code", ["code"])
+  .index("by_from_status", ["fromId", "status"])
+  .index("by_to_status", ["toId", "status"]);
