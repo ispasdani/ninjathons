@@ -46,7 +46,23 @@ export async function awardXp(
   // and leaderboards never sum the ledger.
   const user = await ctx.db.get(entry.userId);
   if (!user) return { awarded: true as const, badges: [] };
+  const now = Date.now();
   const xp = (user.xp ?? 0) + entry.amount;
-  await ctx.db.patch(user._id, { xp });
+  await ctx.db.patch(user._id, { xp, xpTieBreak: -now });
+
+  // And this month's total, for the monthly Level board.
+  const month = monthKey(now);
+  const monthly = await ctx.db
+    .query("xpMonths")
+    .withIndex("by_user_month", (q) => q.eq("userId", user._id).eq("month", month))
+    .unique();
+  if (monthly) await ctx.db.patch(monthly._id, { xp: monthly.xp + entry.amount, tieBreak: -now });
+  else await ctx.db.insert("xpMonths", { userId: user._id, month, xp: entry.amount, tieBreak: -now });
+
   return { awarded: true as const, badges: await checkLevelBadges(ctx, user._id, xp) };
+}
+
+/** The calendar month in UTC, "2026-10". */
+export function monthKey(time: number) {
+  return new Date(time).toISOString().slice(0, 7);
 }

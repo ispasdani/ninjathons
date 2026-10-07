@@ -10,6 +10,7 @@ import {
   userMutation,
   userQuery,
 } from "./lib/functions";
+import { leaveGroup } from "./lib/groups";
 import { levelProgress } from "./lib/levels";
 import {
   checkUsernameRules,
@@ -217,6 +218,30 @@ export const deleteFromClerk = internalMutation({
         .withIndex("by_user_area", (q) => q.eq("userId", user._id))
         .collect();
       for (const row of rows) await ctx.db.delete(row._id);
+    }
+
+    const months = await ctx.db
+      .query("xpMonths")
+      .withIndex("by_user_month", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of months) await ctx.db.delete(row._id);
+
+    // Off the leaderboards now; the ranks close up on the next rebuild.
+    const snapshots = await ctx.db
+      .query("leaderboardSnapshots")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of snapshots) await ctx.db.delete(row._id);
+
+    // Owned groups pass to the member who joined first, or go if left empty.
+    const memberships = await ctx.db
+      .query("groupMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const m of memberships) {
+      const group = await ctx.db.get(m.groupId);
+      if (group) await leaveGroup(ctx, group, user._id);
+      else await ctx.db.delete(m._id);
     }
 
     // The name stays reserved for 90 days after the account is gone.

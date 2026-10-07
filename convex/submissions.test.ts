@@ -207,4 +207,19 @@ describe("solve XP", () => {
     const row = await submit(t, asAda, { language: "python", source: correct.python });
     expect(row?.xpAwarded).toBe(40);
   });
+
+  // The phase 3 check: solves award XP and badges, and leaderboards update.
+  it("puts a solve on the Level boards", async () => {
+    const { t, asAda } = await seeded();
+    await t.withIdentity(identity("user_ada")).mutation(api.user.setUsername, { username: "ada" });
+    await submit(t, asAda, { language: "python", source: correct.python });
+    await t.mutation(internal.leaderboards.rebuildAll, {});
+    await judged(t);
+
+    for (const board of ["level", "level-month"] as const) {
+      const { rows, me } = await asAda.query(api.leaderboards.board, { board, scope: "global" });
+      expect(rows).toEqual([expect.objectContaining({ rank: 1, username: "ada", value: 10 })]);
+      expect(me).toEqual({ rank: 1, value: 10 });
+    }
+  });
 });

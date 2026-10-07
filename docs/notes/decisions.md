@@ -21,6 +21,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 7 Oct 2026 | Levels start at 1; total XP is kept on the user row | [13](#13-xp-and-levels) |
 | 7 Oct 2026 | 21 badges from solves and levels; rarity among players with a solve | [13](#badges) |
 | 7 Oct 2026 | Ratings per area; 1v1 uses Glicko-2 with one rating period per game | [13](#ratings) |
+| 7 Oct 2026 | Level and 1v1 boards with Global, Country and Group scopes; free private groups | [13](#leaderboards-and-groups) |
 
 ---
 
@@ -402,3 +403,15 @@ Decided 7 Oct 2026, in phase 3.
 - **Tiers** are the placeholder bands in design.md 2.5 (Newbie below 1200 to Grandmaster from 2200). A new player's 1500 is Specialist, which stays hidden while provisional.
 - **Every rated game writes `ratingHistory`** (rating after, change, opponent) for the profile chart.
 - **Which games count is the caller's job:** ranked only, both players with 10 ranked games, a gap under 400, at most 3 counted games per pair per day. Built with 1v1 in phase 4, where the matches are.
+
+### Leaderboards and groups
+
+Agreed 7 Oct 2026, in phase 3.
+
+- **Built now: Level (total XP, all time and per calendar month in UTC, resetting on the 1st) and 1v1.** Daily and Weekly come in phase 5, Territory in 6, Learning in 7, Ninjathons in 9. The monthly total is kept in `xpMonths` by `awardXp`.
+- **Scopes now: Global, Country and Group.** Friends comes with follows in phase 8. Players set a country (with a "hide my country" option) from step 6 of this phase; until then the Country scope is empty.
+- **Global and Country come from `leaderboardSnapshots`,** rebuilt every 5 minutes by a cron, page by page, with every eligible player ranked. Readers only see a finished version; old versions are deleted after each build. Last month's monthly board is kept; older ones are deleted. Fine up to about 10,000 players; past that, move to Convex's aggregate component.
+- **Group boards are computed live** and list every member, 0 XP included. **Your own value is always live;** your Global and Country rank catches up on the next rebuild.
+- **Ties go to whoever reached the score first** (`users.xpTieBreak`, `xpMonths.tieBreak`).
+- **1v1 trust rules:** shown only after 10 ranked games and hidden after 30 days without one, with no rating decay.
+- **Groups:** free and private, joined by an 8-character invite code (no look-alike characters, case-insensitive) that every member can see and share. At most 100 members per group and 10 groups per user. The owner renames, regenerates the code (the old one stops working) and removes members. A deleted group is restorable by its owner for 30 days, then purged by a daily cron. When the owner leaves or deletes their account, the member who joined first becomes owner; an empty group is deleted.

@@ -24,6 +24,18 @@ export const xpLedger = defineTable({
   amount: v.number(),
 }).index("by_user_key", ["userId", "key"]);
 
+// XP earned per user per calendar month (UTC, "2026-10"), for the monthly
+// Level board. Kept by awardXp next to the ledger entry; `tieBreak` works as
+// on users.
+export const xpMonths = defineTable({
+  userId: v.id("users"),
+  month: v.string(),
+  xp: v.number(),
+  tieBreak: v.number(),
+})
+  .index("by_user_month", ["userId", "month"])
+  .index("by_month_xp", ["month", "xp", "tieBreak"]);
+
 // Badges a user has earned. `badgeId` is an id from BADGES in lib/badges.ts;
 // one row per user and badge, written only by grantBadge there. Earned badges
 // are permanent, even if the badge is later retired.

@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine: solves award XP and badges; levels, titles and the rating store work. **Next step:** leaderboards (snapshots and scopes) and groups.
+**Now:** Phase 3, Progression engine: the engine is built (XP, levels, badges, ratings, leaderboards, groups). **Next step:** show it in the app (XP bar, solve rewards, badges, leaderboard and group pages, country setting), then check the phase by hand.
 
 ## Phases
 
@@ -25,6 +25,14 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3: leaderboards and groups
+- Boards: Level (all time and this month) and 1v1 (decisions §13). Scopes: Global and Country from `leaderboardSnapshots`, rebuilt every 5 minutes by a cron (`convex/crons.ts`) page by page; Group computed live for members. `leaderboards.board` returns rows from any rank plus your live position.
+- Ties go to whoever got there first; 1v1 shows only players with 10 ranked games who played in the last 30 days. Old snapshot versions and monthly boards older than last month are deleted.
+- Groups (`convex/groups.ts`): create, join by invite code, leave, rename, new code, remove members, soft delete with 30-day restore and a daily purge. 100 members, 10 groups per user.
+- Account deletion removes monthly XP and snapshot rows, and hands owned groups to the earliest member.
+- 18 new tests, including the phase check end to end: a real solve puts the player on both Level boards.
+- Open: no country input yet, so the Country scope stays empty until step 6; join attempts by code aren't rate-limited.
 
 ### 7 Oct 2026 · Phase 3: ratings
 - Glicko-2 in `convex/lib/glicko2.ts`, matching the worked example in Glickman's paper; one rating period per game (decisions §13).
