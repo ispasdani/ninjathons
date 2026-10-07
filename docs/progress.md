@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, the runner is faster and isolated, and the load test passed (on Hobby). **Next step:** real matches by hand with two accounts, then invite 10 to 20 friends.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, the runner is faster and isolated, and the load test passed (on Hobby). **Next step:** host the alpha (production Convex, the site on Vercel), then invite 10 to 20 friends.
 
 ## Phases
 
@@ -25,6 +25,9 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: first real match, by hand
+- Two accounts on the dev deployment (one a Clerk `+clerk_test` account) played a ranked match from Find a match to the result, on Grid Shortest Path: queue, countdown, the problem revealed at the start, Submits judged in Vercel Sandbox, the result.
 
 ### 7 Oct 2026 · Phase 4: load test passed on Hobby
 - The alpha stays on Vercel's Hobby plan; the load test counts as passed there: every verdict right at every load, at most ~40 judgings a minute before players wait ([decisions §5](notes/decisions.md#5-code-runner-vercel-sandbox)). Move to Pro if alpha players often wait, if the month's 5,000 sandboxes run low, and before launch.
