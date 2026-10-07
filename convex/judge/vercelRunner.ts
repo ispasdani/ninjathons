@@ -75,14 +75,22 @@ function isRateLimited(error: unknown) {
   return error instanceof Error && /status code 429|concurren/i.test(error.message);
 }
 
-/** Sandbox.create, waiting out Vercel's rate limit with growing, jittered pauses. */
-async function createSandbox(params: Parameters<typeof Sandbox.create>[0]) {
+type WaitListener = (waiting: boolean) => Promise<unknown>;
+
+/**
+ * Sandbox.create, waiting out Vercel's limits with growing, jittered pauses.
+ * `onWait` hears when the wait starts and when it's over.
+ */
+async function createSandbox(params: Parameters<typeof Sandbox.create>[0], onWait?: WaitListener) {
   const giveUpAt = Date.now() + RATE_LIMIT_WAIT_MS;
   for (let attempt = 0; ; attempt++) {
     try {
-      return await Sandbox.create(params);
+      const sandbox = await Sandbox.create(params);
+      if (attempt > 0) await onWait?.(false);
+      return sandbox;
     } catch (error) {
       if (!isRateLimited(error) || Date.now() >= giveUpAt) throw error;
+      if (attempt === 0) await onWait?.(true);
       const pause = Math.min(10_000, 1000 * 2 ** attempt) * (0.5 + Math.random());
       console.warn(`sandbox: rate limited, retrying in ${Math.round(pause)} ms`);
       await new Promise((resolve) => setTimeout(resolve, Math.min(pause, giveUpAt - Date.now())));
@@ -90,7 +98,7 @@ async function createSandbox(params: Parameters<typeof Sandbox.create>[0]) {
   }
 }
 
-export function vercelRunner(): CodeRunner {
+export function vercelRunner(options: { onWait?: WaitListener } = {}): CodeRunner {
   const credentials = sandboxCredentials();
   const stopping: Promise<unknown>[] = [];
   return {
@@ -102,17 +110,20 @@ export function vercelRunner(): CodeRunner {
       // Hidden test inputs on a drive are mounted read-only by name, not uploaded.
       const drive = job.drive;
       const tests = job.tests.length + (job.drive?.count ?? 0);
-      const sandbox = await createSandbox({
-        ...credentials,
-        image: imageFor(job),
-        region: sandboxRegion(),
-        mounts: drive ? { [DRIVE_DIR]: { drive: drive.name, mode: "snapshot" } } : undefined,
-        networkPolicy: "deny-all",
-        persistent: false,
-        resources: { vcpus: vcpus() },
-        // Every test at its limit, plus room for start-up and compiling.
-        timeout: Math.min(5 * 60_000, tests * job.timeLimitMs + 60_000),
-      });
+      const sandbox = await createSandbox(
+        {
+          ...credentials,
+          image: imageFor(job),
+          region: sandboxRegion(),
+          mounts: drive ? { [DRIVE_DIR]: { drive: drive.name, mode: "snapshot" } } : undefined,
+          networkPolicy: "deny-all",
+          persistent: false,
+          resources: { vcpus: vcpus() },
+          // Every test at its limit, plus room for start-up and compiling.
+          timeout: Math.min(5 * 60_000, tests * job.timeLimitMs + 60_000),
+        },
+        options.onWait,
+      );
       const t1 = Date.now();
       try {
         // The job carries the user's files: the harness writes them where only the

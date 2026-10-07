@@ -143,6 +143,13 @@ export const loadForJudging = internalQuery({
   },
 });
 
+export const setWaiting = internalMutation({
+  args: { submissionId: v.id("submissions"), waiting: v.boolean() },
+  handler: async (ctx, { submissionId, waiting }) => {
+    await ctx.db.patch(submissionId, { waitingForRunner: waiting || undefined });
+  },
+});
+
 export const markRunning = internalMutation({
   args: { submissionId: v.id("submissions") },
   handler: async (ctx, { submissionId }) => {
@@ -162,6 +169,7 @@ export const finish = internalMutation({
       verdict,
       error,
       finishedAt: Date.now(),
+      waitingForRunner: undefined,
     });
 
     // Only a Submit counts as a solve; Run judges the examples only.

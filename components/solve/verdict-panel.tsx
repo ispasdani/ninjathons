@@ -49,10 +49,23 @@ export function VerdictPanel({
 
   if (submission.status === "queued" || submission.status === "running") {
     return (
-      <p className="flex items-center gap-2 text-[13px] text-verdict-pending">
-        <span className="size-2 animate-pulse rounded-full bg-verdict-pending" />
-        {submission.status === "queued" ? "Queued…" : submission.kind === "run" ? "Running examples…" : "Judging…"}
-      </p>
+      <div className="space-y-1 text-[13px]">
+        <p className="flex items-center gap-2 text-verdict-pending">
+          <span className="size-2 animate-pulse rounded-full bg-verdict-pending" />
+          {submission.waitingForRunner
+            ? "Waiting for a free runner…"
+            : submission.status === "queued"
+              ? "Queued…"
+              : submission.kind === "run"
+                ? "Running examples…"
+                : "Judging…"}
+        </p>
+        {submission.waitingForRunner && (
+          <p className="text-muted-foreground">
+            Lots of code is running right now. Yours starts as soon as a runner is free, usually within half a minute.
+          </p>
+        )}
+      </div>
     );
   }
 

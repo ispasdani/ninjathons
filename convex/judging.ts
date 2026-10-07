@@ -24,7 +24,9 @@ export const judge = internalAction({
 
     let runner: CodeRunner | undefined;
     try {
-      runner = vercelRunner();
+      runner = vercelRunner({
+        onWait: (waiting) => ctx.runMutation(internal.submissions.setWaiting, { submissionId, waiting }),
+      });
       const tests: JudgeTest[] = problem.examples.map((e) => ({
         input: e.input,
         expected: e.output,

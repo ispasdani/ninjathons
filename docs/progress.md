@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, the runner is faster and isolated, and the load test has run. **Next step:** decide Hobby or Pro for the alpha (load test results below), then real matches by hand with two accounts, then invite 10 to 20 friends.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, the runner is faster and isolated, and the load test passed (on Hobby). **Next step:** real matches by hand with two accounts, then invite 10 to 20 friends.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: load test passed on Hobby
+- The alpha stays on Vercel's Hobby plan; the load test counts as passed there: every verdict right at every load, at most ~40 judgings a minute before players wait ([decisions §5](notes/decisions.md#5-code-runner-vercel-sandbox)). Move to Pro if alpha players often wait, if the month's 5,000 sandboxes run low, and before launch.
+- "Waiting for a free runner…": while a sandbox waits for Vercel's limit, the submission says so (`submissions.waitingForRunner`, set by the runner's `onWait`), on the solve view and the duel screen. A match Submit keeps its place in the race, which goes by when it was sent.
+- `npm run load:test --local` runs the load test through the local runner (Docker image, or Node.js and Python), free: 20 at once × 2 rounds, 40/40 right, Submit p50 2.4 s and p95 3.3 s.
+- 5 new tests (waiting for and retrying a refused sandbox with the SDK faked, 1 vCPU by default, giving up after 90 s; the waiting mark shown and cleared). 371 tests. Deployed to Convex dev.
+- Open: the waiting message hasn't been seen in the browser (it needs a real rate limit while signed in).
 
 ### 7 Oct 2026 · Phase 4: runner load test
 - `npm run load:test [at once] [rounds] [slug]` (`scripts/load-test.ts`): starts judgings together through the dev deployment, all 7 languages, mostly Submits, and reports p50, p95 and errors.

@@ -64,6 +64,22 @@ async function judged(t: ReturnType<typeof setup>) {
 }
 
 describe("submissions", () => {
+  it("shows when a submission waits for a runner, until its verdict", async () => {
+    const { t, asAda } = await seeded();
+    const id = await asAda.mutation(api.submissions.create, {
+      slug: "add",
+      language: "python",
+      source: "def add(a, b):\n    return a + b\n",
+      kind: "submit",
+    });
+    await t.mutation(internal.submissions.setWaiting, { submissionId: id, waiting: true });
+    expect((await asAda.query(api.submissions.get, { id }))?.waitingForRunner).toBe(true);
+    await judged(t);
+    const row = await asAda.query(api.submissions.get, { id });
+    expect(row?.status).toBe("done");
+    expect(row?.waitingForRunner).toBeUndefined();
+  });
+
   it("judges Submit on examples and hidden tests", async () => {
     const { t, asAda } = await seeded();
     const id = await asAda.mutation(api.submissions.create, {

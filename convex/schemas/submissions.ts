@@ -72,6 +72,9 @@ export const submissions = defineTable({
   badgesEarned: v.optional(v.array(v.string())),
   // Set when the submission was sent in a match.
   matchId: v.optional(v.id("matches")),
+  // Set while its sandbox waits for Vercel's per-minute limit, so the page can
+  // say why it's taking longer.
+  waitingForRunner: v.optional(v.boolean()),
 })
   .index("by_user", ["userId"])
   .index("by_match", ["matchId"])
