@@ -25,15 +25,24 @@ export const current = userQuery({
  * active, so nobody sees it during the countdown.
  */
 export const get = userQuery({
-  args: { id: v.id("matches") },
-  handler: async (ctx, { id }) => {
-    const match = await ctx.db.get(id);
+  // A string, so a mistyped link gets null instead of an error.
+  args: { id: v.string() },
+  handler: async (ctx, args) => {
+    const id = ctx.db.normalizeId("matches", args.id);
+    const match = id && (await ctx.db.get(id));
     if (!match) return null;
     const players = await playersOf(ctx, id);
     if (!players.some((p) => p.userId === ctx.user._id)) return null;
 
     const revealed = match.status === "active" || match.status === "finished";
     const problem = revealed ? await ctx.db.get(match.problemId) : null;
+    // How many tests a Submit runs, for the progress bars before anyone submits.
+    const hiddenTests = problem
+      ? await ctx.db
+          .query("problemTests")
+          .withIndex("by_problem_version", (q) => q.eq("problemId", match.problemId).eq("version", match.problemVersion))
+          .unique()
+      : null;
     const events = await ctx.db
       .query("matchEvents")
       .withIndex("by_match", (q) => q.eq("matchId", id))
@@ -53,6 +62,7 @@ export const get = userQuery({
       winnerId: match.winnerId,
       reason: match.reason,
       problem: problem && problemView(problem),
+      tests: problem ? problem.examples.length + (hiddenTests?.count ?? 0) : null,
       players: await Promise.all(
         players.map(async (p) => {
           const user = await ctx.db.get(p.userId);

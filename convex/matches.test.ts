@@ -131,10 +131,14 @@ describe("matches", () => {
     await t.withIdentity(identity("user_eve", { name: "eve" })).mutation(api.user.ensureUser);
     expect(await t.withIdentity(identity("user_eve")).query(api.matches.get, { id })).toBeNull();
 
+    expect(await asAda.query(api.matches.get, { id: "not-a-match" })).toBeNull();
+
     await advance(COUNTDOWN_MS);
     const after = await asAda.query(api.matches.get, { id });
     expect(after?.status).toBe("active");
     expect(after?.problem?.slug).toBe("add");
+    // Examples plus hidden tests, for the progress bars.
+    expect(after?.tests).toBe(3);
   });
 
   it("refuses Submits before the start and within the cooldown", async () => {

@@ -31,7 +31,14 @@ function Block({ label, text }: { label: string; text: string }) {
   );
 }
 
-export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | null | undefined }) {
+/** `rewards`: show what an accepted Submit earned (off in matches, whose result shows it). */
+export function VerdictPanel({
+  submission,
+  rewards = true,
+}: {
+  submission: Doc<"submissions"> | null | undefined;
+  rewards?: boolean;
+}) {
   if (!submission) {
     return (
       <p className="text-[13px] text-muted-foreground">
@@ -68,7 +75,7 @@ export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | 
         </span>
       </div>
 
-      {submission.kind === "submit" && verdict.status === "accepted" && <Rewards submission={submission} />}
+      {rewards && submission.kind === "submit" && verdict.status === "accepted" && <Rewards submission={submission} />}
 
       {verdict.compileOutput && <Block label="Compiler output" text={verdict.compileOutput} />}
 
