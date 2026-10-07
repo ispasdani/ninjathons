@@ -20,6 +20,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 6 Oct 2026 | Runner speed work for the compiled languages happens in phase 4, before the load test | [5](#5-code-runner-vercel-sandbox) |
 | 7 Oct 2026 | Levels start at 1; total XP is kept on the user row | [13](#13-xp-and-levels) |
 | 7 Oct 2026 | 21 badges from solves and levels; rarity among players with a solve | [13](#badges) |
+| 7 Oct 2026 | Ratings per area; 1v1 uses Glicko-2 with one rating period per game | [13](#ratings) |
 
 ---
 
@@ -390,3 +391,14 @@ Built with their phase: first ranked win, comeback win and rating tiers (4); 7-,
 - **Solve counts are different problems in any language;** the language badges count per language.
 - **Checked in the same transaction as the XP award:** level badges on every award, solve badges on every accepted Submit (so a rule change catches up on the user's next solve).
 - **Rarity** is holders ÷ players with at least one solve (the holders of First solve), from per-badge counts kept as badges are granted and accounts deleted.
+
+### Ratings
+
+Decided 7 Oct 2026, in phase 3.
+
+- **One rating per area** (`ratings`, keyed by user and area): `1v1` with Glicko-2, and `territory`, whose OpenSkill maths comes with Territory in phase 6. Ratings never mix with XP.
+- **Glicko-2, one rating period per game,** as most online games run it (`convex/lib/glicko2.ts`, checked against the worked example in Glickman's paper). New players start at 1500, deviation 350, volatility 0.06, τ = 0.5. Deviation never goes above 350.
+- **Provisional until 10 ranked games:** the owner sees it; leaderboards and other players don't (the plan's trust rules). No rating decay.
+- **Tiers** are the placeholder bands in design.md 2.5 (Newbie below 1200 to Grandmaster from 2200). A new player's 1500 is Specialist, which stays hidden while provisional.
+- **Every rated game writes `ratingHistory`** (rating after, change, opponent) for the profile chart.
+- **Which games count is the caller's job:** ranked only, both players with 10 ranked games, a gap under 400, at most 3 counted games per pair per day. Built with 1v1 in phase 4, where the matches are.

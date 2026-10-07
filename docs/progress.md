@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine: solves award XP and badges; levels and titles work. **Next step:** ratings per area.
+**Now:** Phase 3, Progression engine: solves award XP and badges; levels, titles and the rating store work. **Next step:** leaderboards (snapshots and scopes) and groups.
 
 ## Phases
 
@@ -25,6 +25,14 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3: ratings
+- Glicko-2 in `convex/lib/glicko2.ts`, matching the worked example in Glickman's paper; one rating period per game (decisions §13).
+- Tables `ratings` (one row per user and area: `1v1`, `territory`) and `ratingHistory`. `recordDuel` in `convex/lib/ratings.ts` rates both players of a 1v1 game from their ratings before it and keeps wins, losses and draws.
+- Tiers from design.md 2.5; provisional until 10 ranked games. `ratings.mine` returns your ratings with tier and record.
+- Account deletion removes ratings and history.
+- 15 new tests.
+- Open: nothing calls `recordDuel` until 1v1 (phase 4), which also adds the ranked-game limits. Territory's OpenSkill comes in phase 6.
 
 ### 7 Oct 2026 · Phase 3: badges
 - 21 badges from solves and levels (decisions §13): first solve, 10/50/100/500 problems, first hard, 50 in each language, Polyglot, one per title band. Later badges are listed there with their phase.

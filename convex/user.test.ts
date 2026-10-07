@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { api, internal } from "./_generated/api";
 import { grantBadge } from "./lib/badges";
+import { recordDuel } from "./lib/ratings";
 import { identity, setup } from "./test.setup";
 
 const clerkFields = {
@@ -124,6 +125,7 @@ describe("deleteFromClerk", () => {
       });
       await grantBadge(ctx, userId, "first-solve");
       await grantBadge(ctx, otherId, "first-solve");
+      await recordDuel(ctx, { a: userId, b: otherId, score: 1 });
     });
 
     await t.mutation(internal.user.deleteFromClerk, { clerkId: "user_1" });
@@ -134,12 +136,16 @@ describe("deleteFromClerk", () => {
       xp: await ctx.db.query("xpLedger").collect(),
       badges: await ctx.db.query("userBadges").collect(),
       counts: await ctx.db.query("badgeCounts").collect(),
+      ratings: await ctx.db.query("ratings").collect(),
+      history: await ctx.db.query("ratingHistory").collect(),
     }));
     expect(left.users.map((u) => u.clerkId)).toEqual(["user_2"]);
     expect(left.entitlements).toHaveLength(0);
     expect(left.xp.map((x) => x.userId)).toEqual([otherId]);
     expect(left.badges.map((b) => b.userId)).toEqual([otherId]);
     expect(left.counts).toEqual([expect.objectContaining({ badgeId: "first-solve", holders: 1 })]);
+    expect(left.ratings.map((r) => r.userId)).toEqual([otherId]);
+    expect(left.history.map((h) => h.userId)).toEqual([otherId]);
   });
 
   it("treats a missing user as already deleted", async () => {

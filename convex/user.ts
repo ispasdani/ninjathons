@@ -210,6 +210,15 @@ export const deleteFromClerk = internalMutation({
       await ctx.db.delete(badge._id);
     }
 
+    // Their ratings and history go; opponents keep their own rating changes.
+    for (const table of ["ratings", "ratingHistory"] as const) {
+      const rows = await ctx.db
+        .query(table)
+        .withIndex("by_user_area", (q) => q.eq("userId", user._id))
+        .collect();
+      for (const row of rows) await ctx.db.delete(row._id);
+    }
+
     // The name stays reserved for 90 days after the account is gone.
     if (user.usernameKey) {
       await ctx.db.insert("usernameReservations", {
