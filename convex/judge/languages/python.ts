@@ -90,6 +90,9 @@ export const python: LanguageSpec = {
   starterCode,
   stdioTemplate: "import sys\n\ndata = sys.stdin.read().split()\n\n# Solve it here and print the answer.\n",
   cleanError,
+  entryName: (signature) => snakeCase(signature.functionName),
+  missingEntry: (stderr, _sourceLines, signature) =>
+    stderr.includes(`NameError: function ${snakeCase(signature.functionName)} is not defined`),
   outOfMemory: /\bMemoryError\b/,
   program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + driver(judge.signature) : source;

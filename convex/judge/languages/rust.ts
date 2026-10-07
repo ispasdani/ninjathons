@@ -148,6 +148,12 @@ export const rust: LanguageSpec = {
   starterCode,
   stdioTemplate: "use std::io::{self, Read};\n\nfn main() {\n    let mut input = String::new();\n    io::stdin().read_to_string(&mut input).unwrap();\n    let mut tokens = input.split_ascii_whitespace();\n    // Solve it here and print the answer with println!.\n}\n",
   cleanError,
+  entryName: (signature) => snakeCase(signature.functionName),
+  missingEntry: (output, sourceLines) => {
+    // Each error's main location: "  --> solution.rs:81:31".
+    const lines = [...output.matchAll(/^\s*--> solution\.rs:(\d+):\d+/gm)].map((m) => Number(m[1]));
+    return /^error/m.test(output) && lines.length > 0 && lines.every((line) => line > sourceLines);
+  },
   outOfMemory: /memory allocation of \d+ bytes failed/,
   program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;

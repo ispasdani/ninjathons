@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built. **Next step:** play real matches by hand with two accounts (queue, challenge, ghost, share), then the clear compile error for a misnamed function.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, and a misnamed function gets a clear error. **Next step:** play real matches by hand with two accounts (queue, challenge, ghost, share), then runner speed for the compiled languages.
 
 ## Phases
 
@@ -25,6 +25,12 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: clear error for a misnamed function
+- Closes the known gap from phase 2 ([decisions §8](notes/decisions.md#8-launch-languages)). When an error is in the driver and not in the user's lines (a wrong name like `twosum`, wrong parameter types, no class Solution), the verdict is a Compile error: "Your code needs a function named twoSum, with the parameters and return type of the starter code…", then the starter code, then the original error.
+- Each language spec gains `entryName` (twoSum, two_sum, TwoSum) and `missingEntry`: an error in `NjMain.java` or `driver.cs` but not the user's file (Java, C#); errors only on lines after the user's code (C++, Rust); the driver's own "not defined" error (JavaScript, TypeScript, Python), reported once as a Compile error instead of a runtime error on every test.
+- Errors in the user's own code are left as they are.
+- 2 new driver tests, run in all 7 languages through the runner image. 350 tests; `problems:check` passes for all 30 problems.
 
 ### 7 Oct 2026 · Phase 4: share cards
 - `matches.result`: a finished match's result, public so it can be shared; null while the match is on, so a link can't reveal a live problem. Ratings (as the match left them) and rating changes only for players past their provisional games.

@@ -147,6 +147,11 @@ export const cpp: LanguageSpec = {
   starterCode,
   stdioTemplate: "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    // Read the input with cin, solve it, and print the answer with cout.\n}\n",
   cleanError,
+  entryName: (signature) => signature.functionName,
+  missingEntry: (output, sourceLines) => {
+    const lines = [...output.matchAll(/^solution\.cpp:(\d+):\d+: error/gm)].map((m) => Number(m[1]));
+    return lines.length > 0 && lines.every((line) => line > sourceLines);
+  },
   outOfMemory: /std::bad_alloc/,
   program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;

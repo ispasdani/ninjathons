@@ -314,7 +314,7 @@ problems/two-sum/
 - **Time multipliers:** JavaScript, TypeScript, C++, Rust ×1; Java, C# ×1.5 (start-up and JIT); Python ×2.
 - **Stdio mode:** Java programs are `public class Main`; C# can use top-level statements.
 - **Known gaps:**
-  - A compile error caused by a wrong function or method name (`twosum` instead of `twoSum`) points at a line in the driver, not the user's code. Fix in phase 4, before the private alpha: when a compile error is on a driver line, show "Your code needs a function named …" with the expected signature instead.
+  - ~~A compile error caused by a wrong function or method name (`twosum` instead of `twoSum`) points at a line in the driver, not the user's code.~~ Fixed 7 Oct 2026 (phase 4): when the error is in the driver and not in the user's lines (a wrong name, wrong parameter types, no class Solution), the verdict is a Compile error that says "Your code needs a function named …", shows the starter code as the shape to match, and keeps the original error under it. JavaScript, TypeScript and Python, which only find out when the driver calls the function, get the same Compile error instead of a runtime error on every test. Each language decides what counts (`missingEntry` in `convex/judge/languages`).
   - The editor has syntax colouring for every language but autocomplete only for JavaScript and TypeScript (Monaco's built-in). Java, C#, C++ and Rust would need language servers; not scheduled, decide after the private alpha.
 
 ## 9. Docs in ranked 1v1

@@ -1,4 +1,4 @@
-import { driver, nodeCleanError } from "./javascript";
+import { driver, nodeCleanError, nodeMissingEntry } from "./javascript";
 import type { LanguageSpec } from "./types";
 import type { Signature, ValueType } from "../types";
 
@@ -34,6 +34,9 @@ export const typescript: LanguageSpec = {
   starterCode,
   stdioTemplate: "const input: string = process.getBuiltinModule(\"fs\").readFileSync(0, \"utf8\");\nconst lines = input.trim().split(\"\\n\");\n\n// Solve it here and print the answer with console.log.\n",
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "ts"),
+  entryName: (signature) => signature.functionName,
+  missingEntry: (stderr, sourceLines, signature) =>
+    nodeMissingEntry(stderr, sourceLines, "ts", signature.functionName),
   outOfMemory: /heap out of memory/,
   program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;

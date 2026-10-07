@@ -66,6 +66,16 @@ export function nodeCleanError(stderr: string, sourceLines: number, ext: "js" | 
     .trim();
 }
 
+/**
+ * The driver called a function that isn't there: Node's error header points
+ * at a line after the user's code, with "is not defined" or "is not a function".
+ */
+export function nodeMissingEntry(stderr: string, sourceLines: number, ext: "js" | "ts", name: string): boolean {
+  const header = stderr.replace(/\r\n/g, "\n").split("\n")[0]?.match(new RegExp(`main\\.${ext}:(\\d+)$`));
+  if (!header || Number(header[1]) <= sourceLines) return false;
+  return stderr.includes(`ReferenceError: ${name} is not defined`) || stderr.includes(`TypeError: ${name} is not a function`);
+}
+
 export const javascript: LanguageSpec = {
   id: "javascript",
   label: "JavaScript",
@@ -76,6 +86,9 @@ export const javascript: LanguageSpec = {
   starterCode,
   stdioTemplate: "const input = require(\"fs\").readFileSync(0, \"utf8\");\nconst lines = input.trim().split(\"\\n\");\n\n// Solve it here and print the answer with console.log.\n",
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "js"),
+  entryName: (signature) => signature.functionName,
+  missingEntry: (stderr, sourceLines, signature) =>
+    nodeMissingEntry(stderr, sourceLines, "js", signature.functionName),
   // V8's own heap limit: running out prints "JavaScript heap out of memory".
   outOfMemory: /heap out of memory/,
   program(judge, source, memoryMb) {

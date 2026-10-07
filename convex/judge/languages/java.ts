@@ -153,6 +153,8 @@ export const java: LanguageSpec = {
   starterCode,
   stdioTemplate: "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));\n        // Read lines with in.readLine(), solve it, and print the answer with System.out.println.\n    }\n}\n",
   cleanError,
+  entryName: (signature) => signature.functionName,
+  missingEntry: (output) => /^NjMain\.java:\d+: error/m.test(output) && !/^Solution\.java:\d+: error/m.test(output),
   outOfMemory: /java\.lang\.OutOfMemoryError/,
   program(judge, source, memoryMb): Pick<RunJob, "files" | "compile" | "run"> {
     // The heap is capped at the limit; the JVM's own memory comes on top.

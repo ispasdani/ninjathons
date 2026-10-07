@@ -156,6 +156,9 @@ export const csharp: LanguageSpec = {
   starterCode,
   stdioTemplate: "var input = Console.In.ReadToEnd();\nvar tokens = input.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);\n\n// Solve it here and print the answer with Console.WriteLine.\n",
   cleanError,
+  entryName: (signature) => pascalCase(signature.functionName),
+  missingEntry: (output) =>
+    /driver\.cs\(\d+,\d+\): error/.test(output) && !/solution\.cs\(\d+,\d+\): error/.test(output),
   outOfMemory: /System\.OutOfMemoryException|^Out of memory\./m,
   program(judge, source, memoryMb) {
     const files: Record<string, string> = { "solution.cs": source, "usings.cs": USINGS };

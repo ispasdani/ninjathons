@@ -157,12 +157,41 @@ describe.concurrent.each(languages)("%s driver", (language) => {
     }
   });
 
-  test("rejects a missing function", { timeout: TIMEOUT }, async () => {
-    const verdict = await judgeSubmission(localRunner, {
-      judge: echo("int"), checker: { kind: "exact" }, limits, language, source: "",
+  async function verdictFor(source: string) {
+    return await judgeSubmission(localRunner, {
+      judge: echo("int"), checker: { kind: "exact" }, limits, language, source,
       tests: [{ input: '{"value": 1}', expected: "1", visible: true }], stopAtFirstFailure: false,
     });
+  }
+
+  test("rejects a missing function", { timeout: TIMEOUT }, async () => {
+    const verdict = await verdictFor("");
     expect(["runtime_error", "compile_error"]).toContain(verdict.status);
+  });
+
+  test("explains a misnamed function instead of pointing into the driver", { timeout: TIMEOUT }, async () => {
+    const name = LANGUAGES[language].entryName(signatureOf(echo("int")));
+    const source = solve(language, echo("int"), returnValue[language]).replace(name, `${name}2`);
+    const verdict = await verdictFor(source);
+    expect(verdict.status).toBe("compile_error");
+    expect(verdict.compileOutput).toContain(`Your code needs a function named ${name},`);
+    // The starter code is shown as the shape to match.
+    expect(verdict.compileOutput).toContain(LANGUAGES[language].starterCode(signatureOf(echo("int"))).trim());
+  });
+
+  test("leaves errors in the user's own code as they are", { timeout: TIMEOUT }, async () => {
+    const broken: Record<Language, string> = {
+      javascript: "return value +;",
+      typescript: "return value +;",
+      python: "return value +",
+      java: "return value +;",
+      csharp: "return value +;",
+      cpp: "return value +;",
+      rust: "value +",
+    };
+    const verdict = await verdictFor(solve(language, echo("int"), broken[language]));
+    expect(verdict.status).not.toBe("accepted");
+    expect(verdict.compileOutput ?? "").not.toContain("Your code needs a function");
   });
 
   test("stops an infinite loop at the time limit", { timeout: TIMEOUT }, async () => {
