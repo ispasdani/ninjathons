@@ -55,6 +55,41 @@ export function sandboxRegion() {
   return (process.env.SANDBOX_REGION || "iad1") as "iad1";
 }
 
+// Vercel limits how many vCPUs a team may start per minute and how many
+// sandboxes run at once (Hobby: 20 rising to 40 vCPUs a minute, 10 at once;
+// Pro: 150 rising to 5,000, 10,000 at once). A sandbox refused for either
+// waits and tries again rather than failing the submission, up to this long.
+const RATE_LIMIT_WAIT_MS = 90_000;
+
+/**
+ * vCPUs per sandbox: SANDBOX_VCPUS, default 1 (each comes with 2 GB of memory).
+ * Measured 7 Oct 2026, 1 judges as fast as 2 (one compile, then tests one at a
+ * time) and fits twice as many sandboxes under the per-minute vCPU limit.
+ */
+function vcpus() {
+  const n = Number(process.env.SANDBOX_VCPUS ?? 1);
+  return Number.isInteger(n) && n >= 1 ? n : 1;
+}
+
+function isRateLimited(error: unknown) {
+  return error instanceof Error && /status code 429|concurren/i.test(error.message);
+}
+
+/** Sandbox.create, waiting out Vercel's rate limit with growing, jittered pauses. */
+async function createSandbox(params: Parameters<typeof Sandbox.create>[0]) {
+  const giveUpAt = Date.now() + RATE_LIMIT_WAIT_MS;
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await Sandbox.create(params);
+    } catch (error) {
+      if (!isRateLimited(error) || Date.now() >= giveUpAt) throw error;
+      const pause = Math.min(10_000, 1000 * 2 ** attempt) * (0.5 + Math.random());
+      console.warn(`sandbox: rate limited, retrying in ${Math.round(pause)} ms`);
+      await new Promise((resolve) => setTimeout(resolve, Math.min(pause, giveUpAt - Date.now())));
+    }
+  }
+}
+
 export function vercelRunner(): CodeRunner {
   const credentials = sandboxCredentials();
   const stopping: Promise<unknown>[] = [];
@@ -67,14 +102,14 @@ export function vercelRunner(): CodeRunner {
       // Hidden test inputs on a drive are mounted read-only by name, not uploaded.
       const drive = job.drive;
       const tests = job.tests.length + (job.drive?.count ?? 0);
-      const sandbox = await Sandbox.create({
+      const sandbox = await createSandbox({
         ...credentials,
         image: imageFor(job),
         region: sandboxRegion(),
         mounts: drive ? { [DRIVE_DIR]: { drive: drive.name, mode: "snapshot" } } : undefined,
         networkPolicy: "deny-all",
         persistent: false,
-        resources: { vcpus: 2 },
+        resources: { vcpus: vcpus() },
         // Every test at its limit, plus room for start-up and compiling.
         timeout: Math.min(5 * 60_000, tests * job.timeLimitMs + 60_000),
       });

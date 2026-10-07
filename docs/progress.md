@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, and the runner is faster and isolated. **Next step:** the runner load test. Real matches by hand with two accounts still to do.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, the runner is faster and isolated, and the load test has run. **Next step:** decide Hobby or Pro for the alpha (load test results below), then real matches by hand with two accounts, then invite 10 to 20 friends.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: runner load test
+- `npm run load:test [at once] [rounds] [slug]` (`scripts/load-test.ts`): starts judgings together through the dev deployment, all 7 languages, mostly Submits, and reports p50, p95 and errors.
+- First run, 20 at once: 9 of 20 failed with Vercel's 429 "vCPUs allocation rate limit exceeded". The Hobby plan allows 20 rising to 40 vCPUs a minute and 10 sandboxes at once ([decisions §5](notes/decisions.md#5-code-runner-vercel-sandbox)).
+- Fixes: a refused sandbox waits and retries for up to 90 s instead of failing; sandboxes use 1 vCPU (`SANDBOX_VCPUS`), measured as fast as 2, so twice as many fit in the quota.
+- After: 20 at once × 3 rounds, 60/60 right, Submit p50 5.8 s, p95 24.9 s; 10 at once × 3 rounds, 30/30 right, Submit p50 3.8 s, p95 12.6 s. Every verdict right and no errors at any load; above ~40 judgings a minute, verdicts wait for the quota.
+- Open: on Hobby, a busy moment (more than ~40 Runs and Submits a minute) makes players wait tens of seconds; Pro (150 rising to 5,000 vCPUs a minute) removes that, and is needed at launch anyway. Players see "Judging…" while waiting; a "waiting for a free runner" message would be clearer.
 
 ### 7 Oct 2026 · Phase 4: tests in batches
 - Function-mode tests now run many per process: the harness frames them on stdin, each driver (all 7) loops, times the call itself and marks the end of each test's output. Visible examples and hidden tests run in separate processes, so an example can't reach a hidden input. A timer kills a test that runs past its limit; full programs keep one process per test.
