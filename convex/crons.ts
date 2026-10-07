@@ -10,4 +10,9 @@ crons.interval("rebuild leaderboards", { minutes: 5 }, internal.leaderboards.reb
 // Groups deleted more than 30 days ago (decisions §4).
 crons.daily("purge deleted groups", { hourUTC: 3, minuteUTC: 0 }, internal.groups.purgeDeleted, {});
 
+// The daily challenge: picked on the hour, so a missed run is caught up; then
+// yesterday's missed streaks settled (decisions §15).
+crons.hourly("pick daily challenge", { minuteUTC: 0 }, internal.daily.pick, {});
+crons.daily("settle streaks", { hourUTC: 0, minuteUTC: 5 }, internal.daily.settleStreaks, {});
+
 export default crons;

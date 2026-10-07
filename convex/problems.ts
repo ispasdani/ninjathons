@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalAction, internalMutation, internalQuery } from "./_generated/server";
 import { getCurrentUserOrNull, publicQuery } from "./lib/functions";
-import { problemView } from "./lib/problems";
+import { isListed, problemView } from "./lib/problems";
 import {
   checker,
   difficulty,
@@ -19,7 +19,7 @@ import {
 export const library = publicQuery({
   args: {},
   handler: async (ctx) => {
-    const rows = (await ctx.db.query("problems").take(1000)).filter((p) => p.status !== "draft");
+    const rows = (await ctx.db.query("problems").take(1000)).filter(isListed);
     const status = new Map<string, "solved" | "attempted">();
     const user = await getCurrentUserOrNull(ctx);
     if (user) {
@@ -56,7 +56,7 @@ export const getBySlug = publicQuery({
       .query("problems")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
-    if (!problem || problem.status === "draft") return null;
+    if (!problem || !isListed(problem)) return null;
     return problemView(problem);
   },
 });

@@ -1,5 +1,13 @@
 import { defineSchema } from "convex/server";
 
+import {
+  dailyChallenges,
+  dailyResults,
+  streaks,
+  weeklyProgress,
+  weeklyResults,
+  weeklySets,
+} from "./schemas/challenges";
 import { problems, problemTests, testDrives } from "./schemas/problems";
 import { groupMembers, groups } from "./schemas/groups";
 import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboards";
@@ -34,4 +42,10 @@ export default defineSchema({
   matchQueue,
   matchmaking,
   challenges,
+  dailyChallenges,
+  dailyResults,
+  streaks,
+  weeklySets,
+  weeklyProgress,
+  weeklyResults,
 });

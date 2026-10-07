@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha, is done; the alpha itself moved to the release stage, since everything stays local until then. **Next step:** start phase 5, daily and weekly challenges.
+**Now:** Phase 5, daily and weekly challenges: the daily challenge engine is built. **Next step:** the Daily page and the Daily board.
 
 ## Phases
 
@@ -13,7 +13,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
-| 5 | Daily and weekly challenges | Not started | | |
+| 5 | Daily and weekly challenges | In progress | 7 Oct 2026 | |
 | 6 | Territory | Not started | | |
 | 7 | Learn | Not started | | |
 | 8 | Profiles and Pro | Not started | | |
@@ -25,6 +25,14 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 5: daily challenge engine
+- Rules agreed and written down in [decisions §15](notes/decisions.md#15-daily-and-weekly-challenges): one streak (the daily), dailies never repeat while unused problems are left, weekly sets are new problems hidden until their week, the daily's difficulty follows the weekday.
+- Tables `dailyChallenges`, `dailyResults` and `streaks` (and the weekly tables, used next). `daily.pick` runs on the hour and picks the day's problem: never-used, the weekday's difficulty, then Medium, then any; with none left, the one used longest ago, with a warning in the logs. `daily.settleStreaks` at 00:05 UTC uses a freeze for a missed day or resets the streak.
+- An accepted Submit sent on the day solves the daily (not in a match), timed from `daily.open` (or the first Submit): XP 30 + 5 per streak day after the first (max +50), a freeze every 7 days (max 2), and 4 new badges (7-, 30- and 100-day streaks; Weekly top 10% comes with the weekly). The submission records it (`submissions.daily`).
+- `problems.unreleased` and `isListed` hide a weekly set's problems everywhere (library, solve page, Submit, matches, ghosts) until its week.
+- `daily.today` (problem, reset time, your result and streak) and `daily.fastest` for the page. Account deletion removes streaks and results.
+- 11 new tests. 389 tests (two runner tests time out only under the full suite's load, and pass alone). Deployed to Convex dev; today's daily there is Coin Change.
 
 ### 7 Oct 2026 · Phase 4 done
 - Everything stays local until every phase is built; hosting and the private alpha with 10 to 20 friends move to the release stage (phase 10) ([decisions §12](notes/decisions.md#12-build-plan-phases)).
