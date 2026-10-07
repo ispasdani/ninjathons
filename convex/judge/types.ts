@@ -43,6 +43,20 @@ export type RunJob = {
    * compiler. Local runners always use the runner image.
    */
   image: SandboxImage;
+  /**
+   * Set by the runner, not the language: compile and run the user's code as
+   * `nobody` with every capability dropped, in a folder only it can use, after
+   * deleting the job file. Then the code can't read the job (the hidden test
+   * inputs) or the harness's memory. Needs a harness that may switch user
+   * (Vercel Sandbox, or root in the local container); off on the host.
+   */
+  isolate?: boolean;
+  /**
+   * More tests after `tests`, read by the harness from a drive mounted at
+   * DRIVE_DIR (Vercel Sandbox only): `file` is a gzipped JSON array of stdin
+   * strings, already in the language's wire format.
+   */
+  drive?: { name: string; file: string; count: number };
 };
 
 export type SandboxImage = "managed" | "runner";

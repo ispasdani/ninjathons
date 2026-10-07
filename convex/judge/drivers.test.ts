@@ -292,6 +292,42 @@ test.runIf(languages.includes("cpp"))("a C++ segfault says so", { timeout: TIMEO
   expect(verdict.tests[0].logs).toMatch(/Segmentation fault|Illegal instruction/);
 });
 
+// Isolation needs the container (the harness switches user as root there).
+describe.skipIf(runnerMode() !== "docker")("isolation", () => {
+  // A solution that tries to get at the job and the harness, and reports what it got.
+  const probe = [
+    "import glob, os",
+    "",
+    "def probe() -> str:",
+    "    found = []",
+    "    if glob.glob('/jobs/*/job.json.gz') or glob.glob('/tmp/job.json.gz'):",
+    "        found.append('job file')",
+    "    try:",
+    "        open(f'/proc/{os.getppid()}/environ').read()",
+    "        found.append('harness environ')",
+    "    except OSError:",
+    "        pass",
+    "    try:",
+    "        os.setuid(0)",
+    "        found.append('root')",
+    "    except OSError:",
+    "        pass",
+    "    caps = [l for l in open('/proc/self/status') if l.startswith('CapEff')][0].split()[1]",
+    "    if int(caps, 16) != 0:",
+    "        found.append('capabilities')",
+    "    return ' '.join([str(os.getuid())] + found)",
+    "",
+  ].join("\n");
+  const judge: Judge = { mode: "function", signature: { functionName: "probe", params: [], returns: "string" } };
+
+  test("runs the code as nobody, with no way to the job or the harness", { timeout: TIMEOUT }, async () => {
+    const out = await run("python", judge, probe, ["{}"]);
+    expect(out.tests[0].status).toBe("ok");
+    // nobody, and nothing found.
+    expect(JSON.parse(out.tests[0].stdout)).toBe("65534");
+  });
+});
+
 describe("token wire format", () => {
   test.each(samples)("round-trips %s", (type, value) => {
     const signature = signatureOf(echo(type));

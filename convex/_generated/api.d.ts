@@ -62,6 +62,8 @@ import type * as schemas_ratings from "../schemas/ratings.js";
 import type * as schemas_submissions from "../schemas/submissions.js";
 import type * as schemas_users from "../schemas/users.js";
 import type * as submissions from "../submissions.js";
+import type * as testDrives from "../testDrives.js";
+import type * as testDrivesFill from "../testDrivesFill.js";
 import type * as user from "../user.js";
 
 import type {
@@ -125,6 +127,8 @@ declare const fullApi: ApiFromModules<{
   "schemas/submissions": typeof schemas_submissions;
   "schemas/users": typeof schemas_users;
   submissions: typeof submissions;
+  testDrives: typeof testDrives;
+  testDrivesFill: typeof testDrivesFill;
   user: typeof user;
 }>;
 

@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, and a misnamed function gets a clear error. **Next step:** play real matches by hand with two accounts (queue, challenge, ghost, share), then runner speed for the compiled languages.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, and a misnamed function gets a clear error. **Next step:** runner speed, part 2: all function-mode tests in one process. Real matches by hand with two accounts still to do.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: isolated user code, and hidden tests on drives
+- Security fix found while measuring: the user's code could read the job file in the sandbox (every test input) and print hidden inputs during a visible example. Now it runs as `nobody` through `setpriv` with every capability dropped (Vercel Sandbox hands all of them to every process), in its own folder, after the harness has deleted the job. Probed in both images: it can't read the harness's files or memory or switch back. The local Docker runner runs jobs the same way; a new test checks it.
+- Hidden test inputs on Vercel drives: `testDrives` and `testDrivesFill.fill` (inputs only, both formats, readable only by the harness). The first Submit of a tests file fills its drive in the background; later Submits mount it instead of uploading. On for the compiled languages only (`SANDBOX_TEST_DRIVES`), since a mount slows the managed image's start more than it saves.
+- Measured on Two Sum, median Submit with drive / without: C++ 4.24 / 4.46 s, Java 4.06 / 4.91 s, C# 4.75 / 5.29 s, Rust 4.07 / 4.50 s. Before this work (same day): C++ 5.9–6.3 s, C# 5.2–5.6 s, Java 4.0–5.0 s, Rust 4.2–4.5 s.
+- 351 tests. Deployed to Convex dev.
+- Open: drives of replaced tests files aren't deleted; all tests in one process is the next speed step.
 
 ### 7 Oct 2026 · Phase 4: clear error for a misnamed function
 - Closes the known gap from phase 2 ([decisions §8](notes/decisions.md#8-launch-languages)). When an error is in the driver and not in the user's lines (a wrong name like `twosum`, wrong parameter types, no class Solution), the verdict is a Compile error: "Your code needs a function named twoSum, with the parameters and return type of the starter code…", then the starter code, then the original error.

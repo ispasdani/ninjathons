@@ -6,6 +6,7 @@
  */
 import type { TestResult, Verdict, VerdictStatus } from "../schemas/submissions";
 import { outputMatches } from "./checker";
+import { DRIVE_FILES } from "./harness";
 import { LANGUAGES } from "./languages";
 import type { Checker, CodeRunner, Judge, Language, Limits, RunOutput, TestRun } from "./types";
 import { decodeResult, encodeArgs } from "./wire";
@@ -26,6 +27,11 @@ export type JudgeRequest = {
   tests: JudgeTest[];
   /** Submit stops at the first failing test; Run judges every example. */
   stopAtFirstFailure: boolean;
+  /**
+   * The last `count` tests' inputs are on this drive (convex/testDrives.ts),
+   * so the runner mounts it instead of uploading them. Vercel Sandbox only.
+   */
+  drive?: { name: string; count: number };
 };
 
 const MAX_SHOWN = 2000;
@@ -37,16 +43,20 @@ function clip(text: string): string {
 /** `runCode({ language, source, tests, limits })` from decisions §5. */
 export async function runCode(
   runner: CodeRunner,
-  request: Pick<JudgeRequest, "judge" | "language" | "source" | "limits" | "stopAtFirstFailure"> & {
+  request: Pick<JudgeRequest, "judge" | "language" | "source" | "limits" | "stopAtFirstFailure" | "drive"> & {
     tests: string[];
   },
 ): Promise<RunOutput> {
   const spec = LANGUAGES[request.language];
   const { judge } = request;
   const tokens = judge.mode === "function" && spec.wire === "tokens";
+  const { drive } = request;
+  // The drive's inputs are already in both formats; only the rest go in the job.
+  const inline = drive ? request.tests.slice(0, request.tests.length - drive.count) : request.tests;
   const output = await runner.run({
     ...spec.program(judge, request.source, request.limits.memoryMb),
-    tests: tokens ? request.tests.map((input) => encodeArgs(judge.signature, input)) : request.tests,
+    tests: tokens ? inline.map((input) => encodeArgs(judge.signature, input)) : inline,
+    drive: drive && { name: drive.name, file: tokens ? DRIVE_FILES.tokens : DRIVE_FILES.json, count: drive.count },
     timeLimitMs: Math.round(request.limits.timeMs * spec.timeMultiplier),
     // A crash or timeout usually repeats on every test, so stop at the first
     // one even on Run. Wrong answers are found here, after the run.

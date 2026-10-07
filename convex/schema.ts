@@ -1,6 +1,6 @@
 import { defineSchema } from "convex/server";
 
-import { problems, problemTests } from "./schemas/problems";
+import { problems, problemTests, testDrives } from "./schemas/problems";
 import { groupMembers, groups } from "./schemas/groups";
 import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboards";
 import { challenges, matchEvents, matches, matchmaking, matchPlayers, matchQueue } from "./schemas/matches";
@@ -16,6 +16,7 @@ export default defineSchema({
   entitlements,
   problems,
   problemTests,
+  testDrives,
   submissions,
   xpLedger,
   xpMonths,

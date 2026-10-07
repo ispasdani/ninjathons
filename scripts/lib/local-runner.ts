@@ -12,7 +12,7 @@
  *   and Python only). Isolates nothing.
  */
 import { spawn, spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { gzipSync } from "node:zlib";
@@ -34,12 +34,8 @@ export function runnerMode(): "docker" | "host" {
   return (mode = image.status === 0 ? "docker" : "host");
 }
 
-/** Writes the job's files, the harness and the gzipped job into `dir`. */
+/** Writes the harness and the gzipped job into `dir`; the harness writes the job's files. */
 function writeJob(dir: string, job: RunJob): void {
-  for (const [path, content] of Object.entries(job.files)) {
-    mkdirSync(dirname(join(dir, path)), { recursive: true });
-    writeFileSync(join(dir, path), content);
-  }
   writeFileSync(join(dir, HARNESS_FILE), HARNESS_SOURCE);
   writeFileSync(join(dir, JOB_FILE), gzipSync(JSON.stringify(job)));
 }
@@ -116,11 +112,12 @@ async function runInDocker(job: RunJob): Promise<RunOutput> {
   // The image runs as an unprivileged user that must write compiler output here.
   chmodSync(dir, 0o777);
   try {
-    writeJob(dir, job);
+    writeJob(dir, { ...job, isolate: true });
     // Async, so tests can run jobs side by side.
     const { status, stdout, stderr } = await new Promise<{ status: number | null; stdout: string; stderr: string }>(
       (resolve, reject) => {
-        const child = spawn("docker", ["exec", "-w", `/jobs/${basename(dir)}`, id, "node", HARNESS_FILE, JOB_FILE]);
+        // As root, so the harness can run the code isolated, as in Vercel Sandbox.
+        const child = spawn("docker", ["exec", "-u", "root", "-w", `/jobs/${basename(dir)}`, id, "node", HARNESS_FILE, JOB_FILE]);
         const out: Buffer[] = [];
         const err: Buffer[] = [];
         child.stdout.on("data", (chunk: Buffer) => out.push(chunk));
