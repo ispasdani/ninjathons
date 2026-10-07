@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges and ghost races are built. **Next step:** play real matches by hand with two accounts (queue, challenge, ghost), then share cards.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built. **Next step:** play real matches by hand with two accounts (queue, challenge, ghost, share), then the clear compile error for a misnamed function.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: share cards
+- `matches.result`: a finished match's result, public so it can be shared; null while the match is on, so a link can't reveal a live problem. Ratings (as the match left them) and rating changes only for players past their provisional games.
+- `/m/[matchId]`: the public result page ("@ada beat @bob in 4:12", the problem, both sides with language, tests, solve time and Submits, then Play a match), with a link preview from `/m/[matchId]/card`: a 1200 × 630 PNG drawn by `lib/share-card.tsx` with `next/og`, dark, in the duel colours. Ghost races and time-up results have their own wording.
+- The duel result has Share (the phone's share sheet, or copies the link) and Card (opens the image).
+- Checked in the browser: the card for a solved, a ghost and a time-up result (from a temporary sample route, since removed), and the page and card for a bad id (not-found text, 404). 1 new test. Production build passes; 336 tests. Deployed to Convex dev.
+- Open: the page with a real match hasn't been seen yet; link previews need the production domain set as `metadataBase` before launch (they use the current host until then).
 
 ### 7 Oct 2026 · Phase 4: ghost races
 - `convex/lib/ghosts.ts` and `convex/ghosts.ts`: a ghost is a real player's solve from a finished match, as the times and test counts of their Submits. `ghosts.start` makes an unranked match (`source: "ghost"`) with a ghost player row (`matchPlayers.ghost`), and `ghosts.step` replays each Submit at the same moment after the start, so the progress bars, feed, toasts and "earliest send wins" all work as in a live match.

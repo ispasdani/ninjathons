@@ -1,8 +1,10 @@
 "use client";
 
 import { useQuery } from "convex/react";
+import { Check, Share2 } from "lucide-react";
 import type { FunctionReturnType } from "convex/server";
 import Link from "next/link";
+import { useState } from "react";
 
 import { Difficulty } from "@/components/problem/difficulty";
 import { Button } from "@/components/ui/button";
@@ -195,6 +197,41 @@ function headline(match: Match, me: Player) {
   return { title: won ? "You won" : "You lost", detail: `${won ? "You" : name} ${REASONS[reason]}.` };
 }
 
+/**
+ * Shares the public result page (/m/<id>), whose link preview is the card:
+ * the phone's share sheet where there is one, else the link is copied.
+ */
+function ShareButton({ matchId }: { matchId: string }) {
+  const [copied, setCopied] = useState(false);
+  async function share() {
+    const url = `${window.location.origin}/m/${matchId}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ url });
+        return;
+      } catch {
+        // Closed, or not allowed here: fall back to copying.
+      }
+    }
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+  return (
+    <>
+      <Button variant="outline" size="sm" onClick={share}>
+        {copied ? <Check aria-hidden /> : <Share2 aria-hidden />}
+        {copied ? "Link copied" : "Share"}
+      </Button>
+      <Button variant="ghost" size="sm" asChild>
+        <a href={`/m/${matchId}/card`} target="_blank" rel="noopener">
+          Card
+        </a>
+      </Button>
+    </>
+  );
+}
+
 /** After the end: the result, rating change, XP and badges. */
 export function DuelResult({ match }: { match: Match }) {
   const me = match.players.find((p) => p.you)!;
@@ -237,7 +274,8 @@ export function DuelResult({ match }: { match: Match }) {
           )}
         </div>
       )}
-      <div className="ml-auto flex gap-2">
+      <div className="ml-auto flex flex-wrap gap-2">
+        {match.status === "finished" && <ShareButton matchId={match._id} />}
         <Button variant="outline" size="sm" asChild>
           <Link href="/problems">Problems</Link>
         </Button>

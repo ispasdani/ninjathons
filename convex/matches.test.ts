@@ -292,3 +292,23 @@ describe("matches", () => {
     expect(await t.run((ctx) => ctx.db.get(ada).then((u) => u?.xp ?? 0))).toBe(0);
   });
 });
+
+describe("matches.result", () => {
+  it("is public once a match is finished, and nothing before", async () => {
+    const { t, asAda, match, advance, submit, judge } = await seeded();
+    const id = await match();
+    await advance(COUNTDOWN_MS);
+    // A live match's link reveals nothing, not even to signed-out visitors.
+    expect(await t.query(api.matches.result, { id })).toBeNull();
+
+    vi.advanceTimersByTime(90_000);
+    await judge(await submit(asAda, id), verdict(3));
+    const result = await t.query(api.matches.result, { id });
+    expect(result).toMatchObject({ ranked: true, source: "queue", reason: "solved", problem: { slug: "add" } });
+    const winner = result!.players.find((p) => p.result === "win")!;
+    expect(winner).toMatchObject({ username: "ada", language: "python", solvedInMs: 90_000, submits: 1 });
+    // Both are provisional after one game: no rating or change on the public page.
+    expect(result!.players.every((p) => p.rating === null && p.ratingChange === null)).toBe(true);
+    expect(await t.query(api.matches.result, { id: "not-a-match" })).toBeNull();
+  });
+});

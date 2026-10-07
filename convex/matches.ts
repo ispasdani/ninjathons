@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { internalMutation } from "./_generated/server";
-import { userMutation, userQuery } from "./lib/functions";
+import { publicQuery, userMutation, userQuery } from "./lib/functions";
 import { finishMatch, openMatchOf, playersOf, settle } from "./lib/matches";
 import { problemView } from "./lib/problems";
 import { PROVISIONAL_GAMES, tierFor } from "./lib/ratings";
@@ -105,6 +105,59 @@ export const get = userQuery({
         total: e.total,
         accepted: e.accepted,
       })),
+    };
+  },
+});
+
+/**
+ * A finished match's result for its share page and card. Public, since a
+ * player shares the link; nothing is returned while the match is on, so a
+ * link can't reveal a live problem. Ratings (as the match left them) and
+ * rating changes show only for players past their provisional games (the
+ * trust rules).
+ */
+export const result = publicQuery({
+  args: { id: v.string() },
+  handler: async (ctx, args) => {
+    const id = ctx.db.normalizeId("matches", args.id);
+    const match = id && (await ctx.db.get(id));
+    if (!match || match.status !== "finished") return null;
+    const problem = await ctx.db.get(match.problemId);
+    const players = await playersOf(ctx, match._id);
+    return {
+      _id: match._id,
+      ranked: match.ranked,
+      source: match.source,
+      reason: match.reason,
+      finishedAt: match.finishedAt,
+      problem: problem && { title: problem.title, slug: problem.slug, difficulty: problem.difficulty },
+      players: await Promise.all(
+        players.map(async (p) => {
+          const user = await ctx.db.get(p.userId);
+          const rating = await ctx.db
+            .query("ratings")
+            .withIndex("by_user_area", (q) => q.eq("userId", p.userId).eq("area", "1v1"))
+            .unique();
+          const trusted = rating !== null && rating.games >= PROVISIONAL_GAMES;
+          const won = match.winnerId === p.userId;
+          // Their rating as this match left it.
+          const after = Math.round(p.ratingBefore + (p.ratingChange ?? 0));
+          return {
+            username: user?.username ?? "Deleted player",
+            ghost: p.ghost ?? false,
+            language: p.language,
+            result: p.ghost ? (won ? "win" : match.winnerId ? "loss" : "draw") : p.result,
+            bestPassed: p.bestPassed,
+            total: p.total,
+            // From the start to the accepted Submit, by the server clock.
+            solvedInMs: p.solvedAt === undefined ? null : p.solvedAt - match.startsAt,
+            submits: p.submits,
+            rating: trusted && !p.ghost ? after : null,
+            tier: trusted && !p.ghost ? tierFor(after) : null,
+            ratingChange: trusted && p.ratingChange !== undefined ? Math.round(p.ratingChange) : null,
+          };
+        }),
+      ),
     };
   },
 });
