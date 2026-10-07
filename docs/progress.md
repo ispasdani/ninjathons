@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, the runner is faster and isolated, and the load test passed (on Hobby). **Next step:** host the alpha (production Convex, the site on Vercel), then invite 10 to 20 friends.
+**Now:** Phase 4, 1v1 and private alpha, is done; the alpha itself moved to the release stage, since everything stays local until then. **Next step:** start phase 5, daily and weekly challenges.
 
 ## Phases
 
@@ -12,7 +12,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
-| 4 | 1v1 and private alpha | In progress | 7 Oct 2026 | |
+| 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 5 | Daily and weekly challenges | Not started | | |
 | 6 | Territory | Not started | | |
 | 7 | Learn | Not started | | |
@@ -25,6 +25,11 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4 done
+- Everything stays local until every phase is built; hosting and the private alpha with 10 to 20 friends move to the release stage (phase 10) ([decisions §12](notes/decisions.md#12-build-plan-phases)).
+- Phase 4 is done on what can be checked locally: the runner load test passed (on Hobby) and a real match played end to end by hand.
+- Still open from phase 4, for whenever they come up: challenges, ghost races and the share page haven't been tried by hand; the waiting message hasn't been seen; drives of replaced tests files aren't deleted.
 
 ### 7 Oct 2026 · Phase 4: first real match, by hand
 - Two accounts on the dev deployment (one a Clerk `+clerk_test` account) played a ranked match from Find a match to the result, on Grid Shortest Path: queue, countdown, the problem revealed at the start, Submits judged in Vercel Sandbox, the result.

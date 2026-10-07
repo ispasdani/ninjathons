@@ -353,15 +353,21 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | 1 | Judging core ✅ | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
 | 2 | Foundation ✅ | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
 | 3 | Progression engine ✅ | Solves award XP and badges, and leaderboards update |
-| 4 | 1v1 and private alpha | Runner load test passes; 10 to 20 friends play real matches |
+| 4 | 1v1 and private alpha ✅ | Runner load test passes; real matches play end to end (the friends alpha moved to the release stage, below) |
 | 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
 | 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
 | 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
 | 9 | Ninjathons | One event runs from creation to results (first to cut) |
-| 10 | Closed beta and launch | 2 or 3 office teams plus 20 to 50 players; beta issues fixed |
+| 10 | Closed beta and launch | Hosting, then the private alpha (10 to 20 friends), then 2 or 3 office teams plus 20 to 50 players; issues fixed |
 
 **Content track:** runs alongside the build from phase 2. Problems grow from about 30 to 150–200 by launch, tutorials and roadmaps are written before phase 7, and weekly sets before phase 5.
+
+### Everything stays local until the release stage (7 Oct 2026)
+
+- **Nothing is hosted until every phase is built.** No production Convex deployment, no site on Vercel, no Clerk production instance until then: the release stage (phase 10) puts everything online, then runs the private alpha and the closed beta.
+- **The private alpha moves from phase 4 to the release stage**, since friends can only play on a hosted site. Phase 4 is done when the runner load test passes and a real match plays end to end by hand (both 7 Oct 2026).
+- Development keeps using the Convex dev deployment, the Clerk development instance and Vercel Sandbox (Hobby). Load and speed are measured there, as in phase 4.
 
 ### What changed from the first build order, and why
 
