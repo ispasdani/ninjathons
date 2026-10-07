@@ -30,6 +30,15 @@ export type LanguageSpec = {
    * `sourceLines` is how many lines the user wrote; later lines are the driver.
    */
   cleanError(stderr: string, sourceLines: number): string;
+  /** The function's name as code in this language spells it (twoSum is two_sum in Python). */
+  entryName(signature: Signature): string;
+  /**
+   * Whether this error means the driver found no function to call (a wrong
+   * name, wrong parameter types, no class Solution): the compile output, or
+   * for interpreted languages a run's stderr. True only when the error is in
+   * the driver and not in the user's own lines, which come first.
+   */
+  missingEntry(error: string, sourceLines: number, signature: Signature): boolean;
   /**
    * The files and commands that run the user's source (plus the driver in
    * function mode), with the problem's memory limit applied in the way this

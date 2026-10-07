@@ -6,6 +6,7 @@ import { internalAction } from "./_generated/server";
 import { judgeSubmission, type JudgeTest } from "./judge/judge";
 import type { CodeRunner } from "./judge/types";
 import { RunnerNotConfiguredError, vercelRunner } from "./judge/vercelRunner";
+import { hiddenTestsDrive } from "./testDrives";
 
 /**
  * Judges one submission (scheduled by submissions.create). Expected outputs
@@ -23,18 +24,29 @@ export const judge = internalAction({
 
     let runner: CodeRunner | undefined;
     try {
-      runner = vercelRunner();
+      runner = vercelRunner({
+        onWait: (waiting) => ctx.runMutation(internal.submissions.setWaiting, { submissionId, waiting }),
+      });
       const tests: JudgeTest[] = problem.examples.map((e) => ({
         input: e.input,
         expected: e.output,
         visible: true,
       }));
+      let drive: { name: string; count: number } | undefined;
       if (submission.kind === "submit") {
         if (!testsFile) throw new Error(`no hidden tests for ${problem.slug} v${submission.problemVersion}`);
         const blob = await ctx.storage.get(testsFile);
         if (!blob) throw new Error(`hidden tests file missing for ${problem.slug}`);
+        // The expected outputs are always read here; the inputs come from a
+        // drive when there's one (decisions §5), else they're uploaded.
         const hidden = JSON.parse(await blob.text()) as { input: string; expectedOutput: string }[];
         tests.push(...hidden.map((t) => ({ input: t.input, expected: t.expectedOutput, visible: false })));
+        drive = await hiddenTestsDrive(ctx, {
+          file: testsFile,
+          problemId: problem._id,
+          language: submission.language,
+          count: hidden.length,
+        });
       }
 
       const verdict = await judgeSubmission(runner, {
@@ -45,6 +57,7 @@ export const judge = internalAction({
         source: submission.source,
         tests,
         stopAtFirstFailure: submission.kind === "submit",
+        drive,
       });
       await ctx.runMutation(internal.submissions.finish, { submissionId, verdict });
     } catch (error) {

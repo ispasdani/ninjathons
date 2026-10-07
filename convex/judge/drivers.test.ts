@@ -157,12 +157,82 @@ describe.concurrent.each(languages)("%s driver", (language) => {
     }
   });
 
-  test("rejects a missing function", { timeout: TIMEOUT }, async () => {
-    const verdict = await judgeSubmission(localRunner, {
-      judge: echo("int"), checker: { kind: "exact" }, limits, language, source: "",
+  async function verdictFor(source: string) {
+    return await judgeSubmission(localRunner, {
+      judge: echo("int"), checker: { kind: "exact" }, limits, language, source,
       tests: [{ input: '{"value": 1}', expected: "1", visible: true }], stopAtFirstFailure: false,
     });
+  }
+
+  test("rejects a missing function", { timeout: TIMEOUT }, async () => {
+    const verdict = await verdictFor("");
     expect(["runtime_error", "compile_error"]).toContain(verdict.status);
+  });
+
+  test("explains a misnamed function instead of pointing into the driver", { timeout: TIMEOUT }, async () => {
+    const name = LANGUAGES[language].entryName(signatureOf(echo("int")));
+    const source = solve(language, echo("int"), returnValue[language]).replace(name, `${name}2`);
+    const verdict = await verdictFor(source);
+    expect(verdict.status).toBe("compile_error");
+    expect(verdict.compileOutput).toContain(`Your code needs a function named ${name},`);
+    // The starter code is shown as the shape to match.
+    expect(verdict.compileOutput).toContain(LANGUAGES[language].starterCode(signatureOf(echo("int"))).trim());
+  });
+
+  test("leaves errors in the user's own code as they are", { timeout: TIMEOUT }, async () => {
+    const broken: Record<Language, string> = {
+      javascript: "return value +;",
+      typescript: "return value +;",
+      python: "return value +",
+      java: "return value +;",
+      csharp: "return value +;",
+      cpp: "return value +;",
+      rust: "value +",
+    };
+    const verdict = await verdictFor(solve(language, echo("int"), broken[language]));
+    expect(verdict.status).not.toBe("accepted");
+    expect(verdict.compileOutput ?? "").not.toContain("Your code needs a function");
+  });
+
+  test("runs a batch: each test keeps its own result and printed output", { timeout: TIMEOUT }, async () => {
+    const print: Record<Language, string> = {
+      javascript: "console.log('saw ' + value); return value;",
+      typescript: "console.log('saw ' + value); return value;",
+      python: "print('saw', value)\n    return value",
+      java: 'System.out.println("saw " + value); return value;',
+      csharp: 'Console.WriteLine("saw " + value); return value;',
+      cpp: 'cout << "saw " << value << endl; return value;',
+      rust: 'println!("saw {}", value); value',
+    };
+    const out = await run(language, echo("int"), solve(language, echo("int"), print[language]), [1, 2, 3].map((v) => `{"value": ${v}}`));
+    expect(out.tests.map((t) => t.status)).toEqual(["ok", "ok", "ok"]);
+    expect(out.tests.map((t) => t.stdout.trim())).toEqual(["1", "2", "3"]);
+    for (const [i, test] of out.tests.entries()) {
+      expect(test.stderr).toContain(`saw ${i + 1}`);
+      expect(test.stderr).not.toContain(`saw ${i === 0 ? 2 : 1}`);
+    }
+  });
+
+  test("stops a batch at a slow or crashing test, keeping the ones before", { timeout: TIMEOUT }, async () => {
+    const onTwo: Record<Language, [string, string]> = {
+      javascript: ["if (value === 2) for (;;) {} return value;", "if (value === 2) throw new Error('boom'); return value;"],
+      typescript: ["if (value === 2) for (;;) {} return value;", "if (value === 2) throw new Error('boom'); return value;"],
+      python: ["while value == 2:\n        pass\n    return value", "if value == 2:\n        raise ValueError('boom')\n    return value"],
+      java: ["while (value == 2) {} return value;", 'if (value == 2) throw new RuntimeException("boom"); return value;'],
+      csharp: ["while (value == 2) {} return value;", 'if (value == 2) throw new Exception("boom"); return value;'],
+      cpp: ["volatile int spin = 0; while (value == 2) spin++; return value;", 'if (value == 2) throw runtime_error("boom"); return value;'],
+      rust: ["while value == 2 { std::hint::spin_loop(); } value", 'if value == 2 { panic!("boom") } value'],
+    };
+    const inputs = [1, 2, 3].map((v) => `{"value": ${v}}`);
+    const limits = { timeMs: 300, memoryMb: 256 };
+    const started = Date.now();
+    const slow = await runCode(localRunner, { judge: echo("int"), language, source: solve(language, echo("int"), onTwo[language][0]), limits, tests: inputs, stopAtFirstFailure: true });
+    expect(slow.tests.map((t) => t.status)).toEqual(["ok", "time_limit"]);
+    // One limit plus the grace, not the whole batch's: compiling aside, well under 3 s.
+    expect(Date.now() - started).toBeLessThan(15_000);
+    const crash = await runCode(localRunner, { judge: echo("int"), language, source: solve(language, echo("int"), onTwo[language][1]), limits, tests: inputs, stopAtFirstFailure: true });
+    expect(crash.tests.map((t) => t.status)).toEqual(["ok", "runtime_error"]);
+    expect(crash.tests[1].stderr).toContain("boom");
   });
 
   test("stops an infinite loop at the time limit", { timeout: TIMEOUT }, async () => {
@@ -261,6 +331,75 @@ test.runIf(languages.includes("cpp"))("a C++ segfault says so", { timeout: TIMEO
   });
   expect(verdict.status).toBe("runtime_error");
   expect(verdict.tests[0].logs).toMatch(/Segmentation fault|Illegal instruction/);
+});
+
+describe("visible and hidden tests", () => {
+  test("run in separate processes, so an example can't reach a hidden input", { timeout: TIMEOUT }, async () => {
+    // Returns everything the driver read from stdin, by looking into its frame.
+    const source = [
+      "import sys",
+      "",
+      "def peek(value: int) -> str:",
+      "    return repr(sys._getframe(1).f_locals.get('__in'))",
+      "",
+    ].join("\n");
+    const judge: Judge = {
+      mode: "function",
+      signature: { functionName: "peek", params: [{ name: "value", type: "int" }], returns: "string" },
+    };
+    const verdict = await judgeSubmission(localRunner, {
+      judge,
+      checker: { kind: "exact" },
+      limits,
+      language: "python",
+      source,
+      tests: [
+        { input: '{"value": 1}', expected: '""', visible: true },
+        { input: '{"value": 424242}', expected: '""', visible: false },
+      ],
+      stopAtFirstFailure: false,
+    });
+    expect(verdict.tests).toHaveLength(2);
+    const shown = verdict.tests[0].actual ?? "";
+    expect(shown).toContain("value");
+    expect(shown).not.toContain("424242");
+  });
+});
+
+// Isolation needs the container (the harness switches user as root there).
+describe.skipIf(runnerMode() !== "docker")("isolation", () => {
+  // A solution that tries to get at the job and the harness, and reports what it got.
+  const probe = [
+    "import glob, os",
+    "",
+    "def probe() -> str:",
+    "    found = []",
+    "    if glob.glob('/jobs/*/job.json.gz') or glob.glob('/tmp/job.json.gz'):",
+    "        found.append('job file')",
+    "    try:",
+    "        open(f'/proc/{os.getppid()}/environ').read()",
+    "        found.append('harness environ')",
+    "    except OSError:",
+    "        pass",
+    "    try:",
+    "        os.setuid(0)",
+    "        found.append('root')",
+    "    except OSError:",
+    "        pass",
+    "    caps = [l for l in open('/proc/self/status') if l.startswith('CapEff')][0].split()[1]",
+    "    if int(caps, 16) != 0:",
+    "        found.append('capabilities')",
+    "    return ' '.join([str(os.getuid())] + found)",
+    "",
+  ].join("\n");
+  const judge: Judge = { mode: "function", signature: { functionName: "probe", params: [], returns: "string" } };
+
+  test("runs the code as nobody, with no way to the job or the harness", { timeout: TIMEOUT }, async () => {
+    const out = await run("python", judge, probe, ["{}"]);
+    expect(out.tests[0].status).toBe("ok");
+    // nobody, and nothing found.
+    expect(JSON.parse(out.tests[0].stdout)).toBe("65534");
+  });
 });
 
 describe("token wire format", () => {

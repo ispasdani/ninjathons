@@ -234,6 +234,37 @@ export const deleteFromClerk = internalMutation({
       for (const row of rows) await ctx.db.delete(row._id);
     }
 
+    const queued = await ctx.db
+      .query("matchQueue")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .unique();
+    if (queued) await ctx.db.delete(queued._id);
+
+    // Challenges they sent or received.
+    const sent = await ctx.db
+      .query("challenges")
+      .withIndex("by_from_status", (q) => q.eq("fromId", user._id))
+      .collect();
+    const received = await ctx.db
+      .query("challenges")
+      .withIndex("by_to_status", (q) => q.eq("toId", user._id))
+      .collect();
+    for (const c of [...sent, ...received]) await ctx.db.delete(c._id);
+
+    // Their side of each match and their feed events; opponents keep their own.
+    const played = await ctx.db
+      .query("matchPlayers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of played) {
+      const events = await ctx.db
+        .query("matchEvents")
+        .withIndex("by_match", (q) => q.eq("matchId", row.matchId))
+        .collect();
+      for (const e of events) if (e.userId === user._id) await ctx.db.delete(e._id);
+      await ctx.db.delete(row._id);
+    }
+
     const months = await ctx.db
       .query("xpMonths")
       .withIndex("by_user_month", (q) => q.eq("userId", user._id))

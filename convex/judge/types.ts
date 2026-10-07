@@ -29,8 +29,18 @@ export type RunJob = {
   files: Record<string, string>;
   /** Command and arguments, run once before the tests. */
   compile?: string[];
-  /** Command and arguments, run once per test. */
+  /** Command and arguments, run once per test, or once per batch with `batch`. */
   run: string[];
+  /**
+   * Function mode: the driver runs many tests per process (framing in
+   * harness.ts), so a runtime starts twice per Submit, not once per test.
+   */
+  batch?: boolean;
+  /**
+   * How many of the first tests are visible (their output is shown). With
+   * `batch`, they run in a process of their own, apart from the hidden ones.
+   */
+  visible?: number;
   /** stdin for each test, in order. */
   tests: string[];
   /** Wall-clock limit per test, already multiplied for the language. */
@@ -43,6 +53,20 @@ export type RunJob = {
    * compiler. Local runners always use the runner image.
    */
   image: SandboxImage;
+  /**
+   * Set by the runner, not the language: compile and run the user's code as
+   * `nobody` with every capability dropped, in a folder only it can use, after
+   * deleting the job file. Then the code can't read the job (the hidden test
+   * inputs) or the harness's memory. Needs a harness that may switch user
+   * (Vercel Sandbox, or root in the local container); off on the host.
+   */
+  isolate?: boolean;
+  /**
+   * More tests after `tests`, read by the harness from a drive mounted at
+   * DRIVE_DIR (Vercel Sandbox only): `file` is a gzipped JSON array of stdin
+   * strings, already in the language's wire format.
+   */
+  drive?: { name: string; file: string; count: number };
 };
 
 export type SandboxImage = "managed" | "runner";

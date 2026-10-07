@@ -93,33 +93,48 @@ inline std::string read_all() {
 
 /**
  * Appended after the user's code (a class needs its caller in the same file).
- * Before the call, stdout is pointed at stderr with dup2, so cout and printf
- * debugging stays out of the result, which goes to the saved stdout.
+ * It runs every test of the batch (framing in ../harness.ts). stdout is
+ * pointed at stderr with dup2, so cout and printf debugging stays out of the
+ * results, which go to the saved stdout.
  */
 function driver(signature: Signature): string {
   const reads = signature.params.flatMap((param, i) => [
-    `  ${cppType(param.type).replace(/\bvector\b/g, "std::vector").replace(/\bstring\b/g, "std::string")} nj_a${i};`,
-    `  nj_driver::read(nj_in, nj_a${i});`,
+    `    ${cppType(param.type).replace(/\bvector\b/g, "std::vector").replace(/\bstring\b/g, "std::string")} nj_a${i};`,
+    `    nj_driver::read(nj_in, nj_a${i});`,
   ]);
   const args = signature.params.map((_, i) => `nj_a${i}`).join(", ");
   return [
     PRELUDE,
+    "static bool nj_write(int fd, const std::string& text) {",
+    "  for (size_t done = 0; done < text.size();) {",
+    "    ssize_t n = ::write(fd, text.data() + done, text.size() - done);",
+    "    if (n <= 0) return false;",
+    "    done += n;",
+    "  }",
+    "  return true;",
+    "}",
     "int main() {",
     "  nj_driver::In nj_in{nj_driver::read_all()};",
-    ...reads,
     "  int nj_out = dup(1);",
     "  dup2(2, 1);",
-    "  Solution nj_solution;",
-    `  auto nj_result = nj_solution.${signature.functionName}(${args});`,
-    "  std::cout.flush();",
-    "  std::fflush(stdout);",
-    "  std::string nj_text;",
-    "  nj_driver::put(nj_text, nj_result);",
-    "  nj_text += '\\n';",
-    "  for (size_t done = 0; done < nj_text.size();) {",
-    "    ssize_t n = ::write(nj_out, nj_text.data() + done, nj_text.size() - done);",
-    "    if (n <= 0) return 1;",
-    "    done += n;",
+    "  size_t nj_count = std::stoull(nj_in.next());",
+    "  for (size_t nj_test = 0; nj_test < nj_count; nj_test++) {",
+    "    size_t nj_length = std::stoull(nj_in.next());",
+    // The input starts after the newline that ends its length.
+    "    size_t nj_end = nj_in.p + 1 + nj_length;",
+    ...reads,
+    "    nj_in.p = nj_end;",
+    "    Solution nj_solution;",
+    "    auto nj_start = std::chrono::steady_clock::now();",
+    `    auto nj_result = nj_solution.${signature.functionName}(${args});`,
+    "    auto nj_micros = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - nj_start).count();",
+    "    std::cout.flush();",
+    "    std::fflush(stdout);",
+    "    std::string nj_text;",
+    "    nj_driver::put(nj_text, nj_result);",
+    "    nj_text += '\\n';",
+    "    if (!nj_write(nj_out, std::to_string(nj_micros) + \" \" + std::to_string(nj_text.size()) + \"\\n\" + nj_text)) return 1;",
+    "    nj_write(2, \"\\x1eNJ\\x1e\\n\");",
     "  }",
     "  return 0;",
     "}",
@@ -147,6 +162,11 @@ export const cpp: LanguageSpec = {
   starterCode,
   stdioTemplate: "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    // Read the input with cin, solve it, and print the answer with cout.\n}\n",
   cleanError,
+  entryName: (signature) => signature.functionName,
+  missingEntry: (output, sourceLines) => {
+    const lines = [...output.matchAll(/^solution\.cpp:(\d+):\d+: error/gm)].map((m) => Number(m[1]));
+    return lines.length > 0 && lines.every((line) => line > sourceLines);
+  },
   outOfMemory: /std::bad_alloc/,
   program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;

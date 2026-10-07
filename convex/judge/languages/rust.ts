@@ -91,6 +91,14 @@ mod nj_driver {
         fn dup2(from: i32, to: i32) -> i32;
     }
 
+    /// One number on its own line of the batch framing (../harness.ts).
+    pub fn frame_number(text: &str, pos: &mut usize) -> usize {
+        let rest = &text[*pos..];
+        let end = rest.find('\n').expect("input ended early");
+        *pos += end + 1;
+        rest[..end].trim().parse().unwrap()
+    }
+
     /// Points stdout at stderr, so the solution's prints stay out of the
     /// result, and returns the real stdout for the result.
     pub fn take_stdout() -> std::fs::File {
@@ -104,10 +112,14 @@ mod nj_driver {
 }
 `;
 
-/** Appended after the user's code: the impl block needs the struct in the same crate. */
+/**
+ * Appended after the user's code: the impl block needs the struct in the same
+ * crate. It runs every test of the batch (framing in ../harness.ts); inputs
+ * are ASCII tokens, so slicing them by byte length is safe.
+ */
 function driver(signature: Signature): string {
   const reads = signature.params.map(
-    (param, i) => `    let nj_a${i}: ${rustType(param.type)} = nj_driver::Read::read(&mut nj_in);`,
+    (param, i) => `        let nj_a${i}: ${rustType(param.type)} = nj_driver::Read::read(&mut nj_in);`,
   );
   const args = signature.params.map((_, i) => `nj_a${i}`).join(", ");
   return [
@@ -115,14 +127,25 @@ function driver(signature: Signature): string {
     "fn main() {",
     "    let mut nj_text = String::new();",
     "    std::io::Read::read_to_string(&mut std::io::stdin(), &mut nj_text).unwrap();",
-    "    let mut nj_in = nj_driver::In::new(&nj_text);",
-    ...reads,
     "    let mut nj_out = nj_driver::take_stdout();",
-    `    let nj_result = Solution::${snakeCase(signature.functionName)}(${args});`,
-    "    let mut nj_result_text = String::new();",
-    "    nj_driver::Put::put(&nj_result, &mut nj_result_text);",
-    "    nj_result_text.push('\\n');",
-    "    std::io::Write::write_all(&mut nj_out, nj_result_text.as_bytes()).unwrap();",
+    "    let mut nj_pos = 0usize;",
+    "    let nj_count = nj_driver::frame_number(&nj_text, &mut nj_pos);",
+    "    for _ in 0..nj_count {",
+    "        let nj_length = nj_driver::frame_number(&nj_text, &mut nj_pos);",
+    "        let mut nj_in = nj_driver::In::new(&nj_text[nj_pos..nj_pos + nj_length]);",
+    "        nj_pos += nj_length;",
+    ...reads,
+    "        let nj_start = std::time::Instant::now();",
+    `        let nj_result = Solution::${snakeCase(signature.functionName)}(${args});`,
+    "        let nj_micros = nj_start.elapsed().as_micros();",
+    "        let _ = std::io::Write::flush(&mut std::io::stdout());",
+    "        let mut nj_result_text = String::new();",
+    "        nj_driver::Put::put(&nj_result, &mut nj_result_text);",
+    "        nj_result_text.push('\\n');",
+    "        let nj_frame = format!(\"{} {}\\n{}\", nj_micros, nj_result_text.len(), nj_result_text);",
+    "        std::io::Write::write_all(&mut nj_out, nj_frame.as_bytes()).unwrap();",
+    "        eprint!(\"\\u{1e}NJ\\u{1e}\\n\");",
+    "    }",
     "}",
     "",
   ].join("\n");
@@ -148,6 +171,12 @@ export const rust: LanguageSpec = {
   starterCode,
   stdioTemplate: "use std::io::{self, Read};\n\nfn main() {\n    let mut input = String::new();\n    io::stdin().read_to_string(&mut input).unwrap();\n    let mut tokens = input.split_ascii_whitespace();\n    // Solve it here and print the answer with println!.\n}\n",
   cleanError,
+  entryName: (signature) => snakeCase(signature.functionName),
+  missingEntry: (output, sourceLines) => {
+    // Each error's main location: "  --> solution.rs:81:31".
+    const lines = [...output.matchAll(/^\s*--> solution\.rs:(\d+):\d+/gm)].map((m) => Number(m[1]));
+    return /^error/m.test(output) && lines.length > 0 && lines.every((line) => line > sourceLines);
+  },
   outOfMemory: /memory allocation of \d+ bytes failed/,
   program(judge, source, memoryMb) {
     const code = judge.mode === "function" ? source + "\n" + driver(judge.signature) : source;

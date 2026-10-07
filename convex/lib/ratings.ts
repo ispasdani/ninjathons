@@ -16,7 +16,7 @@ export type RatingArea = Infer<typeof ratingArea>;
 export const PROVISIONAL_GAMES = 10;
 
 // Placeholder names and cut-offs (design.md 2.5).
-const TIERS = [
+export const TIERS = [
   { from: -Infinity, tier: "Newbie" },
   { from: 1200, tier: "Apprentice" },
   { from: 1400, tier: "Specialist" },
@@ -95,7 +95,7 @@ export async function recordDuel(
       change,
       opponentId: side.opponentId,
     });
-    changes.push({ userId: side.userId, rating: next.rating, change });
+    changes.push({ userId: side.userId, rating: next.rating, change, games: record.games });
   }
   return changes;
 }

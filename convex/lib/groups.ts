@@ -5,16 +5,13 @@ import { ConvexError } from "convex/values";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
+import { normalizeCode, randomCode } from "./codes";
 
 export const MAX_MEMBERS = 100;
 export const MAX_GROUPS_PER_USER = 10;
 export const MAX_NAME_LENGTH = 50;
 // A deleted group can be restored by its owner for this long.
 export const RESTORE_FOR_MS = 30 * 24 * 60 * 60 * 1000;
-
-// No 0/O, 1/I/L: codes get read out loud and typed by hand.
-const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-const CODE_LENGTH = 8;
 
 export function cleanGroupName(name: string) {
   const trimmed = name.trim().replace(/\s+/g, " ");
@@ -23,21 +20,11 @@ export function cleanGroupName(name: string) {
 }
 
 /** Codes are case-insensitive; this is the stored form. */
-export function normalizeInviteCode(code: string) {
-  return code.trim().toUpperCase();
-}
+export const normalizeInviteCode = normalizeCode;
 
 export async function newInviteCode(ctx: QueryCtx) {
-  // Bytes past the last whole multiple of the alphabet are skipped, so every
-  // character is equally likely.
-  const limit = 256 - (256 % CODE_ALPHABET.length);
   for (;;) {
-    let code = "";
-    while (code.length < CODE_LENGTH) {
-      for (const b of crypto.getRandomValues(new Uint8Array(CODE_LENGTH))) {
-        if (b < limit && code.length < CODE_LENGTH) code += CODE_ALPHABET[b % CODE_ALPHABET.length];
-      }
-    }
+    const code = randomCode();
     const taken = await ctx.db
       .query("groups")
       .withIndex("by_inviteCode", (q) => q.eq("inviteCode", code))

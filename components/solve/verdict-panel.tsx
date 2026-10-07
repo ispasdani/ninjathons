@@ -31,7 +31,14 @@ function Block({ label, text }: { label: string; text: string }) {
   );
 }
 
-export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | null | undefined }) {
+/** `rewards`: show what an accepted Submit earned (off in matches, whose result shows it). */
+export function VerdictPanel({
+  submission,
+  rewards = true,
+}: {
+  submission: Doc<"submissions"> | null | undefined;
+  rewards?: boolean;
+}) {
   if (!submission) {
     return (
       <p className="text-[13px] text-muted-foreground">
@@ -42,10 +49,23 @@ export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | 
 
   if (submission.status === "queued" || submission.status === "running") {
     return (
-      <p className="flex items-center gap-2 text-[13px] text-verdict-pending">
-        <span className="size-2 animate-pulse rounded-full bg-verdict-pending" />
-        {submission.status === "queued" ? "Queued…" : submission.kind === "run" ? "Running examples…" : "Judging…"}
-      </p>
+      <div className="space-y-1 text-[13px]">
+        <p className="flex items-center gap-2 text-verdict-pending">
+          <span className="size-2 animate-pulse rounded-full bg-verdict-pending" />
+          {submission.waitingForRunner
+            ? "Waiting for a free runner…"
+            : submission.status === "queued"
+              ? "Queued…"
+              : submission.kind === "run"
+                ? "Running examples…"
+                : "Judging…"}
+        </p>
+        {submission.waitingForRunner && (
+          <p className="text-muted-foreground">
+            Lots of code is running right now. Yours starts as soon as a runner is free, usually within half a minute.
+          </p>
+        )}
+      </div>
     );
   }
 
@@ -68,7 +88,7 @@ export function VerdictPanel({ submission }: { submission: Doc<"submissions"> | 
         </span>
       </div>
 
-      {submission.kind === "submit" && verdict.status === "accepted" && <Rewards submission={submission} />}
+      {rewards && submission.kind === "submit" && verdict.status === "accepted" && <Rewards submission={submission} />}
 
       {verdict.compileOutput && <Block label="Compiler output" text={verdict.compileOutput} />}
 

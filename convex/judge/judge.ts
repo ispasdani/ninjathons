@@ -6,6 +6,7 @@
  */
 import type { TestResult, Verdict, VerdictStatus } from "../schemas/submissions";
 import { outputMatches } from "./checker";
+import { DRIVE_FILES } from "./harness";
 import { LANGUAGES } from "./languages";
 import type { Checker, CodeRunner, Judge, Language, Limits, RunOutput, TestRun } from "./types";
 import { decodeResult, encodeArgs } from "./wire";
@@ -26,6 +27,11 @@ export type JudgeRequest = {
   tests: JudgeTest[];
   /** Submit stops at the first failing test; Run judges every example. */
   stopAtFirstFailure: boolean;
+  /**
+   * The last `count` tests' inputs are on this drive (convex/testDrives.ts),
+   * so the runner mounts it instead of uploading them. Vercel Sandbox only.
+   */
+  drive?: { name: string; count: number };
 };
 
 const MAX_SHOWN = 2000;
@@ -37,16 +43,24 @@ function clip(text: string): string {
 /** `runCode({ language, source, tests, limits })` from decisions §5. */
 export async function runCode(
   runner: CodeRunner,
-  request: Pick<JudgeRequest, "judge" | "language" | "source" | "limits" | "stopAtFirstFailure"> & {
+  request: Pick<JudgeRequest, "judge" | "language" | "source" | "limits" | "stopAtFirstFailure" | "drive"> & {
     tests: string[];
+    /** How many of the first tests are visible. */
+    visible?: number;
   },
 ): Promise<RunOutput> {
   const spec = LANGUAGES[request.language];
   const { judge } = request;
   const tokens = judge.mode === "function" && spec.wire === "tokens";
+  const { drive } = request;
+  // The drive's inputs are already in both formats; only the rest go in the job.
+  const inline = drive ? request.tests.slice(0, request.tests.length - drive.count) : request.tests;
   const output = await runner.run({
     ...spec.program(judge, request.source, request.limits.memoryMb),
-    tests: tokens ? request.tests.map((input) => encodeArgs(judge.signature, input)) : request.tests,
+    tests: tokens ? inline.map((input) => encodeArgs(judge.signature, input)) : inline,
+    drive: drive && { name: drive.name, file: tokens ? DRIVE_FILES.tokens : DRIVE_FILES.json, count: drive.count },
+    batch: judge.mode === "function",
+    visible: request.visible,
     timeLimitMs: Math.round(request.limits.timeMs * spec.timeMultiplier),
     // A crash or timeout usually repeats on every test, so stop at the first
     // one even on Run. Wrong answers are found here, after the run.
@@ -78,7 +92,11 @@ export async function runCode(
 }
 
 export async function judgeSubmission(runner: CodeRunner, request: JudgeRequest): Promise<Verdict> {
-  const output = await runCode(runner, { ...request, tests: request.tests.map((t) => t.input) });
+  const output = await runCode(runner, {
+    ...request,
+    tests: request.tests.map((t) => t.input),
+    visible: request.tests.filter((t) => t.visible).length,
+  });
   return decideVerdict(request, output);
 }
 
@@ -87,14 +105,34 @@ export function decideVerdict(
   output: RunOutput,
 ): Verdict {
   const total = request.tests.length;
+  const sourceLines = request.source.split("\n").length;
+  const spec = LANGUAGES[request.language];
+  const missing = (error: string) =>
+    request.judge.mode === "function" && spec.missingEntry(error, sourceLines, request.judge.signature);
   if (output.compile && !output.compile.ok) {
-    return { status: "compile_error", passed: 0, total, timeMs: 0, compileOutput: output.compile.output, tests: [] };
+    const compileOutput = missing(output.compile.output)
+      ? missingEntryMessage(request, "The compiler said:", output.compile.output)
+      : output.compile.output;
+    return { status: "compile_error", passed: 0, total, timeMs: 0, compileOutput, tests: [] };
+  }
+  // Interpreted languages find out when the driver calls the function. Every
+  // test would fail the same way, so it's reported once, like a compile error.
+  const first = output.tests[0];
+  if (first?.status === "runtime_error" && missing(first.stderr)) {
+    const error = spec.cleanError(first.stderr, sourceLines);
+    return {
+      status: "compile_error",
+      passed: 0,
+      total,
+      timeMs: 0,
+      compileOutput: missingEntryMessage(request, "The error was:", error),
+      tests: [],
+    };
   }
 
   const tests: TestResult[] = [];
   let status: VerdictStatus = "accepted";
   let passed = 0;
-  const sourceLines = request.source.split("\n").length;
   for (let i = 0; i < output.tests.length && i < total; i++) {
     const test = request.tests[i];
     const run = output.tests[i];
@@ -112,6 +150,30 @@ export function decideVerdict(
 
   const timeMs = tests.reduce((max, t) => Math.max(max, t.timeMs), 0);
   return { status, passed, total, timeMs, tests };
+}
+
+/**
+ * In place of an error that points into the driver, which the user never
+ * wrote or sees (decisions §8, known gaps): what the driver looks for, the
+ * starter code as the shape to match, then the original error.
+ */
+function missingEntryMessage(
+  request: Pick<JudgeRequest, "judge" | "language">,
+  label: string,
+  original: string,
+): string {
+  if (request.judge.mode !== "function") return original;
+  const spec = LANGUAGES[request.language];
+  return [
+    `Your code needs a function named ${spec.entryName(request.judge.signature)}, with the parameters and return type of the starter code. Check the spelling (names are case-sensitive) and the types.`,
+    "",
+    "The starter code:",
+    "",
+    spec.starterCode(request.judge.signature).trimEnd(),
+    "",
+    label,
+    original.trim(),
+  ].join("\n");
 }
 
 function judgeOne(

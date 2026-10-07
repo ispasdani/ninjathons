@@ -26,19 +26,37 @@ function starterCode(signature: Signature): string {
 
 /**
  * The user's code comes first so error line numbers match the editor. The
- * driver then reads the arguments from stdin, sends anything the solution
- * prints to stderr, and writes only the JSON result to stdout.
+ * driver then runs every test of the batch (the framing is in ../harness.ts):
+ * it reads each test's arguments, times the call, writes the JSON result to
+ * stdout and the end-of-test marker to stderr. Anything the solution prints
+ * goes to stderr.
  */
 export function driver(signature: Signature): string {
   const args = signature.params.map((p) => `__args[${JSON.stringify(p.name)}]`).join(", ");
   return `
 ;(() => {
-  const __fs = process.getBuiltinModule("fs");
-  const __args = JSON.parse(__fs.readFileSync(0, "utf8"));
+  const __in = process.getBuiltinModule("fs").readFileSync(0);
+  let __p = 0;
+  const __line = () => {
+    const end = __in.indexOf(10, __p);
+    const text = __in.toString("latin1", __p, end);
+    __p = end + 1;
+    return Number(text);
+  };
   const __write = process.stdout.write.bind(process.stdout);
   process.stdout.write = (...a) => process.stderr.write(...a);
-  const __result = ${signature.functionName}(${args});
-  __write(JSON.stringify(__result === undefined ? null : __result) + "\\n");
+  const __count = __line();
+  for (let __test = 0; __test < __count; __test++) {
+    const __length = __line();
+    const __args = JSON.parse(__in.toString("utf8", __p, __p + __length));
+    __p += __length;
+    const __start = process.hrtime.bigint();
+    const __result = ${signature.functionName}(${args});
+    const __micros = (process.hrtime.bigint() - __start) / 1000n;
+    const __out = JSON.stringify(__result === undefined ? null : __result) + "\\n";
+    __write(__micros + " " + Buffer.byteLength(__out) + "\\n" + __out);
+    process.stderr.write("\\u001eNJ\\u001e\\n");
+  }
 })();
 `;
 }
@@ -66,6 +84,16 @@ export function nodeCleanError(stderr: string, sourceLines: number, ext: "js" | 
     .trim();
 }
 
+/**
+ * The driver called a function that isn't there: Node's error header points
+ * at a line after the user's code, with "is not defined" or "is not a function".
+ */
+export function nodeMissingEntry(stderr: string, sourceLines: number, ext: "js" | "ts", name: string): boolean {
+  const header = stderr.replace(/\r\n/g, "\n").split("\n")[0]?.match(new RegExp(`main\\.${ext}:(\\d+)$`));
+  if (!header || Number(header[1]) <= sourceLines) return false;
+  return stderr.includes(`ReferenceError: ${name} is not defined`) || stderr.includes(`TypeError: ${name} is not a function`);
+}
+
 export const javascript: LanguageSpec = {
   id: "javascript",
   label: "JavaScript",
@@ -76,6 +104,9 @@ export const javascript: LanguageSpec = {
   starterCode,
   stdioTemplate: "const input = require(\"fs\").readFileSync(0, \"utf8\");\nconst lines = input.trim().split(\"\\n\");\n\n// Solve it here and print the answer with console.log.\n",
   cleanError: (stderr, sourceLines) => nodeCleanError(stderr, sourceLines, "js"),
+  entryName: (signature) => signature.functionName,
+  missingEntry: (stderr, sourceLines, signature) =>
+    nodeMissingEntry(stderr, sourceLines, "js", signature.functionName),
   // V8's own heap limit: running out prints "JavaScript heap out of memory".
   outOfMemory: /heap out of memory/,
   program(judge, source, memoryMb) {

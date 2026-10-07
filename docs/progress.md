@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine, is done. **Next step:** start phase 4, 1v1 and the private alpha.
+**Now:** Phase 4, 1v1 and private alpha, is done; the alpha itself moved to the release stage, since everything stays local until then. **Next step:** start phase 5, daily and weekly challenges.
 
 ## Phases
 
@@ -12,7 +12,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
-| 4 | 1v1 and private alpha | Not started | | |
+| 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 5 | Daily and weekly challenges | Not started | | |
 | 6 | Territory | Not started | | |
 | 7 | Learn | Not started | | |
@@ -25,6 +25,95 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4 done
+- Everything stays local until every phase is built; hosting and the private alpha with 10 to 20 friends move to the release stage (phase 10) ([decisions §12](notes/decisions.md#12-build-plan-phases)).
+- Phase 4 is done on what can be checked locally: the runner load test passed (on Hobby) and a real match played end to end by hand.
+- Still open from phase 4, for whenever they come up: challenges, ghost races and the share page haven't been tried by hand; the waiting message hasn't been seen; drives of replaced tests files aren't deleted.
+
+### 7 Oct 2026 · Phase 4: first real match, by hand
+- Two accounts on the dev deployment (one a Clerk `+clerk_test` account) played a ranked match from Find a match to the result, on Grid Shortest Path: queue, countdown, the problem revealed at the start, Submits judged in Vercel Sandbox, the result.
+
+### 7 Oct 2026 · Phase 4: load test passed on Hobby
+- The alpha stays on Vercel's Hobby plan; the load test counts as passed there: every verdict right at every load, at most ~40 judgings a minute before players wait ([decisions §5](notes/decisions.md#5-code-runner-vercel-sandbox)). Move to Pro if alpha players often wait, if the month's 5,000 sandboxes run low, and before launch.
+- "Waiting for a free runner…": while a sandbox waits for Vercel's limit, the submission says so (`submissions.waitingForRunner`, set by the runner's `onWait`), on the solve view and the duel screen. A match Submit keeps its place in the race, which goes by when it was sent.
+- `npm run load:test --local` runs the load test through the local runner (Docker image, or Node.js and Python), free: 20 at once × 2 rounds, 40/40 right, Submit p50 2.4 s and p95 3.3 s.
+- 5 new tests (waiting for and retrying a refused sandbox with the SDK faked, 1 vCPU by default, giving up after 90 s; the waiting mark shown and cleared). 371 tests. Deployed to Convex dev.
+- Open: the waiting message hasn't been seen in the browser (it needs a real rate limit while signed in).
+
+### 7 Oct 2026 · Phase 4: runner load test
+- `npm run load:test [at once] [rounds] [slug]` (`scripts/load-test.ts`): starts judgings together through the dev deployment, all 7 languages, mostly Submits, and reports p50, p95 and errors.
+- First run, 20 at once: 9 of 20 failed with Vercel's 429 "vCPUs allocation rate limit exceeded". The Hobby plan allows 20 rising to 40 vCPUs a minute and 10 sandboxes at once ([decisions §5](notes/decisions.md#5-code-runner-vercel-sandbox)).
+- Fixes: a refused sandbox waits and retries for up to 90 s instead of failing; sandboxes use 1 vCPU (`SANDBOX_VCPUS`), measured as fast as 2, so twice as many fit in the quota.
+- After: 20 at once × 3 rounds, 60/60 right, Submit p50 5.8 s, p95 24.9 s; 10 at once × 3 rounds, 30/30 right, Submit p50 3.8 s, p95 12.6 s. Every verdict right and no errors at any load; above ~40 judgings a minute, verdicts wait for the quota.
+- Open: on Hobby, a busy moment (more than ~40 Runs and Submits a minute) makes players wait tens of seconds; Pro (150 rising to 5,000 vCPUs a minute) removes that, and is needed at launch anyway. Players see "Judging…" while waiting; a "waiting for a free runner" message would be clearer.
+
+### 7 Oct 2026 · Phase 4: tests in batches
+- Function-mode tests now run many per process: the harness frames them on stdin, each driver (all 7) loops, times the call itself and marks the end of each test's output. Visible examples and hidden tests run in separate processes, so an example can't reach a hidden input. A timer kills a test that runs past its limit; full programs keep one process per test.
+- Drives only for hidden inputs of 1 MB or more (`testDrives.bytes`): below that, uploading is faster than a mount.
+- Two Sum Submit, start of the day → now: C++ 5.9–6.3 → 4.5–4.6 s, C# 5.2–5.6 → 4.2–4.3 s, Java 4.0–5.0 → 4.1–4.6 s, Rust 4.2–4.5 → 3.4 s, JavaScript 2.5–2.7 → 2.1–2.7 s, Python 2.3–2.9 → 2.0–2.3 s, TypeScript 3.7–3.9 → 2.1–2.3 s ([decisions §5](notes/decisions.md#5-code-runner-vercel-sandbox)).
+- 4 new driver tests (batch results and printed output per test, a slow or crashing test mid-batch, examples apart from hidden tests). 366 tests; `problems:check` passes for all 30 problems, slow solutions still time out. Deployed to Convex dev.
+- Open: the compiled languages are still above the 3 s target, mostly sandbox start-up (1.5–2 s) and compiling; warm sandboxes are the next lever, a launch decision.
+
+### 7 Oct 2026 · Phase 4: isolated user code, and hidden tests on drives
+- Security fix found while measuring: the user's code could read the job file in the sandbox (every test input) and print hidden inputs during a visible example. Now it runs as `nobody` through `setpriv` with every capability dropped (Vercel Sandbox hands all of them to every process), in its own folder, after the harness has deleted the job. Probed in both images: it can't read the harness's files or memory or switch back. The local Docker runner runs jobs the same way; a new test checks it.
+- Hidden test inputs on Vercel drives: `testDrives` and `testDrivesFill.fill` (inputs only, both formats, readable only by the harness). The first Submit of a tests file fills its drive in the background; later Submits mount it instead of uploading. On for the compiled languages only (`SANDBOX_TEST_DRIVES`), since a mount slows the managed image's start more than it saves.
+- Measured on Two Sum, median Submit with drive / without: C++ 4.24 / 4.46 s, Java 4.06 / 4.91 s, C# 4.75 / 5.29 s, Rust 4.07 / 4.50 s. Before this work (same day): C++ 5.9–6.3 s, C# 5.2–5.6 s, Java 4.0–5.0 s, Rust 4.2–4.5 s.
+- 351 tests. Deployed to Convex dev.
+- Open: drives of replaced tests files aren't deleted; all tests in one process is the next speed step.
+
+### 7 Oct 2026 · Phase 4: clear error for a misnamed function
+- Closes the known gap from phase 2 ([decisions §8](notes/decisions.md#8-launch-languages)). When an error is in the driver and not in the user's lines (a wrong name like `twosum`, wrong parameter types, no class Solution), the verdict is a Compile error: "Your code needs a function named twoSum, with the parameters and return type of the starter code…", then the starter code, then the original error.
+- Each language spec gains `entryName` (twoSum, two_sum, TwoSum) and `missingEntry`: an error in `NjMain.java` or `driver.cs` but not the user's file (Java, C#); errors only on lines after the user's code (C++, Rust); the driver's own "not defined" error (JavaScript, TypeScript, Python), reported once as a Compile error instead of a runtime error on every test.
+- Errors in the user's own code are left as they are.
+- 2 new driver tests, run in all 7 languages through the runner image. 350 tests; `problems:check` passes for all 30 problems.
+
+### 7 Oct 2026 · Phase 4: share cards
+- `matches.result`: a finished match's result, public so it can be shared; null while the match is on, so a link can't reveal a live problem. Ratings (as the match left them) and rating changes only for players past their provisional games.
+- `/m/[matchId]`: the public result page ("@ada beat @bob in 4:12", the problem, both sides with language, tests, solve time and Submits, then Play a match), with a link preview from `/m/[matchId]/card`: a 1200 × 630 PNG drawn by `lib/share-card.tsx` with `next/og`, dark, in the duel colours. Ghost races and time-up results have their own wording.
+- The duel result has Share (the phone's share sheet, or copies the link) and Card (opens the image).
+- Checked in the browser: the card for a solved, a ghost and a time-up result (from a temporary sample route, since removed), and the page and card for a bad id (not-found text, 404). 1 new test. Production build passes; 336 tests. Deployed to Convex dev.
+- Open: the page with a real match hasn't been seen yet; link previews need the production domain set as `metadataBase` before launch (they use the current host until then).
+
+### 7 Oct 2026 · Phase 4: ghost races
+- `convex/lib/ghosts.ts` and `convex/ghosts.ts`: a ghost is a real player's solve from a finished match, as the times and test counts of their Submits. `ghosts.start` makes an unranked match (`source: "ghost"`) with a ghost player row (`matchPlayers.ghost`), and `ghosts.step` replays each Submit at the same moment after the start, so the progress bars, feed, toasts and "earliest send wins" all work as in a live match.
+- The pick: someone else's solve of a problem you haven't solved if possible, among the 5 closest to your rating, from the last 200 finished matches. The recorded player isn't in the race (ghost rows never count as their open match). No rating change and no match XP.
+- Play offers "Race a ghost" when nobody is waiting, or after 20 s in the queue. The duel screen labels it "Ghost of @name" and "Ghost race · no rating change", with a fainter progress bar; the result says "You beat the ghost" or "The ghost won".
+- 3 new tests. Production build passes; 335 tests. Deployed to Convex dev.
+- Open: not checked in the browser yet; there are no ghosts on dev until someone wins a real match there. `ghosts.available` reads up to 200 matches, fine for the alpha, to revisit with more players.
+
+### 7 Oct 2026 · Phase 4: challenges
+- `challenges` table and `convex/challenges.ts`: challenge by username or make a link (`/challenge/<code>`, the 8-character codes groups use, now in `convex/lib/codes.ts`). Ranked or unranked; unranked may fix the difficulty. Expires after 15 minutes; at most 5 open, one per opponent. Clear errors for an unknown player, yourself, a duplicate.
+- Ranked limits: 10 ranked games each and a gap under 400, checked when sent (for a link, the sender only) and again on accept; the daily pair limit applies when the match ends, as for every ranked game.
+- Accepting makes the match at once; both players' other sent challenges are cancelled when their match starts.
+- `/play` is now Play: language picker, challenges for you (Accept, Decline) and yours (Copy link, Cancel), then Find a match and Challenge someone side by side. `/challenge/[code]` shows the sender, ranked or not, difficulty, expiry, and why you can't accept when you can't.
+- A banner under the header on every signed-in page: "You're in a match · Back to it", or "@ada challenges you · See challenge". A match in its countdown opens by itself, so a challenger who wandered off doesn't miss it.
+- 7 new tests. Production build passes; 332 tests. Deployed to Convex dev.
+- Open: not checked in the browser yet (needs two signed-in accounts).
+
+### 7 Oct 2026 · Phase 4: duel screen
+- `/duel/[matchId]`: a countdown card (you vs them, ratings when not provisional, languages, difficulty and time limit, seconds to the start, Leave), then the HUD (server timer, red in the last minute; both progress bars in the duel colours with tests passed and Submits; Give up) over the solve layout, then a result banner (won, lost or draw and why, rating change, match XP, badges, a note when the pair limit stopped the game counting, Find another match).
+- The editor opens in the language picked before the match; code is kept per match and language in this browser. Submit shows the 10 s cooldown; Run and Submit stop at time up. No hints in matches.
+- Left panel: Description and a Match feed (Submits as tests passed, never code). A toast bottom-right when the opponent submits or gives up.
+- `matches.get` takes any string (a bad link shows "not found") and returns the test count for the progress bars. The verdict panel can leave out practice XP, since a match shows its rewards with the result.
+- Production build passes; 325 tests. Deployed to Convex dev.
+- Open: not checked in the browser yet (needs two signed-in accounts); the client clock isn't corrected against the server's, so a wrong computer clock shows a wrong timer (the server still decides). (The way back to a running match came with challenges: a banner on every page.)
+
+### 7 Oct 2026 · Phase 4: matchmaking
+- Find a match: `matchQueue` (one row per player, with language and rating) and a pairing pass (`queue.pass`) that runs as soon as someone joins, then every 2 s while anyone waits. The rating range starts at ±100 and widens by 50 every 5 s; after a minute anyone is a fair opponent. Longest waiting first, closest rating wins.
+- The page sends a heartbeat every 10 s; a row not seen for 30 s is dropped, so nobody is matched after closing the tab. A single `matchmaking` row keeps two pass loops from running at once.
+- `/play` page: language picker (remembered in this browser), Find a match, waiting time, players waiting, your 1v1 rating, Cancel. "Play" is first in the nav. When matched it opens `/duel/[id]`.
+- 10 new tests. Production build passes; 325 tests. Deployed to Convex dev.
+- Open: `/duel/[id]` doesn't exist yet (next step), and the page hasn't been checked signed in.
+
+### 7 Oct 2026 · Phase 4: match engine
+- Match rules agreed and written down in [decisions §14](notes/decisions.md#14-1v1-matches): difficulty and time limit from the players' average rating, each player's own language, first accepted Submit wins by the time it was sent, best Submit wins at time up, 10 s between Submits.
+- Tables `matches`, `matchPlayers` and `matchEvents`; submissions carry `matchId`. `createMatch` in `convex/lib/matches.ts` picks a problem neither player has solved and schedules the start (after a 10 s countdown) and time up on the server clock.
+- `matches.get` shows the clock, both players' progress (counts only) and the feed, and the problem only once the match is active; `matches.current` finds your open match; `matches.forfeit` cancels during the countdown and loses after it.
+- Results: ranked games within 3 per pair per day change both ratings (`recordDuel`) and give match XP (10, or 25 for a win). 7 new badges: First win, Comeback, and one per rating tier.
+- Account deletion removes the player's match rows and feed events.
+- 11 new tests, one of them judging real code through the local runner.
+- Open: nothing makes matches yet (matchmaking and challenges are the next steps) and there's no duel screen yet. The schema and functions are pushed to Convex dev.
 
 ### 7 Oct 2026 · Phase 3 done
 - The check passes, by hand in the browser on Convex dev: an accepted Submit showed +10 XP and the First solve badge, a repeat solve explained why there was no XP, and the dashboard and the Level board (Global, Country, Group) updated after the next rebuild.

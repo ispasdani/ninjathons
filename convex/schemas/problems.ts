@@ -117,3 +117,18 @@ export const problemTests = defineTable({
   file: v.id("_storage"),
   count: v.number(),
 }).index("by_problem_version", ["problemId", "version"]);
+
+// A Vercel Sandbox drive holding one hidden tests file's inputs (never the
+// expected outputs), mounted read-only into Submit sandboxes so the inputs
+// aren't uploaded every time (decisions §5). One per tests file, so a drive
+// never changes once filled. Written only by convex/testDrives.ts.
+export const testDrives = defineTable({
+  file: v.id("_storage"),
+  drive: v.string(),
+  // When filling started, so a crashed fill can be retried.
+  startedAt: v.number(),
+  // Set once the drive is filled and safe to mount.
+  readyAt: v.optional(v.number()),
+  // The gzipped JSON inputs' size: small files upload faster than a mount.
+  bytes: v.optional(v.number()),
+}).index("by_file", ["file"]);

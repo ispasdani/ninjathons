@@ -1,10 +1,12 @@
 import { ConvexError, v } from "convex/values";
 
 import { internal } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import { internalMutation, internalQuery } from "./_generated/server";
 import { problemLanguages } from "./judge/languages";
 import { userMutation, userQuery } from "./lib/functions";
 import { checkSolveBadges } from "./lib/badges";
+import { noteSubmit, playersOf, recordJudgedSubmit, SUBMIT_COOLDOWN_MS } from "./lib/matches";
 import { awardXp, SOLVE_XP, solveKey } from "./lib/xp";
 import { language } from "./schemas/problems";
 import { submissionKind, verdict } from "./schemas/submissions";
@@ -24,13 +26,29 @@ export const create = userMutation({
     language,
     source: v.string(),
     kind: submissionKind,
+    // Sent from the duel screen: the match's problem, while the match is on.
+    matchId: v.optional(v.id("matches")),
   },
-  handler: async (ctx, { slug, language, source, kind }) => {
+  handler: async (ctx, { slug, language, source, kind, matchId }) => {
     const problem = await ctx.db
       .query("problems")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
     if (!problem || problem.status === "draft") throw new ConvexError("PROBLEM_NOT_FOUND");
+
+    let player: Doc<"matchPlayers"> | undefined;
+    let problemVersion = problem.version;
+    if (matchId) {
+      const match = await ctx.db.get(matchId);
+      player = match ? (await playersOf(ctx, matchId)).find((p) => p.userId === ctx.user._id) : undefined;
+      if (!match || !player || match.problemId !== problem._id) throw new ConvexError("MATCH_NOT_FOUND");
+      if (match.status !== "active" || match.timeUp || Date.now() >= match.endsAt) throw new ConvexError("MATCH_OVER");
+      if (kind === "submit" && player.lastSubmitAt && Date.now() - player.lastSubmitAt < SUBMIT_COOLDOWN_MS) {
+        throw new ConvexError("SUBMIT_COOLDOWN");
+      }
+      // Both players are judged on the tests the match started with.
+      problemVersion = match.problemVersion;
+    }
     if (!problemLanguages(problem.languages).includes(language)) throw new ConvexError("LANGUAGE_NOT_ALLOWED");
     if (new TextEncoder().encode(source).length > MAX_SOURCE_BYTES) throw new ConvexError("SOURCE_TOO_LONG");
 
@@ -48,12 +66,14 @@ export const create = userMutation({
     const submissionId = await ctx.db.insert("submissions", {
       userId: ctx.user._id,
       problemId: problem._id,
-      problemVersion: problem.version,
+      problemVersion,
       language,
       source,
       kind,
       status: "queued",
+      matchId,
     });
+    if (player && kind === "submit") await noteSubmit(ctx, player);
     await ctx.scheduler.runAfter(0, internal.judging.judge, { submissionId });
     return submissionId;
   },
@@ -123,6 +143,13 @@ export const loadForJudging = internalQuery({
   },
 });
 
+export const setWaiting = internalMutation({
+  args: { submissionId: v.id("submissions"), waiting: v.boolean() },
+  handler: async (ctx, { submissionId, waiting }) => {
+    await ctx.db.patch(submissionId, { waitingForRunner: waiting || undefined });
+  },
+});
+
 export const markRunning = internalMutation({
   args: { submissionId: v.id("submissions") },
   handler: async (ctx, { submissionId }) => {
@@ -142,11 +169,14 @@ export const finish = internalMutation({
       verdict,
       error,
       finishedAt: Date.now(),
+      waitingForRunner: undefined,
     });
 
     // Only a Submit counts as a solve; Run judges the examples only.
     const submission = await ctx.db.get(submissionId);
-    if (submission?.kind !== "submit" || verdict?.status !== "accepted") return;
+    if (submission?.kind !== "submit") return;
+    if (submission.matchId) await recordJudgedSubmit(ctx, submission);
+    if (verdict?.status !== "accepted") return;
     const problem = await ctx.db.get(submission.problemId);
     if (!problem) return;
     const amount = SOLVE_XP[problem.difficulty];

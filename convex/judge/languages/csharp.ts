@@ -93,9 +93,10 @@ function prelude(): string {
 }
 
 /**
- * Its own file, so solution.cs is only the user's code. The solution runs on
- * a thread with a 256 MB stack for deep recursion, with Console.Out pointed
- * at stderr. An exception crashes the process with .NET's usual message.
+ * Its own file, so solution.cs is only the user's code. It runs every test of
+ * the batch (framing in ../harness.ts). The solution runs on a thread with a
+ * 256 MB stack for deep recursion, with Console.Out pointed at stderr. An
+ * exception crashes the process with .NET's usual message.
  */
 function driver(signature: Signature): string {
   const reader = (type: ValueType) => {
@@ -112,17 +113,45 @@ function driver(signature: Signature): string {
     "      stdin.CopyTo(buffer);",
     "      input = buffer.ToArray();",
     "    }",
-    ...signature.params.map((param, i) => `    var a${i} = ${reader(param.type)};`),
     "    var stdout = Console.OpenStandardOutput();",
     "    Console.SetOut(Console.Error);",
-    `    ${csType(signature.returns)} result = default;`,
-    `    var t = new System.Threading.Thread(() => { result = new Solution().${pascalCase(signature.functionName)}(${args}); }, 256 << 20);`,
-    "    t.Start();",
-    "    t.Join();",
-    "    Put(result);",
-    "    var bytes = Encoding.ASCII.GetBytes(o.Append('\\n').ToString());",
-    "    stdout.Write(bytes, 0, bytes.Length);",
-    "    stdout.Flush();",
+    "    int count = ReadInt();",
+    "    for (int test = 0; test < count; test++) {",
+    "      int length = ReadInt();",
+    // The input starts after the newline that ends its length.
+    "      int end = p + 1 + length;",
+    ...signature.params.map((param, i) => `      var a${i} = ${reader(param.type)};`),
+    "      p = end;",
+    `      ${csType(signature.returns)} result = default;`,
+    "      long ticks = 0;",
+    "      Exception error = null;",
+    "      var t = new System.Threading.Thread(() => {",
+    "        try {",
+    "          var solution = new Solution();",
+    "          var watch = System.Diagnostics.Stopwatch.StartNew();",
+    `          result = solution.${pascalCase(signature.functionName)}(${args});`,
+    "          ticks = watch.Elapsed.Ticks;",
+    "        } catch (Exception e) { error = e; }",
+    "      }, 256 << 20);",
+    "      t.Start();",
+    "      t.Join();",
+    // .NET takes a second or more to crash on an unhandled exception; this is
+    // its usual message, at once.
+    "      if (error != null) {",
+    '        Console.Error.WriteLine("Unhandled exception. " + error);',
+    "        Console.Error.Flush();",
+    "        Environment.Exit(1);",
+    "      }",
+    "      o.Clear();",
+    "      Put(result);",
+    "      var text = Encoding.ASCII.GetBytes(o.Append('\\n').ToString());",
+    "      var head = Encoding.ASCII.GetBytes((ticks / 10) + \" \" + text.Length + \"\\n\");",
+    "      stdout.Write(head, 0, head.Length);",
+    "      stdout.Write(text, 0, text.Length);",
+    "      stdout.Flush();",
+    "      Console.Error.Write(\"\\u001eNJ\\u001e\\n\");",
+    "      Console.Error.Flush();",
+    "    }",
     "  }",
     "}",
     "",
@@ -156,6 +185,9 @@ export const csharp: LanguageSpec = {
   starterCode,
   stdioTemplate: "var input = Console.In.ReadToEnd();\nvar tokens = input.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);\n\n// Solve it here and print the answer with Console.WriteLine.\n",
   cleanError,
+  entryName: (signature) => pascalCase(signature.functionName),
+  missingEntry: (output) =>
+    /driver\.cs\(\d+,\d+\): error/.test(output) && !/solution\.cs\(\d+,\d+\): error/.test(output),
   outOfMemory: /System\.OutOfMemoryException|^Out of memory\./m,
   program(judge, source, memoryMb) {
     const files: Record<string, string> = { "solution.cs": source, "usings.cs": USINGS };
