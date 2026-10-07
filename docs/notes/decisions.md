@@ -346,7 +346,7 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | 0 | Setup ✅ | Auth, guardrail wrappers, schema, tests and CI, brand |
 | 1 | Judging core ✅ | Two Sum goes from its folder to a correct verdict in JavaScript and Python in under about 3 s; `problems:check` runs in CI |
 | 2 | Foundation ✅ | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
-| 3 | Progression engine | Solves award XP and badges, and leaderboards update |
+| 3 | Progression engine ✅ | Solves award XP and badges, and leaderboards update |
 | 4 | 1v1 and private alpha | Runner load test passes; 10 to 20 friends play real matches |
 | 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
@@ -387,7 +387,7 @@ Agreed 7 Oct 2026. Names are placeholders, like the titles. Badges give no XP an
 | Languages | 50 problems in one language (one per language, 7); Polyglot: problems solved in 5 languages |
 | Levels | One per title band from Coder (level 5) to Legend (50); Initiate has none, since everyone starts there |
 
-Built with their phase: first ranked win, comeback win and rating tiers (4); 7-, 30- and 100-day streaks, daily challenge streaks and weekly top 10% (5); holding the Core (6); first tutorial and each finished roadmap (7); ninjathon participant and winner (9).
+Built with their phase: first ranked win, comeback win and rating tiers (4, see §14); 7-, 30- and 100-day streaks, daily challenge streaks and weekly top 10% (5); holding the Core (6); first tutorial and each finished roadmap (7); ninjathon participant and winner (9).
 
 - **Solve counts are different problems in any language;** the language badges count per language.
 - **Checked in the same transaction as the XP award:** level badges on every award, solve badges on every accepted Submit (so a rule change catches up on the user's next solve).
@@ -415,3 +415,19 @@ Agreed 7 Oct 2026, in phase 3.
 - **Ties go to whoever reached the score first** (`users.xpTieBreak`, `xpMonths.tieBreak`).
 - **1v1 trust rules:** shown only after 10 ranked games and hidden after 30 days without one, with no rating decay.
 - **Groups:** free and private, joined by an 8-character invite code (no look-alike characters, case-insensitive) that every member can see and share. At most 100 members per group and 10 groups per user. The owner renames, regenerates the code (the old one stops working) and removes members. A deleted group is restorable by its owner for 30 days, then purged by a daily cron. When the owner leaves or deletes their account, the member who joined first becomes owner; an empty group is deleted.
+
+## 14. 1v1 matches
+
+Agreed 7 Oct 2026, at the start of phase 4.
+
+- **Difficulty follows the players' average 1v1 rating:** Easy below 1400, Medium from 1400 to 1900, Hard above. **Time limits: 15, 25 and 40 minutes.** One queue for everyone, so waits stay short. New players (1500) get Medium.
+- **Each player picks their own language** before the match; the per-language time multipliers (§8) keep it fair.
+- **The first accepted Submit wins, by the time it was sent,** not when its verdict came back, so a slower compile doesn't lose the race: while the opponent has an earlier Submit still being judged, the result waits for it.
+- **At time up the best Submit wins:** most tests passed, then whoever sent it first. With no passes, or a full tie, it's a draw. Submits sent before time up still count when judged after it; a Submit still not judged two minutes later is treated as lost.
+- **No penalty for a wrong Submit, but 10 seconds between Submits.** The opponent sees your Submit count and best test count, never your code.
+- **The problem is one neither player has solved,** falling back to an unsolved problem of another difficulty, then to any. Until the approved ranked pool exists (before the closed beta, with the encrypted tests in §7), matches draw from every published problem.
+- **A 10-second countdown,** with the problem hidden until it ends. Leaving during the countdown cancels the match with no result; a forfeit after it is a loss.
+- **Which games count:** a ranked game changes ratings and gives match XP only within **3 per pair of players per UTC day**, for every ranked game, not just challenges, since with few players the queue pairs the same people often. Ranked challenges also need 10 ranked games each and a rating gap under 400 (step 3).
+- **Match XP:** 10 for a loss or draw, 25 for a win (not 10 + 25), ranked and counted only, keyed by match. A match solve also gives the normal solve XP if it's the first solve of that problem in that language.
+- **Badges (7):** First win (a ranked win), Comeback (a ranked win after the opponent had passed more tests than you), and one per rating tier from Apprentice to Grandmaster, earned once the rating is no longer provisional. Names are placeholders.
+- **Account deletion** removes the player's side of each match and their feed events; the opponent keeps their own result.

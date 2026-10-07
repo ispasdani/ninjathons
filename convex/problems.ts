@@ -2,8 +2,8 @@ import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { internalAction, internalMutation, internalQuery } from "./_generated/server";
-import { LANGUAGES, problemLanguages } from "./judge/languages";
 import { getCurrentUserOrNull, publicQuery } from "./lib/functions";
+import { problemView } from "./lib/problems";
 import {
   checker,
   difficulty,
@@ -57,29 +57,7 @@ export const getBySlug = publicQuery({
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
     if (!problem || problem.status === "draft") return null;
-    const languages = problemLanguages(problem.languages).map((id) => ({
-      id,
-      label: LANGUAGES[id].label,
-      version: LANGUAGES[id].version,
-      starterCode:
-        problem.judge.mode === "function"
-          ? LANGUAGES[id].starterCode(problem.judge.signature)
-          : LANGUAGES[id].stdioTemplate,
-      timeLimitMs: Math.round(problem.limits.timeMs * LANGUAGES[id].timeMultiplier),
-    }));
-    return {
-      _id: problem._id,
-      slug: problem.slug,
-      title: problem.title,
-      statement: problem.statement,
-      difficulty: problem.difficulty,
-      tags: problem.tags,
-      mode: problem.judge.mode,
-      examples: problem.examples,
-      hints: problem.hints,
-      memoryLimitMb: problem.limits.memoryMb,
-      languages,
-    };
+    return problemView(problem);
   },
 });
 

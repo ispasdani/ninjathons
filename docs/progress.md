@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine, is done. **Next step:** start phase 4, 1v1 and the private alpha.
+**Now:** Phase 4, 1v1 and private alpha: the match engine is built. **Next step:** matchmaking (the queue and the pairing pass).
 
 ## Phases
 
@@ -12,7 +12,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 1 | Judging core | Done | 3 Oct 2026 | 6 Oct 2026 |
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
-| 4 | 1v1 and private alpha | Not started | | |
+| 4 | 1v1 and private alpha | In progress | 7 Oct 2026 | |
 | 5 | Daily and weekly challenges | Not started | | |
 | 6 | Territory | Not started | | |
 | 7 | Learn | Not started | | |
@@ -25,6 +25,15 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: match engine
+- Match rules agreed and written down in [decisions §14](notes/decisions.md#14-1v1-matches): difficulty and time limit from the players' average rating, each player's own language, first accepted Submit wins by the time it was sent, best Submit wins at time up, 10 s between Submits.
+- Tables `matches`, `matchPlayers` and `matchEvents`; submissions carry `matchId`. `createMatch` in `convex/lib/matches.ts` picks a problem neither player has solved and schedules the start (after a 10 s countdown) and time up on the server clock.
+- `matches.get` shows the clock, both players' progress (counts only) and the feed, and the problem only once the match is active; `matches.current` finds your open match; `matches.forfeit` cancels during the countdown and loses after it.
+- Results: ranked games within 3 per pair per day change both ratings (`recordDuel`) and give match XP (10, or 25 for a win). 7 new badges: First win, Comeback, and one per rating tier.
+- Account deletion removes the player's match rows and feed events.
+- 11 new tests, one of them judging real code through the local runner.
+- Open: nothing makes matches yet (matchmaking and challenges are the next steps) and there's no duel screen yet. The schema and functions are pushed to Convex dev.
 
 ### 7 Oct 2026 · Phase 3 done
 - The check passes, by hand in the browser on Convex dev: an accepted Submit showed +10 XP and the First solve badge, a repeat solve explained why there was no XP, and the dashboard and the Level board (Global, Country, Group) updated after the next rebuild.

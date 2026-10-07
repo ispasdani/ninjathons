@@ -1,16 +1,17 @@
 /**
  * Badge definitions and the rules that grant them (roadmap, Progression;
  * decisions §13). Badges give no XP and, once earned, are never taken away.
- * Only the badges that solves and levels can earn exist so far; the rest are
- * added with their phase.
+ * Badges from solves, levels and 1v1 exist so far; the rest are added with
+ * their phase.
  */
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { LANGUAGES } from "../judge/languages";
 import type { Language } from "../judge/types";
 import { TITLES, levelForXp } from "./levels";
+import { PROVISIONAL_GAMES, TIERS, tierFor } from "./ratings";
 
-export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels";
+export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1";
 
 export type Badge = {
   // Stored in userBadges; never changes once released.
@@ -28,6 +29,8 @@ const POLYGLOT_LANGUAGES = 5;
 const languages = Object.keys(LANGUAGES) as Language[];
 // Initiate is everyone's from the start, so it has no badge.
 const titleBands = TITLES.slice(1);
+// Likewise Newbie, the lowest rating tier.
+const ratingTiers = TIERS.slice(1);
 
 export const BADGES: Badge[] = [
   { id: "first-solve", group: "milestones", name: "First solve", description: "Solve your first problem." },
@@ -55,6 +58,19 @@ export const BADGES: Badge[] = [
     group: "levels" as const,
     name: band.title,
     description: `Reach level ${band.from}.`,
+  })),
+  { id: "first-ranked-win", group: "1v1", name: "First win", description: "Win a ranked 1v1 match." },
+  {
+    id: "comeback-win",
+    group: "1v1",
+    name: "Comeback",
+    description: "Win a ranked 1v1 match after your opponent had passed more tests than you.",
+  },
+  ...ratingTiers.map((band) => ({
+    id: `tier-${band.tier.toLowerCase()}`,
+    group: "1v1" as const,
+    name: band.tier,
+    description: `Reach a 1v1 rating of ${band.from} once your rating is no longer provisional.`,
   })),
 ];
 
@@ -121,5 +137,26 @@ export async function checkSolveBadges(
     if (count >= LANGUAGE_SOLVES) due.push(`language-${language}`);
   }
   if (perLanguage.size >= POLYGLOT_LANGUAGES) due.push("polyglot");
+  return await grantAll(ctx, userId, due);
+}
+
+/**
+ * Badges from one finished 1v1 match. A win counts when the match was ranked,
+ * whether or not it changed ratings; tier badges need a rating that is no
+ * longer provisional. Returns the new ones.
+ */
+export async function checkMatchBadges(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  game: { rankedWin: boolean; comeback: boolean; rating?: { rating: number; games: number } },
+) {
+  const due: string[] = [];
+  if (game.rankedWin) due.push("first-ranked-win");
+  if (game.rankedWin && game.comeback) due.push("comeback-win");
+  if (game.rating && game.rating.games >= PROVISIONAL_GAMES) {
+    const reached = tierFor(game.rating.rating);
+    const upTo = ratingTiers.findIndex((band) => band.tier === reached);
+    for (const band of ratingTiers.slice(0, upTo + 1)) due.push(`tier-${band.tier.toLowerCase()}`);
+  }
   return await grantAll(ctx, userId, due);
 }

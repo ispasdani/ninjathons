@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { identity, setup } from "../test.setup";
-import { BADGES, checkLevelBadges, checkSolveBadges, grantBadge } from "./badges";
+import { BADGES, checkLevelBadges, checkMatchBadges, checkSolveBadges, grantBadge } from "./badges";
 import { xpForLevel } from "./levels";
 import { awardXp } from "./xp";
 
@@ -33,12 +33,14 @@ const check = (t: T, userId: Id<"users">, difficulty: "easy" | "medium" | "hard"
   t.run((ctx) => checkSolveBadges(ctx, userId, { difficulty }));
 
 describe("badge definitions", () => {
-  it("has the 21 phase 3 badges with unique ids", () => {
-    expect(BADGES).toHaveLength(21);
-    expect(new Set(BADGES.map((b) => b.id)).size).toBe(21);
+  it("has the 21 phase 3 badges and the 7 for 1v1, with unique ids", () => {
+    expect(BADGES).toHaveLength(28);
+    expect(new Set(BADGES.map((b) => b.id)).size).toBe(28);
     expect(BADGES.map((b) => b.id)).toContain("language-python");
     expect(BADGES.map((b) => b.id)).toContain("title-legend");
     expect(BADGES.map((b) => b.id)).not.toContain("title-initiate");
+    expect(BADGES.map((b) => b.id)).toContain("tier-grandmaster");
+    expect(BADGES.map((b) => b.id)).not.toContain("tier-newbie");
   });
 });
 
@@ -141,5 +143,30 @@ describe("badges.list", () => {
 
     const signedOut = await t.query(api.badges.list);
     expect(signedOut.every((b) => b.earnedAt === null)).toBe(true);
+  });
+});
+
+describe("checkMatchBadges", () => {
+  it("gives tier badges up to the rating's tier only once it's no longer provisional", async () => {
+    const t = setup();
+    const ada = await insertUser(t, "user_1");
+    const provisional = await t.run((ctx) =>
+      checkMatchBadges(ctx, ada, { rankedWin: false, comeback: false, rating: { rating: 1700, games: 9 } }),
+    );
+    expect(provisional).toEqual([]);
+    const settled = await t.run((ctx) =>
+      checkMatchBadges(ctx, ada, { rankedWin: false, comeback: false, rating: { rating: 1700, games: 10 } }),
+    );
+    expect(settled).toEqual(["tier-apprentice", "tier-specialist", "tier-expert"]);
+  });
+
+  it("gives Comeback only with a ranked win", async () => {
+    const t = setup();
+    const ada = await insertUser(t, "user_1");
+    expect(await t.run((ctx) => checkMatchBadges(ctx, ada, { rankedWin: false, comeback: true }))).toEqual([]);
+    expect(await t.run((ctx) => checkMatchBadges(ctx, ada, { rankedWin: true, comeback: true }))).toEqual([
+      "first-ranked-win",
+      "comeback-win",
+    ]);
   });
 });

@@ -70,7 +70,10 @@ export const submissions = defineTable({
   levelReached: v.optional(v.number()),
   // Badges first earned by this submission (ids from lib/badges.ts).
   badgesEarned: v.optional(v.array(v.string())),
+  // Set when the submission was sent in a match.
+  matchId: v.optional(v.id("matches")),
 })
   .index("by_user", ["userId"])
+  .index("by_match", ["matchId"])
   .index("by_user_problem", ["userId", "problemId"])
   .index("by_user_status", ["userId", "status"]);
