@@ -14,7 +14,7 @@ import type { Language, SandboxImage } from "./judge/types";
 // A fill that hasn't finished after this long is assumed lost and may be retried.
 const FILL_RETRY_MS = 10 * 60_000;
 
-/** The drive to mount for this tests file, or null while it isn't ready. */
+/** The drive for this tests file and its size, or null while it isn't ready. */
 export const ready = internalQuery({
   args: { file: v.id("_storage") },
   handler: async (ctx, { file }) => {
@@ -22,7 +22,7 @@ export const ready = internalQuery({
       .query("testDrives")
       .withIndex("by_file", (q) => q.eq("file", file))
       .unique();
-    return row?.readyAt ? row.drive : null;
+    return row?.readyAt ? { drive: row.drive, bytes: row.bytes ?? 0 } : null;
   },
 });
 
@@ -46,13 +46,13 @@ export const claim = internalMutation({
 });
 
 export const markReady = internalMutation({
-  args: { file: v.id("_storage") },
-  handler: async (ctx, { file }) => {
+  args: { file: v.id("_storage"), bytes: v.number() },
+  handler: async (ctx, { file, bytes }) => {
     const row = await ctx.db
       .query("testDrives")
       .withIndex("by_file", (q) => q.eq("file", file))
       .unique();
-    if (row) await ctx.db.patch(row._id, { readyAt: Date.now() });
+    if (row) await ctx.db.patch(row._id, { readyAt: Date.now(), bytes });
   },
 });
 
@@ -66,9 +66,11 @@ export const judgeOf = internalQuery({
  * Which Submits read their hidden inputs from a drive: SANDBOX_TEST_DRIVES is
  * off, runner (the default) or all. Measured 7 Oct 2026: a mount adds ~0.5 s
  * to starting a sandbox from our runner image but 1–1.5 s to Vercel's managed
- * one, against ~1 s to upload Two Sum's tests, so only the compiled languages
- * gain.
+ * one, and uploading costs ~0.2 s plus ~0.6 s per MB, so only the compiled
+ * languages gain, and only for files of DRIVE_MIN_BYTES or more.
  */
+const DRIVE_MIN_BYTES = 1024 * 1024;
+
 function drivesFor(image: SandboxImage) {
   const mode = process.env.SANDBOX_TEST_DRIVES ?? "runner";
   return mode === "all" || (mode === "runner" && image === "runner");
@@ -83,8 +85,12 @@ export async function hiddenTestsDrive(
   request: { file: Id<"_storage">; problemId: Id<"problems">; language: Language; count: number },
 ): Promise<{ name: string; count: number } | undefined> {
   if (!process.env.VERCEL_TOKEN || !drivesFor(LANGUAGES[request.language].image)) return undefined;
-  const name: string | null = await ctx.runQuery(internal.testDrives.ready, { file: request.file });
-  if (name) return { name, count: request.count };
-  await ctx.runMutation(internal.testDrives.claim, { file: request.file, problemId: request.problemId });
-  return undefined;
+  const ready: { drive: string; bytes: number } | null = await ctx.runQuery(internal.testDrives.ready, {
+    file: request.file,
+  });
+  if (!ready) {
+    await ctx.runMutation(internal.testDrives.claim, { file: request.file, problemId: request.problemId });
+    return undefined;
+  }
+  return ready.bytes >= DRIVE_MIN_BYTES ? { name: ready.drive, count: request.count } : undefined;
 }

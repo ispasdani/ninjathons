@@ -94,10 +94,11 @@ function prelude(): string {
 }
 
 /**
- * A separate file, so Solution.java holds only the user's code. Arguments are
- * read before the call; the solution runs on a thread with a 256 MB stack so
- * deep recursion works, with System.out pointed at stderr so its prints stay
- * out of the result. A crash is rethrown from main, with its own stack trace.
+ * A separate file, so Solution.java holds only the user's code. It runs every
+ * test of the batch (framing in ../harness.ts). Each test's arguments are read
+ * before the call; the solution runs on a thread with a 256 MB stack so deep
+ * recursion works, with System.out pointed at stderr so its prints stay out of
+ * the result. A crash is rethrown from main, with its own stack trace.
  */
 function driver(signature: Signature): string {
   const { base, depth } = split(signature.returns);
@@ -107,20 +108,38 @@ function driver(signature: Signature): string {
     prelude(),
     "  public static void main(String[] args) throws Throwable {",
     "    in = System.in.readAllBytes();",
-    ...signature.params.map((param, i) => `    final ${javaType(param.type)} a${i} = ${reader(param.type)};`),
-    `    final ${javaType(signature.returns)}[] result = new ${BASE[base].java}[1]${"[]".repeat(depth)};`,
-    "    final Throwable[] error = new Throwable[1];",
     "    java.io.PrintStream out = System.out;",
     "    System.setOut(System.err);",
-    "    Thread t = new Thread(null, () -> {",
-    `      try { result[0] = new Solution().${signature.functionName}(${args}); } catch (Throwable e) { error[0] = e; }`,
-    '    }, "main", 1L << 28);',
-    "    t.start();",
-    "    t.join();",
-    "    if (error[0] != null) throw error[0];",
-    "    put(result[0]);",
-    "    out.print(o.append('\\n'));",
-    "    out.flush();",
+    "    int count = readInt();",
+    "    for (int test = 0; test < count; test++) {",
+    "      int length = readInt();",
+    // The input starts after the newline that ends its length.
+    "      int end = p + 1 + length;",
+    ...signature.params.map((param, i) => `      final ${javaType(param.type)} a${i} = ${reader(param.type)};`),
+    "      p = end;",
+    `      final ${javaType(signature.returns)}[] result = new ${BASE[base].java}[1]${"[]".repeat(depth)};`,
+    "      final Throwable[] error = new Throwable[1];",
+    "      final long[] nanos = new long[1];",
+    "      Thread t = new Thread(null, () -> {",
+    "        try {",
+    "          Solution solution = new Solution();",
+    "          long start = System.nanoTime();",
+    `          result[0] = solution.${signature.functionName}(${args});`,
+    "          nanos[0] = System.nanoTime() - start;",
+    "        } catch (Throwable e) { error[0] = e; }",
+    '      }, "main", 1L << 28);',
+    "      t.start();",
+    "      t.join();",
+    "      if (error[0] != null) throw error[0];",
+    "      o.setLength(0);",
+    "      put(result[0]);",
+    "      byte[] text = o.append('\\n').toString().getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);",
+    '      out.print((nanos[0] / 1000) + " " + text.length + "\\n");',
+    "      out.write(text, 0, text.length);",
+    "      out.flush();",
+    "      System.err.print(\"\\u001eNJ\\u001e\\n\");",
+    "      System.err.flush();",
+    "    }",
     "  }",
     "}",
     "",

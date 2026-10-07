@@ -29,8 +29,18 @@ export type RunJob = {
   files: Record<string, string>;
   /** Command and arguments, run once before the tests. */
   compile?: string[];
-  /** Command and arguments, run once per test. */
+  /** Command and arguments, run once per test, or once per batch with `batch`. */
   run: string[];
+  /**
+   * Function mode: the driver runs many tests per process (framing in
+   * harness.ts), so a runtime starts twice per Submit, not once per test.
+   */
+  batch?: boolean;
+  /**
+   * How many of the first tests are visible (their output is shown). With
+   * `batch`, they run in a process of their own, apart from the hidden ones.
+   */
+  visible?: number;
   /** stdin for each test, in order. */
   tests: string[];
   /** Wall-clock limit per test, already multiplied for the language. */

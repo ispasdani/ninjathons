@@ -129,4 +129,6 @@ export const testDrives = defineTable({
   startedAt: v.number(),
   // Set once the drive is filled and safe to mount.
   readyAt: v.optional(v.number()),
+  // The gzipped JSON inputs' size: small files upload faster than a mount.
+  bytes: v.optional(v.number()),
 }).index("by_file", ["file"]);

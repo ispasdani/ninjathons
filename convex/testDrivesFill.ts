@@ -57,7 +57,7 @@ export const fill = internalAction({
       // The drive is only safe to mount once this sandbox has let go of it.
       await sandbox.stop();
     }
-    await ctx.runMutation(internal.testDrives.markReady, { file });
+    await ctx.runMutation(internal.testDrives.markReady, { file, bytes: files[0].content.length });
     console.log(`test drive ${name}: ${inputs.length} inputs`);
   },
 });

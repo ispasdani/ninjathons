@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, and a misnamed function gets a clear error. **Next step:** runner speed, part 2: all function-mode tests in one process. Real matches by hand with two accounts still to do.
+**Now:** Phase 4, 1v1 and private alpha: the match engine, matchmaking, the duel screen, challenges, ghost races and share cards are built, a misnamed function gets a clear error, and the runner is faster and isolated. **Next step:** the runner load test. Real matches by hand with two accounts still to do.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 4: tests in batches
+- Function-mode tests now run many per process: the harness frames them on stdin, each driver (all 7) loops, times the call itself and marks the end of each test's output. Visible examples and hidden tests run in separate processes, so an example can't reach a hidden input. A timer kills a test that runs past its limit; full programs keep one process per test.
+- Drives only for hidden inputs of 1 MB or more (`testDrives.bytes`): below that, uploading is faster than a mount.
+- Two Sum Submit, start of the day → now: C++ 5.9–6.3 → 4.5–4.6 s, C# 5.2–5.6 → 4.2–4.3 s, Java 4.0–5.0 → 4.1–4.6 s, Rust 4.2–4.5 → 3.4 s, JavaScript 2.5–2.7 → 2.1–2.7 s, Python 2.3–2.9 → 2.0–2.3 s, TypeScript 3.7–3.9 → 2.1–2.3 s ([decisions §5](notes/decisions.md#5-code-runner-vercel-sandbox)).
+- 4 new driver tests (batch results and printed output per test, a slow or crashing test mid-batch, examples apart from hidden tests). 366 tests; `problems:check` passes for all 30 problems, slow solutions still time out. Deployed to Convex dev.
+- Open: the compiled languages are still above the 3 s target, mostly sandbox start-up (1.5–2 s) and compiling; warm sandboxes are the next lever, a launch decision.
 
 ### 7 Oct 2026 · Phase 4: isolated user code, and hidden tests on drives
 - Security fix found while measuring: the user's code could read the job file in the sandbox (every test input) and print hidden inputs during a visible example. Now it runs as `nobody` through `setpriv` with every capability dropped (Vercel Sandbox hands all of them to every process), in its own folder, after the harness has deleted the job. Probed in both images: it can't read the harness's files or memory or switch back. The local Docker runner runs jobs the same way; a new test checks it.

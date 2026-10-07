@@ -31,8 +31,10 @@ function starterCode(signature: Signature): string {
 
 /**
  * Appended after the user's code. Finds the function under its snake_case or
- * original name, or as a method of a LeetCode-style `class Solution`. Anything
- * the solution prints goes to stderr; stdout gets only the JSON result.
+ * original name, or as a method of a LeetCode-style `class Solution`, then
+ * runs every test of the batch (framing in ../harness.ts): times each call,
+ * writes the JSON result to stdout and the end-of-test marker to stderr.
+ * Anything the solution prints goes to stderr.
  */
 function driver(signature: Signature): string {
   const names = [...new Set([snakeCase(signature.functionName), signature.functionName])];
@@ -40,8 +42,8 @@ function driver(signature: Signature): string {
   return `
 
 def __nj_main():
-    import json, sys
-    __args = json.loads(sys.stdin.buffer.read().decode("utf-8"))
+    import json, sys, time
+    __in = sys.stdin.buffer.read()
     __fn = None
     for __name in ${JSON.stringify(names)}:
         __fn = globals().get(__name)
@@ -51,11 +53,29 @@ def __nj_main():
             break
     if __fn is None:
         raise NameError("function ${names[0]} is not defined")
-    __out = sys.stdout
+    __p = 0
+
+    def __line():
+        nonlocal __p
+        end = __in.index(b"\\n", __p)
+        value = int(__in[__p:end])
+        __p = end + 1
+        return value
+
+    __out = sys.stdout.buffer
     sys.stdout = sys.stderr
-    __result = __fn(${args})
-    sys.stdout = __out
-    __out.write(json.dumps(__result, default=list) + "\\n")
+    for _ in range(__line()):
+        __length = __line()
+        __args = json.loads(__in[__p:__p + __length].decode("utf-8"))
+        __p += __length
+        __start = time.perf_counter_ns()
+        __result = __fn(${args})
+        __micros = (time.perf_counter_ns() - __start) // 1000
+        __text = (json.dumps(__result, default=list) + "\\n").encode("utf-8")
+        __out.write(b"%d %d\\n" % (__micros, len(__text)) + __text)
+        __out.flush()
+        sys.stderr.write("\\x1eNJ\\x1e\\n")
+        sys.stderr.flush()
 
 
 __nj_main()

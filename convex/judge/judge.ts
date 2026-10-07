@@ -45,6 +45,8 @@ export async function runCode(
   runner: CodeRunner,
   request: Pick<JudgeRequest, "judge" | "language" | "source" | "limits" | "stopAtFirstFailure" | "drive"> & {
     tests: string[];
+    /** How many of the first tests are visible. */
+    visible?: number;
   },
 ): Promise<RunOutput> {
   const spec = LANGUAGES[request.language];
@@ -57,6 +59,8 @@ export async function runCode(
     ...spec.program(judge, request.source, request.limits.memoryMb),
     tests: tokens ? inline.map((input) => encodeArgs(judge.signature, input)) : inline,
     drive: drive && { name: drive.name, file: tokens ? DRIVE_FILES.tokens : DRIVE_FILES.json, count: drive.count },
+    batch: judge.mode === "function",
+    visible: request.visible,
     timeLimitMs: Math.round(request.limits.timeMs * spec.timeMultiplier),
     // A crash or timeout usually repeats on every test, so stop at the first
     // one even on Run. Wrong answers are found here, after the run.
@@ -88,7 +92,11 @@ export async function runCode(
 }
 
 export async function judgeSubmission(runner: CodeRunner, request: JudgeRequest): Promise<Verdict> {
-  const output = await runCode(runner, { ...request, tests: request.tests.map((t) => t.input) });
+  const output = await runCode(runner, {
+    ...request,
+    tests: request.tests.map((t) => t.input),
+    visible: request.tests.filter((t) => t.visible).length,
+  });
   return decideVerdict(request, output);
 }
 
