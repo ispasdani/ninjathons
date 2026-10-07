@@ -19,6 +19,9 @@ export const users = defineTable({
   usernameChangedAt: v.optional(v.number()),
   // ISO 3166-1 alpha-2, for the Country leaderboard scope.
   country: v.optional(v.string()),
+  // Total XP, the sum of this user's xpLedger rows. Written only by awardXp
+  // in lib/xp.ts; absent means 0. Level and title are computed from it.
+  xp: v.optional(v.number()),
 })
   .index("by_clerkId", ["clerkId"])
   .index("by_email", ["email"])

@@ -91,7 +91,11 @@ describe("getCurrentUser", () => {
     const me = await t
       .withIdentity(identity("user_1"))
       .query(api.user.getCurrentUser);
-    expect(me).toMatchObject({ clerkId: "user_1", tier: "free" });
+    expect(me).toMatchObject({
+      clerkId: "user_1",
+      tier: "free",
+      progress: { xp: 0, level: 1, title: "Initiate", levelXp: 0, nextLevelXp: 100 },
+    });
   });
 });
 

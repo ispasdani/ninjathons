@@ -18,6 +18,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 3 Oct 2026 | Build plan: 11 phases with a check that marks each one done; judging core first | [12](#12-build-plan-phases) |
 | 6 Oct 2026 | HTML and CSS move from phase 2 to phase 7 (Learn) | [8](#8-launch-languages), [12](#12-build-plan-phases) |
 | 6 Oct 2026 | Runner speed work for the compiled languages happens in phase 4, before the load test | [5](#5-code-runner-vercel-sandbox) |
+| 7 Oct 2026 | Levels start at 1; total XP is kept on the user row | [13](#13-xp-and-levels) |
 
 ---
 
@@ -362,3 +363,12 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 - **A private alpha follows 1v1,** so problems with the runner and judging are found early, not only in the closed beta.
 - **The runner load test moves to 1v1,** when many people first submit code at the same moment.
 - **Unchanged:** the cut order if time runs short (ninjathons, then weekly challenges, then courses beyond the first roadmap), and never cutting judging quality.
+
+## 13. XP and levels
+
+Decided 7 Oct 2026, in phase 3.
+
+- **Everyone starts at level 1, and level n + 1 takes 100 × n^1.5 XP in total** (rounded): level 2 at 100, level 3 at 283, level 5 at 800, level 50 at 34,300. Read literally, the roadmap's "level n needs 100 × n^1.5" would start new players at level 0, below the first title band.
+- **Titles are the roadmap's placeholder names** (Initiate to Legend) until the brand names are chosen (§6).
+- **Total XP is kept on the user row** (`users.xp`), updated in the same transaction as each ledger entry, so levels and leaderboards never sum the ledger. Level and title are computed from it on read, never stored.
+- **Solve XP is keyed by slug** (`solve:<slug>:<language>`), since the slug never changes (§7).

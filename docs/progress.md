@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine: solves award XP. **Next step:** levels and titles from total XP.
+**Now:** Phase 3, Progression engine: solves award XP, levels and titles work. **Next step:** badge rules.
 
 ## Phases
 
@@ -25,6 +25,12 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3: levels and titles
+- Total XP on the user row (`users.xp`), updated by `awardXp` in the same transaction as the ledger entry.
+- `convex/lib/levels.ts`: level from total XP (start at 1; level n + 1 at 100 × n^1.5, so level 2 at 100 XP, 50 at 34,300) and the roadmap's placeholder titles, Initiate to Legend (decisions §13).
+- `user.getCurrentUser` returns `progress` (XP, level, title, where this level starts and the next begins) for the XP bar.
+- 7 tests: thresholds, title bands, slower levels as you go, the total matching the ledger.
 
 ### 7 Oct 2026 · Phase 3: solves award XP
 - An accepted Submit writes to the XP ledger: 10 easy, 20 medium, 40 hard (roadmap, XP sources), first solve per problem per language only. Run and failed Submits give nothing.

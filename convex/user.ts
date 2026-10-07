@@ -10,6 +10,7 @@ import {
   userMutation,
   userQuery,
 } from "./lib/functions";
+import { levelProgress } from "./lib/levels";
 import {
   checkUsernameRules,
   USERNAME_COOLDOWN_MS,
@@ -29,7 +30,7 @@ export const getCurrentUser = publicQuery({
     const user = await getCurrentUserOrNull(ctx);
     if (!user) return null;
     const { tier } = await getPlan(ctx, user);
-    return { ...user, tier };
+    return { ...user, tier, progress: levelProgress(user.xp ?? 0) };
   },
 });
 

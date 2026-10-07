@@ -41,5 +41,9 @@ export async function awardXp(
   if (existing) return { awarded: false as const };
 
   await ctx.db.insert("xpLedger", entry);
+  // The running total on the user row, kept in the same transaction, so levels
+  // and leaderboards never sum the ledger.
+  const user = await ctx.db.get(entry.userId);
+  if (user) await ctx.db.patch(user._id, { xp: (user.xp ?? 0) + entry.amount });
   return { awarded: true as const };
 }
