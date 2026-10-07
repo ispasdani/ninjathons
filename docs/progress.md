@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 3, Progression engine: the engine is built (XP, levels, badges, ratings, leaderboards, groups). **Next step:** show it in the app (XP bar, solve rewards, badges, leaderboard and group pages, country setting), then check the phase by hand.
+**Now:** Phase 3, Progression engine: engine and pages built, deployed to Convex dev. **Next step:** check the signed-in pages by hand (dashboard, solve rewards, groups, settings), then close the phase.
 
 ## Phases
 
@@ -25,6 +25,15 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 7 Oct 2026 · Phase 3: progression in the app
+- Dashboard: level card with the XP bar, your Level board rank, badges earned, groups.
+- Solve view: an accepted Submit shows +XP, a new level and new badges; a repeat solve says why there's no XP. Submissions record `levelReached`.
+- New pages: `/leaderboards` (Level, This month, 1v1; Global, Country, Group; your row pinned, Jump to me, paging), `/badges` (by area, rarity, yours), `/groups` and `/groups/[id]` (create, join, invite code, members, owner controls, restore), `/settings` (country, or none).
+- Header: Leaderboards and Badges links; on phones the nav folds into a menu so the header no longer scrolls sideways at 375 px. Groups and Settings are in the account menu.
+- `user.setCountry` (ISO codes, `convex/lib/countries.ts`); a group page or board you can't see returns nothing instead of an error.
+- Deployed to Convex dev; the leaderboard cron runs there. Checked in the browser signed out: leaderboards (all scopes), badges, light and dark, phone width. Production build passes; 306 tests.
+- Open: the signed-in pages haven't been checked by hand yet.
 
 ### 7 Oct 2026 · Phase 3: leaderboards and groups
 - Boards: Level (all time and this month) and 1v1 (decisions §13). Scopes: Global and Country from `leaderboardSnapshots`, rebuilt every 5 minutes by a cron (`convex/crons.ts`) page by page; Group computed live for members. `leaderboards.board` returns rows from any rank plus your live position.

@@ -10,6 +10,7 @@ import {
   userMutation,
   userQuery,
 } from "./lib/functions";
+import { isCountryCode } from "./lib/countries";
 import { leaveGroup } from "./lib/groups";
 import { levelProgress } from "./lib/levels";
 import {
@@ -147,6 +148,19 @@ export const setUsername = userMutation({
       usernameKey: key,
       ...(changing ? { usernameChangedAt: now } : {}),
     });
+  },
+});
+
+/**
+ * The country shown on leaderboards and used for the Country scope, or null
+ * to show none (and leave the Country boards). Takes effect on the next
+ * leaderboard rebuild.
+ */
+export const setCountry = userMutation({
+  args: { country: v.union(v.string(), v.null()) },
+  handler: async (ctx, { country }) => {
+    if (country !== null && !isCountryCode(country)) throw new ConvexError("UNKNOWN_COUNTRY");
+    await ctx.db.patch(ctx.user._id, { country: country ?? undefined });
   },
 });
 

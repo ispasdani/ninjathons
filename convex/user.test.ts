@@ -102,6 +102,19 @@ describe("getCurrentUser", () => {
   });
 });
 
+describe("setCountry", () => {
+  it("sets a known country and clears it", async () => {
+    const t = setup();
+    const userId = await t.mutation(internal.user.upsertFromClerk, clerkFields);
+    const asAda = t.withIdentity(identity("user_1"));
+    await asAda.mutation(api.user.setCountry, { country: "RO" });
+    expect((await t.run((ctx) => ctx.db.get(userId)))?.country).toBe("RO");
+    await expect(asAda.mutation(api.user.setCountry, { country: "XX" })).rejects.toThrow("UNKNOWN_COUNTRY");
+    await asAda.mutation(api.user.setCountry, { country: null });
+    expect((await t.run((ctx) => ctx.db.get(userId)))?.country).toBeUndefined();
+  });
+});
+
 describe("deleteFromClerk", () => {
   it("removes the user and everything keyed to them", async () => {
     const t = setup();
@@ -162,7 +175,7 @@ describe("deleteFromClerk", () => {
       await ctx.db.insert("leaderboardSnapshots", { board: "level", version: 1, userId, value: 10, rank: 1 });
     });
     const groupId = await t.withIdentity(identity("user_1")).mutation(api.groups.create, { name: "Team" });
-    const { inviteCode } = await t.withIdentity(identity("user_1")).query(api.groups.get, { groupId });
+    const { inviteCode } = (await t.withIdentity(identity("user_1")).query(api.groups.get, { groupId }))!;
     await t.withIdentity(identity("user_2")).mutation(api.groups.join, { inviteCode });
 
     await t.mutation(internal.user.deleteFromClerk, { clerkId: "user_1" });

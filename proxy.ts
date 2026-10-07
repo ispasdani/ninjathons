@@ -10,6 +10,7 @@ const isAppRoute = createRouteMatcher([
   "/solve(.*)",
   "/courses(.*)",
   "/settings(.*)",
+  "/groups(.*)",
   "/onboarding(.*)",
 ]);
 

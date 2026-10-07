@@ -150,7 +150,8 @@ async function liveValue(ctx: QueryCtx, board: string, userId: Id<"users">) {
 /**
  * One board in one scope, from `fromRank` (1 is the top; pass your own rank
  * minus 5 for "Jump to me"). Global and Country come from the latest
- * snapshot; Group is live and for its members only. `me` is the caller's
+ * snapshot; Group is live and for its members only (empty for anyone else).
+ * `me` is the caller's
  * own position: their live value, with the rank from the same source.
  */
 export const board = publicQuery({
@@ -176,11 +177,12 @@ export const board = publicQuery({
     const user = await getCurrentUserOrNull(ctx);
 
     if (args.scope === "group") {
-      if (!user || !args.groupId) throw new ConvexError("GROUP_NOT_FOUND");
+      // Not a member (or the group just went): an empty board, not an error,
+      // so an open page doesn't break when someone is removed.
+      const empty = { rows: [], builtAt: null, me: null };
+      if (!user || !args.groupId) return empty;
       const group = await ctx.db.get(args.groupId);
-      if (!group || group.deletedAt !== undefined || !(await membership(ctx, group._id, user._id))) {
-        throw new ConvexError("GROUP_NOT_FOUND");
-      }
+      if (!group || group.deletedAt !== undefined || !(await membership(ctx, group._id, user._id))) return empty;
       const members = await ctx.db
         .query("groupMembers")
         .withIndex("by_group_user", (q) => q.eq("groupId", group._id))
@@ -189,7 +191,8 @@ export const board = publicQuery({
       const mine = ranked.find((r) => r.userId === user._id);
       return {
         rows: await Promise.all(ranked.slice(from - 1, from - 1 + limit).map((r) => presentRow(ctx, key, r))),
-        builtAt: Date.now(),
+        // Live, not from a snapshot.
+        builtAt: null,
         me: mine ? { rank: mine.rank, value: Math.round(mine.value) } : null,
       };
     }

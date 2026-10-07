@@ -23,7 +23,7 @@ async function players(t: T, ...names: string[]) {
 
 async function groupWith(t: T, owner: ReturnType<T["withIdentity"]>, ...joiners: ReturnType<T["withIdentity"]>[]) {
   const groupId = await owner.mutation(api.groups.create, { name: "  Office   team " });
-  const { inviteCode } = await owner.query(api.groups.get, { groupId });
+  const { inviteCode } = (await owner.query(api.groups.get, { groupId }))!;
   for (const j of joiners) {
     vi.advanceTimersByTime(1000);
     await j.mutation(api.groups.join, { inviteCode: inviteCode.toLowerCase() });
@@ -50,7 +50,7 @@ describe("groups", () => {
     const [ada, bob] = await players(t, "ada", "bob");
     const { groupId, inviteCode } = await groupWith(t, ada, bob);
     expect(await bob.mutation(api.groups.join, { inviteCode })).toBe(groupId);
-    expect((await bob.query(api.groups.get, { groupId })).memberCount).toBe(2);
+    expect((await bob.query(api.groups.get, { groupId }))!.memberCount).toBe(2);
     await expect(bob.mutation(api.groups.join, { inviteCode: "NOPE2345" })).rejects.toThrow("INVITE_NOT_FOUND");
   });
 
@@ -58,7 +58,7 @@ describe("groups", () => {
     const t = setup();
     const [ada, eve] = await players(t, "ada", "eve");
     const { groupId } = await groupWith(t, ada);
-    await expect(eve.query(api.groups.get, { groupId })).rejects.toThrow("GROUP_NOT_FOUND");
+    expect(await eve.query(api.groups.get, { groupId })).toBeNull();
     await expect(eve.mutation(api.groups.leave, { groupId })).rejects.toThrow("GROUP_NOT_FOUND");
     expect(await eve.query(api.groups.mine)).toEqual([]);
   });
@@ -75,10 +75,10 @@ describe("groups", () => {
     expect(fresh).not.toBe(inviteCode);
     await expect(cy.mutation(api.groups.join, { inviteCode })).rejects.toThrow("INVITE_NOT_FOUND");
 
-    const bobId = (await ada.query(api.groups.get, { groupId })).members[1].userId;
+    const bobId = (await ada.query(api.groups.get, { groupId }))!.members[1].userId;
     await ada.mutation(api.groups.removeMember, { groupId, userId: bobId });
-    await expect(bob.query(api.groups.get, { groupId })).rejects.toThrow("GROUP_NOT_FOUND");
-    expect((await ada.query(api.groups.get, { groupId })).name).toBe("Platform");
+    expect(await bob.query(api.groups.get, { groupId })).toBeNull();
+    expect((await ada.query(api.groups.get, { groupId }))!.name).toBe("Platform");
   });
 
   it("hands the group to the earliest member when the owner leaves, and deletes it when empty", async () => {
@@ -101,7 +101,7 @@ describe("groups", () => {
 
     const groupId = await bob.mutation(api.groups.create, { name: "Full" });
     await t.run((ctx) => ctx.db.patch(groupId, { memberCount: MAX_MEMBERS }));
-    const { inviteCode } = await bob.query(api.groups.get, { groupId });
+    const { inviteCode } = (await bob.query(api.groups.get, { groupId }))!;
     const [cy] = await players(t, "cy");
     await expect(cy.mutation(api.groups.join, { inviteCode })).rejects.toThrow("GROUP_FULL");
   });
@@ -113,13 +113,13 @@ describe("groups", () => {
     await expect(bob.mutation(api.groups.remove, { groupId })).rejects.toThrow("NOT_GROUP_OWNER");
     await ada.mutation(api.groups.remove, { groupId });
 
-    await expect(bob.query(api.groups.get, { groupId })).rejects.toThrow("GROUP_NOT_FOUND");
+    expect(await bob.query(api.groups.get, { groupId })).toBeNull();
     expect(await bob.query(api.groups.mine)).toEqual([]);
     expect(await ada.query(api.groups.mine)).toEqual([expect.objectContaining({ deletedAt: expect.any(Number) })]);
     await expect(bob.mutation(api.groups.join, { inviteCode })).rejects.toThrow("INVITE_NOT_FOUND");
 
     await ada.mutation(api.groups.restore, { groupId });
-    expect((await bob.query(api.groups.get, { groupId })).memberCount).toBe(2);
+    expect((await bob.query(api.groups.get, { groupId }))!.memberCount).toBe(2);
 
     await ada.mutation(api.groups.remove, { groupId });
     vi.advanceTimersByTime(RESTORE_FOR_MS + 1000);

@@ -159,6 +159,7 @@ export const finish = internalMutation({
     const badges = [...xp.badges, ...(await checkSolveBadges(ctx, submission.userId, problem))];
     await ctx.db.patch(submissionId, {
       xpAwarded: xp.awarded ? amount : undefined,
+      levelReached: xp.awarded ? xp.levelUp : undefined,
       badgesEarned: badges.length ? badges : undefined,
     });
   },

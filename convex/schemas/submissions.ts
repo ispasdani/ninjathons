@@ -66,6 +66,8 @@ export const submissions = defineTable({
   // XP this submission earned: set on an accepted Submit that was the first
   // solve of the problem in this language.
   xpAwarded: v.optional(v.number()),
+  // The level this submission's XP took the user to, when it crossed one.
+  levelReached: v.optional(v.number()),
   // Badges first earned by this submission (ids from lib/badges.ts).
   badgesEarned: v.optional(v.array(v.string())),
 })

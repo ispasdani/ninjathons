@@ -33,6 +33,7 @@ import type * as judge_wire from "../judge/wire.js";
 import type * as judging from "../judging.js";
 import type * as leaderboards from "../leaderboards.js";
 import type * as lib_badges from "../lib/badges.js";
+import type * as lib_countries from "../lib/countries.js";
 import type * as lib_functions from "../lib/functions.js";
 import type * as lib_glicko2 from "../lib/glicko2.js";
 import type * as lib_groups from "../lib/groups.js";
@@ -85,6 +86,7 @@ declare const fullApi: ApiFromModules<{
   judging: typeof judging;
   leaderboards: typeof leaderboards;
   "lib/badges": typeof lib_badges;
+  "lib/countries": typeof lib_countries;
   "lib/functions": typeof lib_functions;
   "lib/glicko2": typeof lib_glicko2;
   "lib/groups": typeof lib_groups;

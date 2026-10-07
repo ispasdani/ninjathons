@@ -188,7 +188,7 @@ describe("group scope", () => {
     await player(t, "eve");
     const asAda = t.withIdentity(identity("user_ada"));
     const groupId = await asAda.mutation(api.groups.create, { name: "Office" });
-    const { inviteCode } = await asAda.query(api.groups.get, { groupId });
+    const { inviteCode } = (await asAda.query(api.groups.get, { groupId }))!;
     await t.withIdentity(identity("user_bob")).mutation(api.groups.join, { inviteCode });
     await earn(t, ada, 10);
 
@@ -199,11 +199,10 @@ describe("group scope", () => {
     ]);
     expect(board.me).toEqual({ rank: 1, value: 10 });
 
-    await expect(
-      t.withIdentity(identity("user_eve")).query(api.leaderboards.board, { board: "level", scope: "group", groupId }),
-    ).rejects.toThrow("GROUP_NOT_FOUND");
-    await expect(t.query(api.leaderboards.board, { board: "level", scope: "group", groupId })).rejects.toThrow(
-      "GROUP_NOT_FOUND",
-    );
+    const empty = { rows: [], builtAt: null, me: null };
+    expect(
+      await t.withIdentity(identity("user_eve")).query(api.leaderboards.board, { board: "level", scope: "group", groupId }),
+    ).toEqual(empty);
+    expect(await t.query(api.leaderboards.board, { board: "level", scope: "group", groupId })).toEqual(empty);
   });
 });

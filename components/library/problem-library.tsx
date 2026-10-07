@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { Difficulty } from "@/components/problem/difficulty";
+import { Segmented } from "@/components/ui/segmented";
 import { api } from "@/convex/_generated/api";
 
 type Row = NonNullable<ReturnType<typeof useLibrary>>[number];
@@ -18,36 +19,6 @@ function useLibrary() {
 }
 
 const ORDER = { easy: 0, medium: 1, hard: 2 };
-
-/** Segmented control: one choice out of a few, 13px, like the nav buttons. */
-function Segmented<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  options: [T, string][];
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div role="radiogroup" aria-label={label} className="flex rounded-md border p-0.5">
-      {options.map(([id, text]) => (
-        <button
-          key={id}
-          type="button"
-          role="radio"
-          aria-checked={value === id}
-          onClick={() => onChange(id)}
-          className="h-7 rounded-sm px-2.5 text-[13px] text-muted-foreground transition-colors duration-150 ease-out-quad hover:text-foreground aria-checked:bg-bg-secondary aria-checked:font-medium aria-checked:text-foreground"
-        >
-          {text}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 function StatusIcon({ status }: { status: Row["status"] }) {
   if (status === "solved") {

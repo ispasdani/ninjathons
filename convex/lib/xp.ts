@@ -10,6 +10,7 @@ import type { MutationCtx } from "../_generated/server";
 import type { difficulty } from "../schemas/problems";
 import type { xpSource } from "../schemas/progression";
 import { checkLevelBadges } from "./badges";
+import { levelForXp } from "./levels";
 
 // Starting values from the roadmap (docs/01, XP sources), tuned during the beta.
 export const SOLVE_XP: Record<Infer<typeof difficulty>, number> = {
@@ -59,7 +60,10 @@ export async function awardXp(
   if (monthly) await ctx.db.patch(monthly._id, { xp: monthly.xp + entry.amount, tieBreak: -now });
   else await ctx.db.insert("xpMonths", { userId: user._id, month, xp: entry.amount, tieBreak: -now });
 
-  return { awarded: true as const, badges: await checkLevelBadges(ctx, user._id, xp) };
+  // The new level when this award crossed into one, for the level-up moment.
+  const level = levelForXp(xp);
+  const levelUp = level > levelForXp(xp - entry.amount) ? level : undefined;
+  return { awarded: true as const, badges: await checkLevelBadges(ctx, user._id, xp), levelUp };
 }
 
 /** The calendar month in UTC, "2026-10". */

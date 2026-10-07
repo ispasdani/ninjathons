@@ -206,6 +206,14 @@ describe("solve XP", () => {
     });
     const row = await submit(t, asAda, { language: "python", source: correct.python });
     expect(row?.xpAwarded).toBe(40);
+    expect(row?.levelReached).toBeUndefined();
+  });
+
+  it("records the level a solve reaches", async () => {
+    const { t, users, asAda } = await seeded();
+    await t.run((ctx) => ctx.db.patch(users[0], { xp: 95 }));
+    const row = await submit(t, asAda, { language: "python", source: correct.python });
+    expect(row?.levelReached).toBe(2);
   });
 
   // The phase 3 check: solves award XP and badges, and leaderboards update.

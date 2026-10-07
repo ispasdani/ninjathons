@@ -154,11 +154,17 @@ export const mine = userQuery({
   },
 });
 
-/** One group and its members, for members only. */
+/**
+ * One group and its members, for members only; null otherwise. Takes any
+ * string, since it comes from the page URL.
+ */
 export const get = userQuery({
-  args: { groupId: v.id("groups") },
-  handler: async (ctx, { groupId }) => {
-    const group = await memberGroup(ctx, groupId, ctx.user._id);
+  args: { groupId: v.string() },
+  handler: async (ctx, args) => {
+    const groupId = ctx.db.normalizeId("groups", args.groupId);
+    if (!groupId) return null;
+    const group = await ctx.db.get(groupId);
+    if (!group || group.deletedAt !== undefined || !(await membership(ctx, groupId, ctx.user._id))) return null;
     const rows = await ctx.db
       .query("groupMembers")
       .withIndex("by_group_user", (q) => q.eq("groupId", groupId))
