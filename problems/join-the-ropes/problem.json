@@ -1,0 +1,18 @@
+{
+  "slug": "join-the-ropes",
+  "title": "Join the Ropes",
+  "difficulty": "medium",
+  "tags": ["heap", "greedy"],
+  "mode": "function",
+  "signature": {
+    "functionName": "joinCost",
+    "params": [{ "name": "ropes", "type": "int[]" }],
+    "returns": "long"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

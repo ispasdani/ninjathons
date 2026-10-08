@@ -496,5 +496,5 @@ Themes chosen to cover techniques the first 30 problems barely touch. Each set h
 | 2 | Guess the Answer: binary search on the answer | Integer Square Root (easy), Minimum Reading Speed (medium), Delivery Capacity (medium), Kth Smallest Pair Distance (hard) |
 | 3 | Beyond the Grid: graphs | Connected Components (easy), Fewest Terms (medium), Signal Time (medium), Critical Links (hard) |
 | 4 | Lines on a Timeline: intervals and sweep lines | Can Attend All (easy), Most Meetings (medium; replaces Insert Interval, too close to Merge Intervals), Rooms Needed (medium), The Skyline (hard) |
-| 5 | Top of the Heap: heaps and greedy | planned: kth largest, task scheduling, merging sorted lists, a running median |
+| 5 | Top of the Heap: heaps and greedy | Kth Largest (easy), Join the Ropes (medium), Smallest Covering Range (medium), Running Median (hard). Task scheduling (a counting formula) and merging sorted lists (sorting is as fast) were dropped: neither needs the heap |
 | 6 | Building Up: dynamic programming, part two | planned: house robber, paths with obstacles, longest common subsequence, one interval DP |

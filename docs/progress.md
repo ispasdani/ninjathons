@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 4 of the 6 weekly sets are written. **Next step:** weekly set 5, Top of the Heap (heaps and greedy).
+**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 5 of the 6 weekly sets are written. **Next step:** weekly set 6, Building Up (dynamic programming, part two), the last piece of phase 5.
 
 ## Phases
 
@@ -20,11 +20,16 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 46 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 4 of 6 weekly sets.
+Content track: 50 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 5 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5: weekly set 5, Top of the Heap
+- Set 5, `weekly/top-of-the-heap` (heaps and greedy), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Kth Largest (easy; repeats count), Join the Ropes (medium; sorting once isn't enough), Smallest Covering Range (medium; up to 10,000 lists, ties go to the smaller start, widths past 32 bits), Running Median (hard; two heaps, the lower middle on even counts). 900 points in all.
+- Task scheduling and merging sorted lists were dropped from the plan, since neither needs a heap ([decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026)). Smallest Covering Range allows 10,000 lists: with 1,000, scanning every list for the smallest still passed (518 ms).
+- `problems:check` passes for all 50 problems and 5 sets; checked by hand that inserting into a sorted list times out on Running Median, as its hint says. Seeded to Convex dev: set 5 waits for Monday 9 Nov, its problems hidden from the library (checked in the browser).
 
 ### 8 Oct 2026 · Phase 5: weekly set 4, Lines on a Timeline
 - Set 4, `weekly/lines-on-a-timeline` (intervals and sweep lines), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Can Attend All (easy), Most Meetings (medium; greedy by end against greedy by start), Rooms Needed (medium; a meeting may start the minute another ends), The Skyline (hard; sweep with a max-heap, no repeated heights). 900 points in all.
