@@ -8,6 +8,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Language } from "../judge/types";
 import { COUNTDOWN_MS, currentRating, MATCH_TIME_MS, solvedSlugs } from "./matches";
+import { isListed } from "./problems";
 
 // How many recent finished matches to look through for a recording.
 const SEARCH_MATCHES = 200;
@@ -37,7 +38,7 @@ export async function findRecording(ctx: QueryCtx, userId: Id<"users">): Promise
   for (const match of finished) {
     if (match.source === "ghost") continue;
     const problem = await ctx.db.get(match.problemId);
-    if (!problem || problem.status === "draft") continue;
+    if (!problem || !isListed(problem)) continue;
     const players = await ctx.db
       .query("matchPlayers")
       .withIndex("by_match", (q) => q.eq("matchId", match._id))

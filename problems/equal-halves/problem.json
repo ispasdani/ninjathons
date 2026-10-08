@@ -1,0 +1,18 @@
+{
+  "slug": "equal-halves",
+  "title": "Equal Halves",
+  "difficulty": "medium",
+  "tags": ["dynamic-programming", "knapsack", "subset-sum"],
+  "mode": "function",
+  "signature": {
+    "functionName": "canSplit",
+    "params": [{ "name": "nums", "type": "int[]" }],
+    "returns": "bool"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

@@ -5,12 +5,14 @@
  * reference solution through the generated drivers and requires Accepted, and
  * requires every wrong-* solution to fail and every slow-* one to time out.
  * Runs code in the runner image, or with the local Node.js and Python
- * (scripts/lib/local-runner.ts).
+ * (scripts/lib/local-runner.ts). With no slugs, also checks the weekly sets
+ * (weekly/, scripts/lib/weekly.ts).
  */
 import { judgeSubmission } from "../convex/judge/judge";
 import { LANGUAGES, problemLanguages } from "../convex/judge/languages";
 import { allTests, checkTestTypes, generateTests, listProblemDirs, loadProblem, type Problem } from "./lib/problems";
 import { localRunner } from "./lib/local-runner";
+import { checkWeeklySets, loadWeeklySets } from "./lib/weekly";
 
 const MIN_HIDDEN = 10;
 const MAX_EXAMPLE_BYTES = 16 * 1024;
@@ -90,7 +92,21 @@ async function main() {
     if (errors.length) failed++;
   }
   console.log(failed ? `\n${failed} of ${dirs.length} problems failed.` : `\nAll ${dirs.length} problems passed.`);
-  process.exit(failed ? 1 : 0);
+
+  // The weekly sets, when checking everything.
+  let setErrors: string[] = [];
+  if (process.argv.length <= 2) {
+    try {
+      const sets = loadWeeklySets();
+      setErrors = checkWeeklySets(sets);
+      for (const error of setErrors) console.log(`  ✗ ${error}`);
+      if (!setErrors.length) console.log(`All ${sets.length} weekly sets passed.`);
+    } catch (error) {
+      setErrors = [(error as Error).message];
+      console.log(`  ✗ ${setErrors[0]}`);
+    }
+  }
+  process.exit(failed || setErrors.length ? 1 : 0);
 }
 
 void main();

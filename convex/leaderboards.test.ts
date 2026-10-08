@@ -148,7 +148,16 @@ describe("monthly Level board", () => {
     await rebuild(t);
     expect((await t.query(api.leaderboards.board, october)).rows).toHaveLength(0);
     const boards = await t.run((ctx) => ctx.db.query("leaderboardVersions").collect());
-    expect(boards.map((b) => b.board).sort()).toEqual(["1v1", "level", "level-month:2026-11", "level-month:2026-12"]);
+    expect(boards.map((b) => b.board).sort()).toEqual([
+      "1v1",
+      "daily",
+      "level",
+      "level-month:2026-11",
+      "level-month:2026-12",
+      // Weekly boards older than last week go too.
+      "weekly:2026-W50",
+      "weekly:2026-W51",
+    ]);
   });
 
   it("refuses a malformed month", async () => {
@@ -204,5 +213,44 @@ describe("group scope", () => {
       await t.withIdentity(identity("user_eve")).query(api.leaderboards.board, { board: "level", scope: "group", groupId }),
     ).toEqual(empty);
     expect(await t.query(api.leaderboards.board, { board: "level", scope: "group", groupId })).toEqual(empty);
+  });
+});
+
+describe("Daily board", () => {
+  it("ranks by current streak, then total dailies solved, then who got there first", async () => {
+    const t = setup();
+    const ada = await player(t, "ada");
+    const bob = await player(t, "bob");
+    const cy = await player(t, "cy");
+    const dee = await player(t, "dee");
+    await player(t, "idle"); // never solved a daily: not on the board
+    await t.run(async (ctx) => {
+      const row = { best: 9, freezes: 0, coveredThrough: "2026-10-07" };
+      await ctx.db.insert("streaks", { userId: ada, current: 3, totalSolved: 9, tieBreak: -2, ...row });
+      await ctx.db.insert("streaks", { userId: bob, current: 5, totalSolved: 5, tieBreak: -3, ...row });
+      await ctx.db.insert("streaks", { userId: cy, current: 3, totalSolved: 9, tieBreak: -1, ...row });
+      await ctx.db.insert("streaks", { userId: dee, current: 0, totalSolved: 20, tieBreak: -4, best: 20, freezes: 0 });
+    });
+    await rebuild(t);
+    const daily = { board: "daily" as const, scope: "global" as const };
+    const { rows } = await t.query(api.leaderboards.board, daily);
+    expect(rows.map((r) => [r.username, r.value, "totalSolved" in r ? r.totalSolved : null])).toEqual([
+      ["bob", 5, 5],
+      ["cy", 3, 9],
+      ["ada", 3, 9],
+      ["dee", 0, 20],
+    ]);
+
+    // The group scope sorts the same way, live.
+    const groupId = await t.run(async (ctx) => {
+      const id = await ctx.db.insert("groups", { name: "G", inviteCode: "ABCDEFGH", ownerId: ada, memberCount: 2 });
+      for (const userId of [ada, cy]) await ctx.db.insert("groupMembers", { groupId: id, userId });
+      return id;
+    });
+    const group = await t
+      .withIdentity(identity("user_ada"))
+      .query(api.leaderboards.board, { board: "daily", scope: "group", groupId });
+    expect(group.rows.map((r) => r.username)).toEqual(["cy", "ada"]);
+    expect(group.me).toEqual({ rank: 2, value: 3 });
   });
 });

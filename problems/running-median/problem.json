@@ -1,0 +1,18 @@
+{
+  "slug": "running-median",
+  "title": "Running Median",
+  "difficulty": "hard",
+  "tags": ["heap", "two-heaps", "data-stream"],
+  "mode": "function",
+  "signature": {
+    "functionName": "runningMedians",
+    "params": [{ "name": "nums", "type": "int[]" }],
+    "returns": "int[]"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

@@ -1,11 +1,13 @@
 "use client";
 
 import { useQuery } from "convex/react";
+import { Flame } from "lucide-react";
 import Link from "next/link";
 
 import { LevelBar } from "@/components/progression/level-bar";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
+import { cn } from "@/lib/utils";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 
@@ -14,6 +16,8 @@ export default function DashboardPage() {
   const problems = useQuery(api.problems.library);
   const badges = useQuery(api.badges.list);
   const board = useQuery(api.leaderboards.board, { board: "level", scope: "global", limit: 1 });
+  const daily = useQuery(api.daily.today);
+  const weekly = useQuery(api.weekly.current);
 
   if (user === undefined) {
     return <p className="text-[13px] text-muted-foreground">Loading…</p>;
@@ -72,6 +76,34 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <Link href="/daily" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+          <p className={eyebrow}>Daily challenge</p>
+          <p className="mt-3 flex items-baseline gap-2">
+            <Flame
+              className={cn("size-6 self-center", daily?.me?.streak ? "text-brand-text" : "text-muted-foreground")}
+              aria-hidden
+            />
+            <span className="font-mono text-4xl font-medium tabular-nums">{daily?.me?.streak ?? 0}</span>
+            <span className="text-[13px] text-muted-foreground">day streak</span>
+          </p>
+          <p className="mt-2 truncate text-[13px] text-muted-foreground">
+            {!daily?.problem
+              ? "Today's problem is on its way."
+              : daily.me?.solvedAt != null
+                ? `Solved today: ${daily.problem.title}`
+                : `Today: ${daily.problem.title}`}
+          </p>
+        </Link>
+        <Link href="/weekly" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+          <p className={eyebrow}>Weekly challenge</p>
+          <p className="mt-3 font-mono text-4xl font-medium tabular-nums">
+            {weekly?.me?.points ?? 0}
+            {weekly?.set && <span className="text-lg text-muted-foreground"> / {weekly.set.maxPoints}</span>}
+          </p>
+          <p className="mt-2 truncate text-[13px] text-muted-foreground">
+            {weekly?.set ? `This week: ${weekly.set.title}` : "No set this week. The next starts on Monday."}
+          </p>
+        </Link>
         <Link href="/leaderboards" className="rounded-md border p-6 transition-colors hover:border-border-strong">
           <p className={eyebrow}>Leaderboard</p>
           <p className="mt-3 font-mono text-4xl font-medium tabular-nums">

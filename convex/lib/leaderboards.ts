@@ -1,18 +1,25 @@
 /**
  * Leaderboards (roadmap, Progression; decisions §13). Each board ranks players
  * by one value, read in rank order from an index so a rebuild can go page by
- * page. Built now: Level (all time and monthly) and 1v1; the others come with
- * their phase.
+ * page. Built now: Level (all time and monthly), 1v1 and Daily; the others
+ * come with their phase.
  */
 import { v, type Infer } from "convex/values";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
+import { previousWeek, weekKey } from "./days";
 import { levelProgress } from "./levels";
 import { PROVISIONAL_GAMES, tierFor } from "./ratings";
 import { monthKey } from "./xp";
 
-export const boardKind = v.union(v.literal("level"), v.literal("level-month"), v.literal("1v1"));
+export const boardKind = v.union(
+  v.literal("level"),
+  v.literal("level-month"),
+  v.literal("1v1"),
+  v.literal("daily"),
+  v.literal("weekly"),
+);
 export type BoardKind = Infer<typeof boardKind>;
 
 // 1v1 players drop off the board after this long without a game, and come
@@ -20,21 +27,39 @@ export type BoardKind = Infer<typeof boardKind>;
 export const INACTIVE_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 
 const MONTH = /^\d{4}-\d{2}$/;
+const WEEK = /^\d{4}-W\d{2}$/;
 
-/** The stored key of a board: "level", "level-month:2026-10" or "1v1". */
-export function boardKey(kind: BoardKind, month?: string) {
-  if (kind !== "level-month") return kind;
-  if (month !== undefined && !MONTH.test(month)) throw new Error(`Bad month: ${month}`);
-  return `level-month:${month ?? monthKey(Date.now())}`;
+/**
+ * The stored key of a board: "level", "level-month:2026-10", "1v1", "daily"
+ * or "weekly:2026-W41". `period` is the month or week, defaulting to now's.
+ */
+export function boardKey(kind: BoardKind, period?: string) {
+  if (kind === "level-month") {
+    if (period !== undefined && !MONTH.test(period)) throw new Error(`Bad month: ${period}`);
+    return `level-month:${period ?? monthKey(Date.now())}`;
+  }
+  if (kind === "weekly") {
+    if (period !== undefined && !WEEK.test(period)) throw new Error(`Bad week: ${period}`);
+    return `weekly:${period ?? weekKey(Date.now())}`;
+  }
+  return kind;
 }
 
-/** The boards the scheduled rebuild keeps fresh. */
+/**
+ * The boards the scheduled rebuild keeps fresh. Last week's too, so its
+ * final standings include the last minutes of Sunday.
+ */
 export function liveBoards(now: number) {
-  return ["level", `level-month:${monthKey(now)}`, "1v1"];
+  const week = weekKey(now);
+  return ["level", `level-month:${monthKey(now)}`, "1v1", "daily", `weekly:${week}`, `weekly:${previousWeek(week)}`];
 }
 
-/** Monthly boards older than last month are deleted; last month's stays. */
+/**
+ * Monthly boards older than last month and weekly boards older than last
+ * week are deleted; the last finished one of each stays readable.
+ */
 export function isRetired(board: string, now: number) {
+  if (board.startsWith("weekly:")) return board.slice("weekly:".length) < previousWeek(weekKey(now));
   if (!board.startsWith("level-month:")) return false;
   const lastMonth = new Date(now);
   lastMonth.setUTCDate(1);
@@ -86,6 +111,22 @@ export async function sourcePage(
       page: page.page.filter((r) => eligible1v1(r, now)).map((r): Entry => ({ userId: r.userId, value: r.rating })),
     };
   }
+  if (board === "daily") {
+    // Current streak, then total dailies solved, then who got there first
+    // (decisions §15). Everyone who has solved a daily is on it.
+    const page = await ctx.db.query("streaks").withIndex("by_board").order("desc").paginate(paginationOpts);
+    return { ...page, page: page.page.map((r): Entry => ({ userId: r.userId, value: r.current })) };
+  }
+  if (board.startsWith("weekly:")) {
+    // Points, then less total time.
+    const week = board.slice("weekly:".length);
+    const page = await ctx.db
+      .query("weeklyResults")
+      .withIndex("by_week_board", (q) => q.eq("week", week))
+      .order("desc")
+      .paginate(paginationOpts);
+    return { ...page, page: page.page.map((r): Entry => ({ userId: r.userId, value: r.points })) };
+  }
   throw new Error(`Unknown board: ${board}`);
 }
 
@@ -95,7 +136,8 @@ export async function sourcePage(
  */
 export async function groupEntries(ctx: QueryCtx, board: string, userIds: Id<"users">[]) {
   const now = Date.now();
-  const scored: (Entry & { tieBreak: number })[] = [];
+  // Sorted by value, then `then` (Daily: total solved), then tieBreak.
+  const scored: (Entry & { then?: number; tieBreak: number })[] = [];
   for (const userId of userIds) {
     if (board === "level") {
       const user = await ctx.db.get(userId);
@@ -112,11 +154,23 @@ export async function groupEntries(ctx: QueryCtx, board: string, userIds: Id<"us
         .withIndex("by_user_area", (q) => q.eq("userId", userId).eq("area", "1v1"))
         .unique();
       if (row && eligible1v1(row, now)) scored.push({ userId, value: row.rating, tieBreak: -row.lastGameAt });
+    } else if (board === "daily") {
+      const row = await ctx.db
+        .query("streaks")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .unique();
+      if (row) scored.push({ userId, value: row.current, then: row.totalSolved, tieBreak: row.tieBreak });
+    } else if (board.startsWith("weekly:")) {
+      const row = await ctx.db
+        .query("weeklyResults")
+        .withIndex("by_user_week", (q) => q.eq("userId", userId).eq("week", board.slice("weekly:".length)))
+        .unique();
+      if (row) scored.push({ userId, value: row.points, tieBreak: row.tieBreak });
     } else {
       throw new Error(`Unknown board: ${board}`);
     }
   }
-  scored.sort((a, b) => b.value - a.value || b.tieBreak - a.tieBreak);
+  scored.sort((a, b) => b.value - a.value || (b.then ?? 0) - (a.then ?? 0) || b.tieBreak - a.tieBreak);
   return scored.map(({ userId, value }, i) => ({ userId, value, rank: i + 1 }));
 }
 
@@ -129,7 +183,7 @@ export async function presentRow(
   const user = await ctx.db.get(row.userId);
   const value = Math.round(row.value);
   const { level, title } = levelProgress(user?.xp ?? 0);
-  return {
+  const base = {
     rank: row.rank,
     userId: row.userId,
     username: user?.username ?? null,
@@ -140,4 +194,21 @@ export async function presentRow(
     // Level boards show level and title; 1v1 shows the tier.
     ...(board === "1v1" ? { tier: tierFor(value) } : { level, title }),
   };
+  if (board === "daily") {
+    // The Daily board's second column: total dailies solved.
+    const streak = await ctx.db
+      .query("streaks")
+      .withIndex("by_user", (q) => q.eq("userId", row.userId))
+      .unique();
+    return { ...base, totalSolved: streak?.totalSolved ?? 0 };
+  }
+  if (board.startsWith("weekly:")) {
+    // The Weekly board's second column: total time, the tie-break.
+    const result = await ctx.db
+      .query("weeklyResults")
+      .withIndex("by_user_week", (q) => q.eq("userId", row.userId).eq("week", board.slice("weekly:".length)))
+      .unique();
+    return { ...base, timeMs: result?.timeMs ?? 0, solved: result?.solved ?? 0 };
+  }
+  return base;
 }

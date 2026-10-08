@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "n": 4, "prerequisites": [[0, 1], [0, 2], [1, 3], [2, 3]] },
+    "output": 3,
+    "explanation": "Term 1: course 0. Term 2: courses 1 and 2. Term 3: course 3."
+  },
+  {
+    "input": { "n": 3, "prerequisites": [[0, 1], [1, 2], [2, 1]] },
+    "output": -1,
+    "explanation": "Courses 1 and 2 each need the other first."
+  },
+  {
+    "input": { "n": 3, "prerequisites": [] },
+    "output": 1
+  }
+]

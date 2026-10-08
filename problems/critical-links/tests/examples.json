@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "n": 4, "links": [[0, 1], [1, 2], [2, 0], [1, 3]] },
+    "output": [[1, 3]],
+    "explanation": "0, 1 and 2 form a loop, so none of those links is critical; only [1, 3] connects server 3."
+  },
+  {
+    "input": { "n": 3, "links": [[0, 1], [0, 1], [1, 2]] },
+    "output": [[1, 2]],
+    "explanation": "0 and 1 are joined twice, so either link alone can be cut."
+  },
+  {
+    "input": { "n": 2, "links": [] },
+    "output": []
+  }
+]

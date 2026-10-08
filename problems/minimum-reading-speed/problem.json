@@ -1,0 +1,21 @@
+{
+  "slug": "minimum-reading-speed",
+  "title": "Minimum Reading Speed",
+  "difficulty": "medium",
+  "tags": ["arrays", "binary-search"],
+  "mode": "function",
+  "signature": {
+    "functionName": "minReadingSpeed",
+    "params": [
+      { "name": "pages", "type": "int[]" },
+      { "name": "hours", "type": "int" }
+    ],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

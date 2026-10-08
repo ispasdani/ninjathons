@@ -1,0 +1,21 @@
+{
+  "slug": "range-sum-queries",
+  "title": "Range Sum Queries",
+  "difficulty": "easy",
+  "tags": ["arrays", "prefix-sums"],
+  "mode": "function",
+  "signature": {
+    "functionName": "rangeSums",
+    "params": [
+      { "name": "nums", "type": "int[]" },
+      { "name": "queries", "type": "int[][]" }
+    ],
+    "returns": "long[]"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

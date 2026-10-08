@@ -12,6 +12,7 @@ import type * as badges from "../badges.js";
 import type * as benchmark from "../benchmark.js";
 import type * as challenges from "../challenges.js";
 import type * as crons from "../crons.js";
+import type * as daily from "../daily.js";
 import type * as ghosts from "../ghosts.js";
 import type * as groups from "../groups.js";
 import type * as http from "../http.js";
@@ -37,6 +38,8 @@ import type * as leaderboards from "../leaderboards.js";
 import type * as lib_badges from "../lib/badges.js";
 import type * as lib_codes from "../lib/codes.js";
 import type * as lib_countries from "../lib/countries.js";
+import type * as lib_daily from "../lib/daily.js";
+import type * as lib_days from "../lib/days.js";
 import type * as lib_functions from "../lib/functions.js";
 import type * as lib_ghosts from "../lib/ghosts.js";
 import type * as lib_glicko2 from "../lib/glicko2.js";
@@ -48,11 +51,13 @@ import type * as lib_matchmaking from "../lib/matchmaking.js";
 import type * as lib_problems from "../lib/problems.js";
 import type * as lib_ratings from "../lib/ratings.js";
 import type * as lib_usernames from "../lib/usernames.js";
+import type * as lib_weekly from "../lib/weekly.js";
 import type * as lib_xp from "../lib/xp.js";
 import type * as matches from "../matches.js";
 import type * as problems from "../problems.js";
 import type * as queue from "../queue.js";
 import type * as ratings from "../ratings.js";
+import type * as schemas_challenges from "../schemas/challenges.js";
 import type * as schemas_groups from "../schemas/groups.js";
 import type * as schemas_leaderboards from "../schemas/leaderboards.js";
 import type * as schemas_matches from "../schemas/matches.js";
@@ -65,6 +70,7 @@ import type * as submissions from "../submissions.js";
 import type * as testDrives from "../testDrives.js";
 import type * as testDrivesFill from "../testDrivesFill.js";
 import type * as user from "../user.js";
+import type * as weekly from "../weekly.js";
 
 import type {
   ApiFromModules,
@@ -77,6 +83,7 @@ declare const fullApi: ApiFromModules<{
   benchmark: typeof benchmark;
   challenges: typeof challenges;
   crons: typeof crons;
+  daily: typeof daily;
   ghosts: typeof ghosts;
   groups: typeof groups;
   http: typeof http;
@@ -102,6 +109,8 @@ declare const fullApi: ApiFromModules<{
   "lib/badges": typeof lib_badges;
   "lib/codes": typeof lib_codes;
   "lib/countries": typeof lib_countries;
+  "lib/daily": typeof lib_daily;
+  "lib/days": typeof lib_days;
   "lib/functions": typeof lib_functions;
   "lib/ghosts": typeof lib_ghosts;
   "lib/glicko2": typeof lib_glicko2;
@@ -113,11 +122,13 @@ declare const fullApi: ApiFromModules<{
   "lib/problems": typeof lib_problems;
   "lib/ratings": typeof lib_ratings;
   "lib/usernames": typeof lib_usernames;
+  "lib/weekly": typeof lib_weekly;
   "lib/xp": typeof lib_xp;
   matches: typeof matches;
   problems: typeof problems;
   queue: typeof queue;
   ratings: typeof ratings;
+  "schemas/challenges": typeof schemas_challenges;
   "schemas/groups": typeof schemas_groups;
   "schemas/leaderboards": typeof schemas_leaderboards;
   "schemas/matches": typeof schemas_matches;
@@ -130,6 +141,7 @@ declare const fullApi: ApiFromModules<{
   testDrives: typeof testDrives;
   testDrivesFill: typeof testDrivesFill;
   user: typeof user;
+  weekly: typeof weekly;
 }>;
 
 /**

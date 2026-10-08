@@ -1,0 +1,18 @@
+{
+  "slug": "paths-around-obstacles",
+  "title": "Paths Around Obstacles",
+  "difficulty": "medium",
+  "tags": ["dynamic-programming", "matrix", "counting"],
+  "mode": "function",
+  "signature": {
+    "functionName": "countPaths",
+    "params": [{ "name": "grid", "type": "string[]" }],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

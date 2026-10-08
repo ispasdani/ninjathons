@@ -1,0 +1,11 @@
+[
+  {
+    "input": { "bookings": [[1, 2, 10], [2, 3, 20], [2, 5, 25]], "n": 5 },
+    "output": [10, 55, 45, 25, 25],
+    "explanation": "Flight 2 is in all three bookings: 10 + 20 + 25 = 55. Flights 4 and 5 are only in the last one."
+  },
+  {
+    "input": { "bookings": [[1, 2, 10], [2, 2, 15]], "n": 2 },
+    "output": [10, 25]
+  }
+]

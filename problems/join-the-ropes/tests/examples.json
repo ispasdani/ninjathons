@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "ropes": [4, 3, 2, 6] },
+    "output": 29,
+    "explanation": "Tie 2 + 3 = 5 (cost 5), then 4 + 5 = 9 (cost 9), then 6 + 9 = 15 (cost 15): 5 + 9 + 15 = 29."
+  },
+  {
+    "input": { "ropes": [1, 1, 1, 1] },
+    "output": 8,
+    "explanation": "Tie the pairs (2 + 2), then the two halves (4)."
+  },
+  {
+    "input": { "ropes": [10] },
+    "output": 0
+  }
+]

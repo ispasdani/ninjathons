@@ -5,11 +5,15 @@
  * instead of duplicating. Examples go into `problems`; hidden and generated
  * tests into a file referenced from `problemTests`. Uses the Convex CLI's
  * login (`npx convex run`), so it seeds your dev deployment unless --prod.
+ * Then seeds the weekly sets (weekly/, decisions §15) that list any of the
+ * problems seeded (every set, with no slugs); a weekly set's problems stay
+ * hidden until its week starts.
  * Run problems:check first: this script only validates the shape.
  */
 import { spawnSync } from "node:child_process";
 
 import { allTests, checkTestTypes, generateTests, listProblemDirs, loadProblem } from "./lib/problems";
+import { loadWeeklySets, weeklySetOf } from "./lib/weekly";
 
 const args = process.argv.slice(2);
 const prod = args.includes("--prod");
@@ -26,7 +30,7 @@ function convexRun(fn: string, fnArgs: object): unknown {
   return JSON.parse(result.stdout.trim());
 }
 
-async function seedOne(dir: string) {
+async function seedOne(dir: string, setOf: Map<string, string>) {
   const problem = loadProblem(dir);
   const typeErrors = checkTestTypes(problem);
   if (typeErrors.length) throw new Error(typeErrors.join("\n"));
@@ -57,6 +61,8 @@ async function seedOne(dir: string) {
       status: meta.status,
     },
     hidden,
+    // A weekly set's problem stays hidden until its week (decisions §15).
+    weeklySet: setOf.get(meta.slug),
   };
 
   const uploadUrl = convexRun("problems:generateUploadUrl", {}) as string;
@@ -78,13 +84,37 @@ async function main() {
     process.exit(1);
   }
   console.log(`Seeding ${dirs.length} problems to the ${prod ? "PRODUCTION" : "dev"} deployment`);
+  const sets = loadWeeklySets();
+  const setOf = weeklySetOf(sets);
   let failed = 0;
   for (const dir of dirs) {
     try {
-      await seedOne(dir);
+      await seedOne(dir, setOf);
     } catch (error) {
       failed++;
       console.log(`  ✗ ${dir}: ${(error as Error).message}`);
+    }
+  }
+  // Then their weekly sets, whose problems must be seeded first.
+  const seeded = new Set(dirs.map((dir) => loadProblem(dir).meta.slug));
+  const due = sets.filter((set) => set.problems.some((slug) => seeded.has(slug)));
+  if (due.length) {
+    console.log(`Seeding ${due.length} weekly sets`);
+    for (const set of due) {
+      try {
+        const result = convexRun("weekly:seedSet", {
+          slug: set.slug,
+          title: set.title,
+          theme: set.theme,
+          order: set.order,
+          problems: set.problems,
+        }) as { created: boolean; started: boolean };
+        const what = result.started ? "already started: title and theme updated" : result.created ? "created" : "updated";
+        console.log(`  ✓ ${set.slug} ${what}`);
+      } catch (error) {
+        failed++;
+        console.log(`  ✗ ${set.slug}: ${(error as Error).message}`);
+      }
     }
   }
   process.exit(failed ? 1 : 0);

@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "grid": ["...", ".#.", "..."] },
+    "output": 2,
+    "explanation": "Around the obstacle either across the top then down, or down the left then across."
+  },
+  {
+    "input": { "grid": [".#", ".."] },
+    "output": 1
+  },
+  {
+    "input": { "grid": ["..#.", "...."] },
+    "output": 2,
+    "explanation": "The robot has to drop to the bottom row before the obstacle: in the first column or the second."
+  }
+]

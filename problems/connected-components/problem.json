@@ -1,0 +1,21 @@
+{
+  "slug": "connected-components",
+  "title": "Connected Components",
+  "difficulty": "easy",
+  "tags": ["graphs", "union-find", "dfs"],
+  "mode": "function",
+  "signature": {
+    "functionName": "countComponents",
+    "params": [
+      { "name": "n", "type": "int" },
+      { "name": "edges", "type": "int[][]" }
+    ],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

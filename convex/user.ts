@@ -271,6 +271,15 @@ export const deleteFromClerk = internalMutation({
       .collect();
     for (const row of months) await ctx.db.delete(row._id);
 
+    // Their streak and their daily and weekly results.
+    const challengeRows = [
+      ...(await ctx.db.query("streaks").withIndex("by_user", (q) => q.eq("userId", user._id)).collect()),
+      ...(await ctx.db.query("dailyResults").withIndex("by_user_day", (q) => q.eq("userId", user._id)).collect()),
+      ...(await ctx.db.query("weeklyProgress").withIndex("by_user_week", (q) => q.eq("userId", user._id)).collect()),
+      ...(await ctx.db.query("weeklyResults").withIndex("by_user_week", (q) => q.eq("userId", user._id)).collect()),
+    ];
+    for (const row of challengeRows) await ctx.db.delete(row._id);
+
     // Off the leaderboards now; the ranks close up on the next rebuild.
     const snapshots = await ctx.db
       .query("leaderboardSnapshots")

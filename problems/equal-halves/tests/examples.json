@@ -1,0 +1,17 @@
+[
+  {
+    "input": { "nums": [1, 5, 11, 5] },
+    "output": true,
+    "explanation": "[1, 5, 5] and [11]."
+  },
+  {
+    "input": { "nums": [1, 2, 3, 5] },
+    "output": false,
+    "explanation": "The total is 11, which is odd."
+  },
+  {
+    "input": { "nums": [3, 3, 2, 2, 2] },
+    "output": true,
+    "explanation": "[3, 3] and [2, 2, 2]."
+  }
+]

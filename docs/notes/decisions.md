@@ -354,7 +354,7 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | 2 | Foundation ✅ | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
 | 3 | Progression engine ✅ | Solves award XP and badges, and leaderboards update |
 | 4 | 1v1 and private alpha ✅ | Runner load test passes; real matches play end to end (the friends alpha moved to the release stage, below) |
-| 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |
+| 5 | Daily and weekly challenges ✅ | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
 | 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
 | 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
@@ -447,3 +447,54 @@ Agreed 7 Oct 2026, at the start of phase 4.
 - **Ghost races:** offered on Play when nobody is waiting, or after 20 seconds in the queue. A ghost is a real player's solve from a finished match (queue or challenge): the times and test counts of their Submits, replayed by the server at the same moments after the start, never their code. It's labelled "Ghost of @name" everywhere, and the race is always unranked: no rating change and no match XP (a first solve still gives its solve XP). The pick is someone else's solve of a problem you haven't solved if possible, among the 5 closest to your rating, from the last 200 finished matches. The recorded player isn't in the race and can play as normal; if they delete their account, their recordings go with it.
 - **Share cards:** every finished match has a public result page, `/m/<match id>`, whose link preview is the card image. It's public because players share it; while a match is on, the page shows nothing. It shows usernames, languages, tests passed, solve time and Submits; ratings and rating changes only for players past their provisional games. No code, ever. Doc use ("used 2 doc pages", §9) joins the card with the docs library.
 - **Account deletion** removes the player's side of each match, their feed events and their challenges; the opponent keeps their own result.
+
+## 15. Daily and weekly challenges
+
+Agreed 7 Oct 2026, at the start of phase 5. Neither challenge changes a rating (roadmap, Challenges).
+
+### Daily challenge
+
+- **One problem for everyone per UTC day,** picked by a cron on the hour (so a missed run is caught up within the hour), reset at 00:00 UTC.
+- **Difficulty follows the weekday:** Easy on Monday and Tuesday, Medium Wednesday to Friday, Hard on Saturday and Sunday. If none of that difficulty is left, Medium, then any.
+- **Never repeats:** only problems that have never been a daily, never one from a weekly set that hasn't finished, never a draft. The pick warns in the logs when fewer than 14 are left. If none at all are left, the one used longest ago is reused, with a louder warning, so a day never goes without a daily.
+- **A solve counts when an accepted Submit is sent that UTC day** (by when it was sent, as in 1v1), from the solve view, not in a match. It counts even if you had solved the problem before. **Time is from when you first opened it that day;** the solve page records the opening.
+- **XP: 30, plus 5 per streak day after the first, at most +50** (30 on day 1, 35 on day 2, 80 from day 11). Keyed `daily:<day>`, separate from solve XP.
+
+### Streak
+
+- **One streak: days in a row with the daily solved.** It drives the bonus XP, the Daily board, the freezes and the 7-, 30- and 100-day badges (the roadmap's "daily challenge streaks" are these).
+- **Freezes:** one earned each time the streak reaches a multiple of 7, at most 2 held. A missed day uses one automatically (a cron just after midnight UTC settles yesterday) and keeps the streak without adding to it. With none left, the streak goes to 0. Best streak and total dailies solved are kept.
+
+### Weekly challenge
+
+- **A themed set of 3 to 5 new problems,** written for it and hidden until its week. Sets live in `weekly/<slug>/set.json` and are seeded like problems. A cron at 00:00 UTC on Monday starts the next unstarted set in order, which puts its problems in the library from then on; with none left, that week has no set and the logs warn.
+- **Monday to Sunday, UTC** (ISO weeks, "2026-W42").
+- **Points: 100 easy, 200 medium, 400 hard per problem,** for an accepted Submit sent during the week. **Tie-break: total time,** each problem timed from when you first opened it.
+- **XP: 25 per problem, plus 100 for the full set,** during its week only (`weekly:<week>:<slug>`, `weekly:<week>:set`). After the week the problems are ordinary library problems.
+- **Top 10% badge:** a cron on Monday settles last week; the top 10% (rounded up) of players with at least one point earn it.
+
+### Boards and badges
+
+- **Daily board:** current streak, then total dailies solved, then who got there first. **Weekly board:** this week's points, then less time; it starts empty each Monday, and last week's stays readable. Both have Global, Country and Group scopes, like the others. Today's daily also lists its fastest solves, live.
+- **Badges (4):** 7-, 30- and 100-day streaks, and Weekly top 10%. Names are placeholders.
+- **Account deletion** removes the player's streak and their daily and weekly results.
+
+### Weekly sets as built (8 Oct 2026)
+
+- **A set is a folder, `weekly/<slug>/`:** `set.json` (`{ "title", "order", "problems": [slugs] }`) and `theme.md`, the introduction shown on the Weekly page. Its problems are ordinary folders in `problems/`, written like any other.
+- **`npm run problems:check`** with no slugs also checks the sets: 3 to 5 problems, each with a folder and not a draft, in no other set, a theme, and a unique order.
+- **`npm run problems:seed`** with no slugs seeds the problems, then the sets. A set's problems are unreleased from their first seed until the set starts. Re-seeding a started set changes only its title and theme.
+- **Starting:** the hourly `weekly.start` starts the next set by order on Mondays (UTC) and settles last week. `npx convex run weekly:start '{"force": true}'` starts one on any other day, for trying a set on dev.
+
+### The first 6 sets (8 Oct 2026)
+
+Themes chosen to cover techniques the first 30 problems barely touch. Each set has 3 to 5 new problems, easy to hard.
+
+| Order | Set | Problems |
+|---|---|---|
+| 1 | Running Totals: prefix sums and difference arrays | Range Sum Queries (easy), Flight Bookings (medium), Subarray Sum Equals K (medium), Shortest Subarray with Sum at Least K (hard) |
+| 2 | Guess the Answer: binary search on the answer | Integer Square Root (easy), Minimum Reading Speed (medium), Delivery Capacity (medium), Kth Smallest Pair Distance (hard) |
+| 3 | Beyond the Grid: graphs | Connected Components (easy), Fewest Terms (medium), Signal Time (medium), Critical Links (hard) |
+| 4 | Lines on a Timeline: intervals and sweep lines | Can Attend All (easy), Most Meetings (medium; replaces Insert Interval, too close to Merge Intervals), Rooms Needed (medium), The Skyline (hard) |
+| 5 | Top of the Heap: heaps and greedy | Kth Largest (easy), Join the Ropes (medium), Smallest Covering Range (medium), Running Median (hard). Task scheduling (a counting formula) and merging sorted lists (sorting is as fast) were dropped: neither needs the heap |
+| 6 | Building Up: dynamic programming, part two | House Robber (easy), Paths Around Obstacles (medium), Equal Halves (medium; replaces longest common subsequence, too close to Edit Distance), Pop the Balloons (hard) |

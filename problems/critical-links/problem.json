@@ -1,0 +1,21 @@
+{
+  "slug": "critical-links",
+  "title": "Critical Links",
+  "difficulty": "hard",
+  "tags": ["graphs", "dfs", "bridges"],
+  "mode": "function",
+  "signature": {
+    "functionName": "criticalLinks",
+    "params": [
+      { "name": "n", "type": "int" },
+      { "name": "links", "type": "int[][]" }
+    ],
+    "returns": "int[][]"
+  },
+  "checker": { "kind": "unordered" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

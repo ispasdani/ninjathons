@@ -6,6 +6,9 @@ import { internalMutation, internalQuery } from "./_generated/server";
 import { problemLanguages } from "./judge/languages";
 import { userMutation, userQuery } from "./lib/functions";
 import { checkSolveBadges } from "./lib/badges";
+import { openDaily, recordDailySolve } from "./lib/daily";
+import { isListed } from "./lib/problems";
+import { openWeekly, recordWeeklySolve } from "./lib/weekly";
 import { noteSubmit, playersOf, recordJudgedSubmit, SUBMIT_COOLDOWN_MS } from "./lib/matches";
 import { awardXp, SOLVE_XP, solveKey } from "./lib/xp";
 import { language } from "./schemas/problems";
@@ -34,7 +37,7 @@ export const create = userMutation({
       .query("problems")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
-    if (!problem || problem.status === "draft") throw new ConvexError("PROBLEM_NOT_FOUND");
+    if (!problem || !isListed(problem)) throw new ConvexError("PROBLEM_NOT_FOUND");
 
     let player: Doc<"matchPlayers"> | undefined;
     let problemVersion = problem.version;
@@ -74,6 +77,11 @@ export const create = userMutation({
       matchId,
     });
     if (player && kind === "submit") await noteSubmit(ctx, player);
+    // A Submit to the daily or a weekly problem starts its clock if the page didn't.
+    if (!matchId && kind === "submit") {
+      await openDaily(ctx, ctx.user._id, problem._id, Date.now());
+      await openWeekly(ctx, ctx.user._id, problem._id, Date.now());
+    }
     await ctx.scheduler.runAfter(0, internal.judging.judge, { submissionId });
     return submissionId;
   },
@@ -187,10 +195,17 @@ export const finish = internalMutation({
       amount,
     });
     const badges = [...xp.badges, ...(await checkSolveBadges(ctx, submission.userId, problem))];
+    const daily = await recordDailySolve(ctx, submission);
+    if (daily) badges.push(...daily.badges);
+    const weekly = await recordWeeklySolve(ctx, submission, problem);
+    if (weekly) badges.push(...weekly.badges);
     await ctx.db.patch(submissionId, {
       xpAwarded: xp.awarded ? amount : undefined,
-      levelReached: xp.awarded ? xp.levelUp : undefined,
+      // The highest level any of this Submit's awards reached: the last one to cross a level.
+      levelReached: weekly?.levelUp ?? daily?.levelUp ?? (xp.awarded ? xp.levelUp : undefined),
       badgesEarned: badges.length ? badges : undefined,
+      daily: daily ? { xp: daily.xp, streak: daily.streak, freezeEarned: daily.freezeEarned } : undefined,
+      weekly: weekly ? { points: weekly.points, xp: weekly.xp, setComplete: weekly.setComplete } : undefined,
     });
   },
 });

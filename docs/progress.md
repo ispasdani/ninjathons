@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 4, 1v1 and private alpha, is done; the alpha itself moved to the release stage, since everything stays local until then. **Next step:** start phase 5, daily and weekly challenges.
+**Now:** Phase 5, daily and weekly challenges, is done: the daily runs unattended and all 6 weekly sets are written and seeded on dev. **Next step:** start phase 6, Territory.
 
 ## Phases
 
@@ -13,18 +13,85 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
-| 5 | Daily and weekly challenges | Not started | | |
+| 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
 | 6 | Territory | Not started | | |
 | 7 | Learn | Not started | | |
 | 8 | Profiles and Pro | Not started | | |
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 of 6 weekly sets.
+Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5 done
+- The check passes: the daily pick ran by itself on dev at midnight UTC (8 Oct, Word Frequency), and the 6 weekly sets are written, checked and seeded (24 new problems, 54 in all).
+- Still open from phase 5, for whenever they come up: the signed-in states of the Daily and Weekly pages, the solve-view chips and the rewards haven't been seen in the browser; the first unattended weekly start is Monday 12 Oct on dev (set 1, Running Totals), and the first settle with the top 10% badge on Monday 19 Oct. The six sets cover six weeks; more are needed before launch so the weekly never runs dry. `weekly.settle` reads a whole week at once, fine until a few thousand players a week.
+
+### 8 Oct 2026 · Phase 5: weekly set 6, Building Up
+- Set 6, `weekly/building-up` (dynamic programming, part two), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: House Robber (easy), Paths Around Obstacles (medium; modulo 10^9 + 7, blocked first row and column), Equal Halves (medium; subset sum, beats handing items to whoever has less), Pop the Balloons (hard; interval DP, up to 200 balloons so O(n³) fits in Python too). 900 points in all.
+- Equal Halves replaces the planned longest common subsequence, too close to Edit Distance in the library ([decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026)). Two fixes found by `problems:check`: a miscounted example in Paths Around Obstacles, and Equal Halves' first "no split" tests had odd totals, so the brute force ruled them out at once; now they have even totals with an odd half.
+- `problems:check` passes for all 54 problems and 6 sets. Seeded to Convex dev: set 6 waits for Monday 16 Nov, its problems hidden from the library (checked in the browser). Production build passes; 393 tests.
+
+### 8 Oct 2026 · Phase 5: weekly set 5, Top of the Heap
+- Set 5, `weekly/top-of-the-heap` (heaps and greedy), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Kth Largest (easy; repeats count), Join the Ropes (medium; sorting once isn't enough), Smallest Covering Range (medium; up to 10,000 lists, ties go to the smaller start, widths past 32 bits), Running Median (hard; two heaps, the lower middle on even counts). 900 points in all.
+- Task scheduling and merging sorted lists were dropped from the plan, since neither needs a heap ([decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026)). Smallest Covering Range allows 10,000 lists: with 1,000, scanning every list for the smallest still passed (518 ms).
+- `problems:check` passes for all 50 problems and 5 sets; checked by hand that inserting into a sorted list times out on Running Median, as its hint says. Seeded to Convex dev: set 5 waits for Monday 9 Nov, its problems hidden from the library (checked in the browser).
+
+### 8 Oct 2026 · Phase 5: weekly set 4, Lines on a Timeline
+- Set 4, `weekly/lines-on-a-timeline` (intervals and sweep lines), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Can Attend All (easy), Most Meetings (medium; greedy by end against greedy by start), Rooms Needed (medium; a meeting may start the minute another ends), The Skyline (hard; sweep with a max-heap, no repeated heights). 900 points in all.
+- Most Meetings replaces the planned Insert Interval, which is too close to Merge Intervals in the library ([decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026)).
+- `problems:check` passes for all 46 problems and 4 sets. Seeded to Convex dev: set 4 waits for Monday 2 Nov, its problems hidden from the library (checked in the browser).
+
+### 8 Oct 2026 · Phase 5: weekly set 3, Beyond the Grid
+- Set 3, `weekly/beyond-the-grid` (graphs from edge lists), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Connected Components (easy; loops and repeated links), Fewest Terms (medium; topological levels, -1 on a cycle), Signal Time (medium; Dijkstra, against a fewest-links BFS and Bellman–Ford), Critical Links (hard; bridges with repeated links and 100,000-deep chains, any order through the `unordered` checker). 900 points in all.
+- `problems:check` passes for all 42 problems and 3 sets. Seeded to Convex dev: set 3 waits for Monday 26 Oct, its problems hidden from the library (checked in the browser).
+
+### 8 Oct 2026 · Phase 5: weekly set 2, Guess the Answer
+- Set 2, `weekly/guess-the-answer` (binary search on the answer), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Integer Square Root (easy; the wrong one is a floating-point root, off by one just below squares near 2^53), Minimum Reading Speed (medium), Delivery Capacity (medium), Kth Smallest Pair Distance (hard; `k` passes 32 bits). 900 points in all.
+- `problems:check` passes for all 38 problems and both sets. Seeded to Convex dev: set 2 waits for Monday 19 Oct, and its problems are hidden from the library (checked in the browser).
+
+### 8 Oct 2026 · Phase 5: weekly set 1, Running Totals
+- The 6 set themes are planned in [decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026): Running Totals, Guess the Answer, Beyond the Grid, Lines on a Timeline, Top of the Heap, Building Up.
+- Set 1, `weekly/running-totals` (prefix sums and difference arrays), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Range Sum Queries (easy), Flight Bookings (medium), Subarray Sum Equals K (medium), Shortest Subarray with Sum at Least K (hard). 900 points in all.
+- `problems:seed` now seeds every set that lists a problem it seeded, so new problems and their set go up without re-uploading the rest.
+- `problems:check` passes for all 34 problems and the set. Seeded to Convex dev: the set waits for Monday 12 Oct, and its problems are hidden from the library until then (checked in the browser). 393 tests.
+- Open: the first unattended start is Monday 12 Oct, 00:00 UTC on dev; the Weekly page with a running set can be checked then.
+
+### 8 Oct 2026 · Phase 5: Weekly page
+- `/weekly` (public, "Weekly" in the nav after Daily): the set's title and theme (markdown), the time left, its problems in order with difficulty and points, your clock or solve time on each and Solve, Carry on or Open; Your week: points out of the set's total with a bar, solved, total time, and the rewards. With no set this week it says so and points to the daily.
+- The solve view's chip now covers both challenges (`components/solve/challenge-chips.tsx`): on a problem of this week's set it starts that problem's clock (`weekly.open`) and shows "Weekly · n pts" with the clock or solve time.
+- `weekly.current` gives each problem's solve time. A Weekly card on the dashboard: your points this week and the set's title.
+- Checked in the browser signed out, with no set on dev: the empty state on desktop and phone (no sideways scroll), no console errors. Production build passes; 393 tests. Deployed to Convex dev.
+- Open: a page with a running set and the signed-in states haven't been seen; they can be once the first set is seeded.
+
+### 8 Oct 2026 · Phase 5: weekly challenge engine
+- Sets live in `weekly/<slug>/` (`set.json` and `theme.md`, [decisions §15](notes/decisions.md#weekly-sets-as-built-8-oct-2026)). `problems:check` checks them (3 to 5 problems, each with a folder and in no other set, a theme, a unique order); `problems:seed` seeds the problems, then the sets (`weekly.seedSet`). A set's problems are unreleased from their first seed, so they never show before their week.
+- `weekly.start`, hourly: on Mondays (UTC) the next set by order becomes this week's and its problems join the library; last week is settled (`weekly.settle`: the top 10%, rounded up, of players with points earn Weekly top 10%, once). `force` starts a set on any day, for dev. With no set left it logs an error once.
+- A Submit sent during the week to one of the set's problems scores 100 / 200 / 400 points by difficulty, timed from `weekly.open` (or the first Submit), with 25 XP per problem and 100 for the full set (`submissions.weekly`). After the week they're ordinary problems.
+- Weekly board on Leaderboards: points, then less total time, with the time shown; last week's board stays readable and gets a final rebuild, older ones are deleted. `weekly.current` returns the set, its problems with your progress, and your total, for the Weekly page.
+- An accepted Submit shows "Weekly · +n points" and "set complete".
+- Checked: the set checker against throwaway sets (a missing folder, no theme, too few problems, a duplicate order, a problem in two sets); the Weekly tab in the browser, no console errors. 3 new tests. Production build passes; 393 tests. Deployed to Convex dev.
+- Open: no sets written yet, so nothing has run on dev; the Weekly page comes next.
+
+### 8 Oct 2026 · Phase 5: Daily page and Daily board
+- `/daily` (public, "Daily" in the nav after Play): today's problem with its difficulty and tags, the time to the next problem, Solve or Carry on with your clock running, or your solve time; your streak, best, total solved and freezes, with a nudge when today isn't solved; today's fastest solves with language and time.
+- The solve view starts your clock when today's daily opens (`daily.open`) and shows a Daily chip in the toolbar with the clock, or your solve time. An accepted Submit shows "+XP · Daily solved · n-day streak", and "freeze earned" when it earned one.
+- Daily board on Leaderboards: streak, then total dailies solved, then who got there first; Global, Country and Group like the others. Rebuilt every 5 minutes with the rest.
+- A Daily card on the dashboard: your streak and today's problem.
+- The hourly pick ran by itself on dev at midnight UTC: 8 Oct's daily is Word Frequency (Thursday, Medium).
+- Checked in the browser signed out: the Daily page (desktop and phone, no sideways scroll), the Daily board tab, no console errors. 1 new test. Production build passes; 390 tests. Deployed to Convex dev.
+- Open: the signed-in states (clock, streak card, chip, rewards) haven't been seen in the browser.
+
+### 7 Oct 2026 · Phase 5: daily challenge engine
+- Rules agreed and written down in [decisions §15](notes/decisions.md#15-daily-and-weekly-challenges): one streak (the daily), dailies never repeat while unused problems are left, weekly sets are new problems hidden until their week, the daily's difficulty follows the weekday.
+- Tables `dailyChallenges`, `dailyResults` and `streaks` (and the weekly tables, used next). `daily.pick` runs on the hour and picks the day's problem: never-used, the weekday's difficulty, then Medium, then any; with none left, the one used longest ago, with a warning in the logs. `daily.settleStreaks` at 00:05 UTC uses a freeze for a missed day or resets the streak.
+- An accepted Submit sent on the day solves the daily (not in a match), timed from `daily.open` (or the first Submit): XP 30 + 5 per streak day after the first (max +50), a freeze every 7 days (max 2), and 4 new badges (7-, 30- and 100-day streaks; Weekly top 10% comes with the weekly). The submission records it (`submissions.daily`).
+- `problems.unreleased` and `isListed` hide a weekly set's problems everywhere (library, solve page, Submit, matches, ghosts) until its week.
+- `daily.today` (problem, reset time, your result and streak) and `daily.fastest` for the page. Account deletion removes streaks and results.
+- 11 new tests. 389 tests (two runner tests time out only under the full suite's load, and pass alone). Deployed to Convex dev; today's daily there is Coin Change.
 
 ### 7 Oct 2026 · Phase 4 done
 - Everything stays local until every phase is built; hosting and the private alpha with 10 to 20 friends move to the release stage (phase 10) ([decisions §12](notes/decisions.md#12-build-plan-phases)).

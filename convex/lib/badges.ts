@@ -11,7 +11,7 @@ import type { Language } from "../judge/types";
 import { TITLES, levelForXp } from "./levels";
 import { PROVISIONAL_GAMES, TIERS, tierFor } from "./ratings";
 
-export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1";
+export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1" | "challenges";
 
 export type Badge = {
   // Stored in userBadges; never changes once released.
@@ -25,6 +25,7 @@ export type Badge = {
 const SOLVE_MILESTONES = [10, 50, 100, 500];
 const LANGUAGE_SOLVES = 50;
 const POLYGLOT_LANGUAGES = 5;
+export const STREAK_BADGES = [7, 30, 100];
 
 const languages = Object.keys(LANGUAGES) as Language[];
 // Initiate is everyone's from the start, so it has no badge.
@@ -72,6 +73,19 @@ export const BADGES: Badge[] = [
     name: band.tier,
     description: `Reach a 1v1 rating of ${band.from} once your rating is no longer provisional.`,
   })),
+  // Granted in lib/daily.ts and weekly.ts (decisions §15).
+  ...STREAK_BADGES.map((days) => ({
+    id: `streak-${days}`,
+    group: "challenges" as const,
+    name: `${days}-day streak`,
+    description: `Solve the daily challenge ${days} days in a row.`,
+  })),
+  {
+    id: "weekly-top-10",
+    group: "challenges",
+    name: "Weekly top 10%",
+    description: "Finish a weekly challenge in the top 10%.",
+  },
 ];
 
 /** Grants a badge once; returns whether it was new. */

@@ -1,0 +1,21 @@
+{
+  "slug": "kth-smallest-pair-distance",
+  "title": "Kth Smallest Pair Distance",
+  "difficulty": "hard",
+  "tags": ["arrays", "binary-search", "two-pointers", "sorting"],
+  "mode": "function",
+  "signature": {
+    "functionName": "kthSmallestDistance",
+    "params": [
+      { "name": "nums", "type": "int[]" },
+      { "name": "k", "type": "long" }
+    ],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

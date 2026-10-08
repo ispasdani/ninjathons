@@ -1,0 +1,5 @@
+{
+  "title": "Building Up",
+  "order": 6,
+  "problems": ["house-robber", "paths-around-obstacles", "equal-halves", "pop-the-balloons"]
+}

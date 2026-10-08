@@ -11,6 +11,7 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import type { Language } from "@/convex/judge/types";
 import { CodeEditor } from "./code-editor";
+import { ChallengeChips } from "./challenge-chips";
 import { ProblemStatement } from "./problem-statement";
 import { Split } from "./split";
 import { SubmissionsList } from "./submissions-list";
@@ -163,6 +164,7 @@ export function SolveView({ slug }: { slug: string }) {
           /
         </span>
         <span className="truncate text-[13px] font-medium">{problem.title}</span>
+        <ChallengeChips slug={slug} />
 
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <select

@@ -101,6 +101,9 @@ export const problems = defineTable({
   hints: v.array(v.string()),
   // beta: practice only. approved: may appear in ranked matches.
   status: v.union(v.literal("draft"), v.literal("beta"), v.literal("approved")),
+  // In a weekly set that hasn't started: hidden everywhere until its Monday
+  // (decisions §15). Set by the weekly seed, cleared when the set starts.
+  unreleased: v.optional(v.boolean()),
 })
   .index("by_slug", ["slug"])
   .index("by_status", ["status"]);

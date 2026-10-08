@@ -12,6 +12,7 @@ const GROUPS = [
   ["languages", "Languages"],
   ["levels", "Levels"],
   ["1v1", "1v1"],
+  ["challenges", "Challenges"],
 ] as const;
 
 function rarityText(rarity: number) {

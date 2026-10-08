@@ -1,0 +1,18 @@
+{
+  "slug": "smallest-covering-range",
+  "title": "Smallest Covering Range",
+  "difficulty": "medium",
+  "tags": ["heap", "sliding-window", "sorting"],
+  "mode": "function",
+  "signature": {
+    "functionName": "smallestRange",
+    "params": [{ "name": "lists", "type": "int[][]" }],
+    "returns": "int[]"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

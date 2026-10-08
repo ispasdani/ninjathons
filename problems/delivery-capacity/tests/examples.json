@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "weights": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "days": 5 },
+    "output": 15,
+    "explanation": "Days: [1, 2, 3, 4, 5], [6, 7], [8], [9], [10]. With 14, it would take 6 days."
+  },
+  {
+    "input": { "weights": [3, 2, 2, 4, 1, 4], "days": 3 },
+    "output": 6,
+    "explanation": "Days: [3, 2], [2, 4], [1, 4]."
+  },
+  {
+    "input": { "weights": [1, 2, 3, 1, 1], "days": 4 },
+    "output": 3
+  }
+]

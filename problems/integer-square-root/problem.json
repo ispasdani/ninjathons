@@ -1,0 +1,18 @@
+{
+  "slug": "integer-square-root",
+  "title": "Integer Square Root",
+  "difficulty": "easy",
+  "tags": ["math", "binary-search"],
+  "mode": "function",
+  "signature": {
+    "functionName": "integerSqrt",
+    "params": [{ "name": "xs", "type": "long[]" }],
+    "returns": "long[]"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}
