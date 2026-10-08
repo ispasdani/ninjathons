@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 6, Territory: built (rules in [decisions §16](notes/decisions.md#16-territory), engine, lobbies, Find a match, game screen, Territory board) and played in full by 3 and 6 bots on dev. **Next step:** the phase check: a group lobby of 3 to 6 real players finishing a full game, by hand.
+**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)). Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the content model, lesson and roadmap pages, progress, learning XP and the Learning board.
 
 ## Phases
 
@@ -15,7 +15,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
 | 6 | Territory | In progress | 8 Oct 2026 | |
-| 7 | Learn | Not started | | |
+| 7 | Learn | In progress | 8 Oct 2026 | |
 | 8 | Profiles and Pro | Not started | | |
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
@@ -25,6 +25,10 @@ Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7: Learn rules
+- Agreed and written up in [decisions §17](notes/decisions.md#17-learn): tutorials and 3 roadmaps, no separate courses; one kind of lesson, finished when opened and its exercises solved (earlier solves count); 15 XP per lesson, 100 per module, 4 badges and a Learning board; the free first module is marked now and locked in phase 8; HTML and CSS challenges checked in the browser against a target page (DOM and computed styles), practice only; curated MDN and Python docs; lessons and roadmaps as files checked and seeded with the problems.
+- Phase 6's check (a real group game by hand) is left for the end; phase 6 stays in progress.
 
 ### 8 Oct 2026 · Phase 6: bots in your own lobby
 - `npm run territory:sim -- [bots] --join <code> [--pace <seconds>]`: the bots (default 2) take seats in a lobby you opened, keep them alive with heartbeats, and play once you start it, waiting about 60 s between Submits (`--pace`) so a person has a chance. They stay afterwards; the teardown removes them and every game only bots played, but keeps games a person played in.

@@ -23,6 +23,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 7 Oct 2026 | Ratings per area; 1v1 uses Glicko-2 with one rating period per game | [13](#ratings) |
 | 7 Oct 2026 | Level and 1v1 boards with Global, Country and Group scopes; free private groups | [13](#leaderboards-and-groups) |
 | 8 Oct 2026 | Territory: ring values, one problem deck per difficulty, captures by send time, OpenSkill on the 1v1 scale | [16](#16-territory) |
+| 8 Oct 2026 | Learn: tutorials and 3 roadmaps (no separate courses), lessons finish when their exercises are solved, HTML and CSS checked in the browser, curated MDN and Python docs | [17](#17-learn) |
 
 ---
 
@@ -547,3 +548,47 @@ Agreed 8 Oct 2026, at the start of phase 6. Adds to the roadmap's rules (Compete
 ### As built
 
 - Territory has its own tables (`territoryGames`, `territoryPlayers`, `territoryRegions`, `territoryEvents`, lobbies and queue) rather than sharing `matches`, which assumes one problem and two players.
+
+## 17. Learn
+
+Agreed 8 Oct 2026, at the start of phase 7. Adds to the roadmap's rules (Learn, Progression) and §8 (HTML and CSS).
+
+### What's in phase 7
+
+- **Tutorials and 3 roadmaps** (Programming basics, Data structures and algorithms, Interview prep). **No separate courses:** a roadmap's modules are its course. Per-language courses ("Learn Rust through 40 problems") wait until after launch, in line with the cut order (§12).
+- **HTML and CSS challenges,** checked in the browser (below).
+- **The docs library:** curated MDN (JavaScript, HTML, CSS) and Python pages. The Java, .NET, C++ and Rust sets come later.
+
+### Lessons, tutorials and roadmaps
+
+- **One kind of lesson:** a page of teaching (Markdown, with code in JavaScript and Python unless the lesson is about one language) that ends in 1 to 3 exercises. Exercises are ordinary library problems (or HTML and CSS challenges), so anyone can still solve them from the library; the teaching around them is what's Pro.
+- **A tutorial is a lesson that stands on its own.** Tutorials are free and public: readable signed out, with their own pages for search. About 20 at launch.
+- **A roadmap is an ordered path of 4 to 6 modules,** each 2 to 4 lessons, drawn as nodes on a path with progress per node. A module can use tutorials (which stay free) as well as lessons written for the roadmap.
+- **Pro (phase 8): the first module of each roadmap is free, the rest is Pro.** Each module records whether it's the free preview now; everything stays open until phase 8 adds the lock and its refusal tests. Lesson text is served by a Convex query, never built into a page, so phase 8 only has to lock the query. A roadmap's title and outline are public.
+- **A lesson is finished when you've opened it signed in and every exercise is solved,** in any language, in any order. Solves from before count, so a player who already solved the exercises finishes the lesson by opening it. No "mark as read" button.
+- **A module is finished when all its lessons are; a roadmap when all its modules are.**
+
+### XP, badges and the Learning board
+
+- **XP (roadmap, Progression): 15 per lesson or tutorial, 100 per module,** once each, keyed `lesson:<slug>` and `module:<roadmap>:<module>`. A finished roadmap gives its badge, not more XP. Exercise solves give their normal solve XP on top.
+- **Badges (4):** First lesson (the roadmap's "first tutorial"; any lesson counts), and one per finished roadmap. Names are placeholders.
+- **Learning board:** learning XP (lessons and modules), all time and per calendar month in UTC, with Global, Country and Group scopes and ties to whoever got there first, like the Level board.
+- **Account deletion** removes the player's lesson and roadmap progress.
+
+### HTML and CSS challenges
+
+- **"Build the same output as this one":** a challenge has a target page, starter files and a list of checks. The player edits HTML, CSS or both (the challenge says which) and sees their page next to the target, with a toggle to lay the target over it.
+- **Checked in the browser:** the player's page and the target render in sandboxed iframes at the same width (and at a second, narrow width for responsive challenges), and each check compares the two: elements present and their count and text, chosen computed styles, and position and size within a few pixels. Scripts never run in either page. Run and Submit are instant and free.
+- **Practice only (§8):** web challenges are in the library and lessons, never in the daily, weekly, 1v1 or Territory. An accepted Submit gives normal solve XP (keyed `solve:<slug>:web`) and counts for lessons. The verdict is the browser's own, so it could be faked; the XP at stake is small and each challenge pays once, and V1.1's server-side visual judge will re-check them.
+- **Written like problems:** a folder in `problems/` with `"mode": "web"`, the target, the starter files, the checks, a reference that must pass and at least one wrong answer that must fail. `problems:check` runs them in a headless browser.
+
+### The docs library
+
+- **Curated pages, imported into Convex** with their source and license line (MDN: CC-BY-SA 2.5; Python: PSF License): the JavaScript built-ins, the HTML elements and CSS properties the lessons and challenges use, and the Python built-ins, built-in types and the standard modules problems use (`collections`, `heapq`, `bisect`, `itertools`, `functools`, `math`, `re`).
+- **A docs panel in the solve view,** searchable, for the language you're using. Allowed in ranked 1v1 (§9) for JavaScript, TypeScript and Python; doc pages opened during a match are logged for the result ("used 2 doc pages"). The other languages show "no docs yet" until their sets arrive.
+
+### Content files
+
+- **Lessons** are folders, `learn/lessons/<slug>/`: `lesson.json` (`{ "title", "summary", "tutorial": true|false, "exercises": [slugs] }`) and `lesson.md`. **Roadmaps** are `learn/roadmaps/<slug>/roadmap.json` (`{ "title", "summary", "order", "modules": [{ "slug", "title", "summary", "free", "lessons": [slugs] }] }`) and `intro.md`.
+- **`npm run problems:check` and `problems:seed`** with no slugs also check and seed lessons and roadmaps, as they do weekly sets. A lesson's exercises must exist and not be drafts; a lesson belongs to at most one roadmap module, except tutorials; exactly the first module is free.
+- **Order of work:** the content model, pages, progress, XP and board first; then HTML and CSS challenges; then the content (about 20 tutorials, 3 roadmaps, and the easy problems Programming basics needs); the docs library last.
