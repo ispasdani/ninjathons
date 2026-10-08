@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
+import { Flame } from "lucide-react";
 import Link from "next/link";
 
 import { api } from "@/convex/_generated/api";
@@ -15,7 +16,8 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
   const earned = submission.badgesEarned ?? [];
   const badges = useQuery(api.badges.list, earned.length ? {} : "skip");
 
-  if (submission.xpAwarded === undefined) {
+  const daily = submission.daily;
+  if (submission.xpAwarded === undefined && !daily) {
     return (
       <p className="text-[13px] text-muted-foreground">
         No XP this time: you&apos;ve already solved this problem in this language. Try another language for more.
@@ -24,11 +26,21 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
   }
 
   const names = earned.map((id) => badges?.find((b) => b.id === id)?.name ?? "…");
+  const xp = (submission.xpAwarded ?? 0) + (daily?.xp ?? 0);
   return (
     <div className="flex flex-wrap items-center gap-2 text-[13px]" role="status">
-      <span className="rounded-xs bg-brand px-1.5 py-0.5 font-mono text-xs font-medium text-brand-foreground tabular-nums">
-        +{submission.xpAwarded} XP
-      </span>
+      {xp > 0 && (
+        <span className="rounded-xs bg-brand px-1.5 py-0.5 font-mono text-xs font-medium text-brand-foreground tabular-nums">
+          +{xp} XP
+        </span>
+      )}
+      {daily && (
+        <Link href="/daily" className="flex items-center gap-1 font-medium hover:underline">
+          <Flame className="size-3.5 text-brand-text" aria-hidden />
+          Daily solved · {daily.streak}-day streak
+          {daily.freezeEarned && <span className="font-normal text-text-secondary">· freeze earned</span>}
+        </Link>
+      )}
       {submission.levelReached !== undefined && (
         <span className="font-medium">
           Level {submission.levelReached} reached · {titleForLevel(submission.levelReached)}

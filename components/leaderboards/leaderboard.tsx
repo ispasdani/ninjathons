@@ -14,7 +14,7 @@ import { countryName } from "@/lib/countries";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
 
-export type BoardTab = "level" | "month" | "1v1";
+export type BoardTab = "level" | "month" | "1v1" | "daily";
 export type Scope = "global" | "country" | "group";
 
 const PAGE = 50;
@@ -23,12 +23,14 @@ const BOARDS: [BoardTab, string][] = [
   ["level", "Level"],
   ["month", "This month"],
   ["1v1", "1v1"],
+  ["daily", "Daily"],
 ];
 
 const ABOUT: Record<BoardTab, string> = {
   level: "Total XP from every area. XP only goes up.",
   month: "XP earned this calendar month (UTC). Starts again on the 1st.",
   "1v1": "1v1 rating. Shown after 10 ranked games; hidden after 30 days without one.",
+  daily: "Daily challenge streak, then total dailies solved. Miss a day without a freeze and the streak starts again.",
 };
 
 function updatedAgo(builtAt: number | null, now: number) {
@@ -79,7 +81,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
     router.replace(params.size ? `${pathname}?${params}` : pathname, { scroll: false });
   }
 
-  const unit = board === "1v1" ? "Rating" : "XP";
+  const unit = board === "1v1" ? "Rating" : board === "daily" ? "Streak" : "XP";
   const me = data?.me ?? null;
 
   return (
@@ -135,7 +137,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                 {me.rank ? `#${me.rank.toLocaleString("en")}` : "Not ranked yet"}
               </span>
               <span className="font-mono tabular-nums">
-                {me.value.toLocaleString("en")} {unit === "XP" ? "XP" : ""}
+                {me.value.toLocaleString("en")} {unit === "XP" ? "XP" : unit === "Streak" ? (me.value === 1 ? "day" : "days") : ""}
               </span>
               {me.rank === null && scope !== "group" && (
                 <span className="text-muted-foreground">You&apos;ll appear within 5 minutes.</span>
@@ -154,7 +156,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                 <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
                   <th className="w-16 py-3 pl-4 text-right font-medium">Rank</th>
                   <th className="py-3 pl-6 font-medium">Player</th>
-                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" ? "Tier" : "Level"}</th>
+                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" ? "Tier" : board === "daily" ? "Solved" : "Level"}</th>
                   <th className="py-3 pr-4 text-right font-medium">{unit}</th>
                 </tr>
               </thead>
@@ -172,6 +174,8 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                         ? "No more players."
                         : board === "1v1"
                           ? "No one is ranked yet. Players appear after 10 ranked games."
+                          : board === "daily"
+                            ? "No streaks yet. Solve today's daily to start one."
                           : "No one is here yet. Solve a problem to be the first."}
                     </td>
                   </tr>
@@ -207,7 +211,9 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                           </span>
                         </td>
                         <td className="hidden pr-4 sm:table-cell">
-                          {"tier" in row ? (
+                          {"totalSolved" in row ? (
+                            <span className="font-mono tabular-nums">{row.totalSolved.toLocaleString("en")}</span>
+                          ) : "tier" in row ? (
                             <TierName tier={row.tier} />
                           ) : (
                             <span>

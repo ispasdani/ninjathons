@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: the daily challenge engine is built. **Next step:** the Daily page and the Daily board.
+**Now:** Phase 5, daily and weekly challenges: the daily challenge is playable, with its page and board. **Next step:** the weekly challenge engine.
 
 ## Phases
 
@@ -25,6 +25,15 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5: Daily page and Daily board
+- `/daily` (public, "Daily" in the nav after Play): today's problem with its difficulty and tags, the time to the next problem, Solve or Carry on with your clock running, or your solve time; your streak, best, total solved and freezes, with a nudge when today isn't solved; today's fastest solves with language and time.
+- The solve view starts your clock when today's daily opens (`daily.open`) and shows a Daily chip in the toolbar with the clock, or your solve time. An accepted Submit shows "+XP · Daily solved · n-day streak", and "freeze earned" when it earned one.
+- Daily board on Leaderboards: streak, then total dailies solved, then who got there first; Global, Country and Group like the others. Rebuilt every 5 minutes with the rest.
+- A Daily card on the dashboard: your streak and today's problem.
+- The hourly pick ran by itself on dev at midnight UTC: 8 Oct's daily is Word Frequency (Thursday, Medium).
+- Checked in the browser signed out: the Daily page (desktop and phone, no sideways scroll), the Daily board tab, no console errors. 1 new test. Production build passes; 390 tests. Deployed to Convex dev.
+- Open: the signed-in states (clock, streak card, chip, rewards) haven't been seen in the browser.
 
 ### 7 Oct 2026 · Phase 5: daily challenge engine
 - Rules agreed and written down in [decisions §15](notes/decisions.md#15-daily-and-weekly-challenges): one streak (the daily), dailies never repeat while unused problems are left, weekly sets are new problems hidden until their week, the daily's difficulty follows the weekday.

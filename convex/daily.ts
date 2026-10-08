@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { internalMutation } from "./_generated/server";
+import { LANGUAGES } from "./judge/languages";
 import { dailyFor, difficultyForDay, openDaily, settle, streakOf } from "./lib/daily";
 import { addDays, dayKey, dayStart } from "./lib/days";
 import { getCurrentUserOrNull, publicQuery, userMutation } from "./lib/functions";
@@ -161,7 +162,7 @@ export const fastest = publicQuery({
           name: user?.name ?? "Deleted player",
           imageUrl: user?.imageUrl ?? "",
           timeMs: r.timeMs!,
-          language: r.language ?? null,
+          language: r.language ? LANGUAGES[r.language].label : null,
         };
       }),
     );
