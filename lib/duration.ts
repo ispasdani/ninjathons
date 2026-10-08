@@ -6,3 +6,12 @@ export function duration(ms: number) {
   const s = String(total % 60).padStart(2, "0");
   return h ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
 }
+
+/** Time left, roughly: "2 d 5 h", "5 h 12 min", "12 min". */
+export function timeLeft(ms: number) {
+  const minutes = Math.max(0, Math.ceil(ms / 60_000));
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor((minutes % 1440) / 60);
+  if (days) return `${days} d ${hours} h`;
+  return hours ? `${hours} h ${minutes % 60} min` : `${minutes} min`;
+}

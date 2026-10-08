@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: the daily challenge is playable; the weekly engine and board are built. **Next step:** the Weekly page.
+**Now:** Phase 5, daily and weekly challenges: both challenges are built, with their pages and boards. **Next step:** write the 6 weekly sets (18 to 30 new problems).
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5: Weekly page
+- `/weekly` (public, "Weekly" in the nav after Daily): the set's title and theme (markdown), the time left, its problems in order with difficulty and points, your clock or solve time on each and Solve, Carry on or Open; Your week: points out of the set's total with a bar, solved, total time, and the rewards. With no set this week it says so and points to the daily.
+- The solve view's chip now covers both challenges (`components/solve/challenge-chips.tsx`): on a problem of this week's set it starts that problem's clock (`weekly.open`) and shows "Weekly · n pts" with the clock or solve time.
+- `weekly.current` gives each problem's solve time. A Weekly card on the dashboard: your points this week and the set's title.
+- Checked in the browser signed out, with no set on dev: the empty state on desktop and phone (no sideways scroll), no console errors. Production build passes; 393 tests. Deployed to Convex dev.
+- Open: a page with a running set and the signed-in states haven't been seen; they can be once the first set is seeded.
 
 ### 8 Oct 2026 · Phase 5: weekly challenge engine
 - Sets live in `weekly/<slug>/` (`set.json` and `theme.md`, [decisions §15](notes/decisions.md#weekly-sets-as-built-8-oct-2026)). `problems:check` checks them (3 to 5 problems, each with a folder and in no other set, a theme, a unique order); `problems:seed` seeds the problems, then the sets (`weekly.seedSet`). A set's problems are unreleased from their first seed, so they never show before their week.

@@ -145,7 +145,11 @@ describe("weekly solve", () => {
     const current = await ada.as.query(api.weekly.current, {});
     expect(current.me).toEqual({ points: 700, timeMs: 600_000, solved: 3 });
     expect(current.set?.maxPoints).toBe(700);
-    expect(current.set?.problems.every((p) => p.solvedAt !== null)).toBe(true);
+    expect(current.set?.problems.map((p) => [p.slug, p.points, p.timeMs])).toEqual([
+      ["f-easy", 100, 0],
+      ["f-medium", 200, 0],
+      ["f-hard", 400, 600_000],
+    ]);
     // Solve XP (10 + 40 + 20) plus weekly XP (3 × 25 + 100).
     expect((await t.run((ctx) => ctx.db.get(ada.userId)))?.xp).toBe(70 + 175);
 

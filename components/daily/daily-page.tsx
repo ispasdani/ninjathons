@@ -7,19 +7,13 @@ import Link from "next/link";
 import { Difficulty } from "@/components/problem/difficulty";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
-import { duration } from "@/lib/duration";
+import { duration, timeLeft } from "@/lib/duration";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 // At most 2 freezes are held (decisions §15).
 const MAX_FREEZES = 2;
-
-function resetsIn(ms: number) {
-  const minutes = Math.max(0, Math.ceil(ms / 60_000));
-  const h = Math.floor(minutes / 60);
-  return h ? `${h} h ${minutes % 60} min` : `${minutes} min`;
-}
 
 /**
  * The Daily page (decisions §15): today's problem, the reset countdown, your
@@ -47,7 +41,7 @@ export function DailyPage() {
           </p>
         </div>
         <p className="font-mono text-[13px] text-muted-foreground tabular-nums">
-          New problem in {resetsIn(today.endsAt - now)}
+          New problem in {timeLeft(today.endsAt - now)}
         </p>
       </header>
 

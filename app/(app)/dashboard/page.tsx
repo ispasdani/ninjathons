@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const badges = useQuery(api.badges.list);
   const board = useQuery(api.leaderboards.board, { board: "level", scope: "global", limit: 1 });
   const daily = useQuery(api.daily.today);
+  const weekly = useQuery(api.weekly.current);
 
   if (user === undefined) {
     return <p className="text-[13px] text-muted-foreground">Loading…</p>;
@@ -91,6 +92,16 @@ export default function DashboardPage() {
               : daily.me?.solvedAt != null
                 ? `Solved today: ${daily.problem.title}`
                 : `Today: ${daily.problem.title}`}
+          </p>
+        </Link>
+        <Link href="/weekly" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+          <p className={eyebrow}>Weekly challenge</p>
+          <p className="mt-3 font-mono text-4xl font-medium tabular-nums">
+            {weekly?.me?.points ?? 0}
+            {weekly?.set && <span className="text-lg text-muted-foreground"> / {weekly.set.maxPoints}</span>}
+          </p>
+          <p className="mt-2 truncate text-[13px] text-muted-foreground">
+            {weekly?.set ? `This week: ${weekly.set.title}` : "No set this week. The next starts on Monday."}
           </p>
         </Link>
         <Link href="/leaderboards" className="rounded-md border p-6 transition-colors hover:border-border-strong">

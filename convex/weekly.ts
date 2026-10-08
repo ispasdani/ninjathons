@@ -139,6 +139,7 @@ export const current = publicQuery({
         points: WEEKLY_POINTS[problem.difficulty],
         openedAt: progress?.openedAt ?? null,
         solvedAt: progress?.solvedAt ?? null,
+        timeMs: progress?.solvedAt !== undefined ? progress.solvedAt - progress.openedAt : null,
       });
     }
 
