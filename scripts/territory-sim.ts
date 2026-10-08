@@ -1,5 +1,6 @@
 /**
  * npm run territory:sim [players] [--ranked] [--keep]
+ * npm run territory:sim [bots] --join <code> [--pace <seconds>]
  *
  * Plays one whole Territory game on the Convex dev deployment with bots
  * (convex/territorySim.ts): bot accounts in a lobby, started like a host's
@@ -11,6 +12,12 @@
  * Passes when the game finishes by the rules with every bot placed. Then the
  * bots and their games are removed, unless --keep (remove later with
  * `npx convex run territorySim:teardown`). Default: 3 players, unranked.
+ *
+ * With --join, the bots (default 2) take seats in a lobby you opened, keep
+ * them alive, and play once you start it from the lobby page. They wait
+ * about --pace seconds between Submits (default 60), so a person has a
+ * chance. They stay afterwards so you can look at the result; the teardown
+ * removes them but keeps your games.
  */
 import { spawn } from "node:child_process";
 import { join } from "node:path";
@@ -76,19 +83,51 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
   const flags = process.argv.slice(2);
-  const players = Number(flags.find((a) => !a.startsWith("--")) ?? 3);
+  const option = (name: string) => {
+    const i = flags.indexOf(name);
+    return i >= 0 ? flags[i + 1] : undefined;
+  };
+  const code = option("--join");
+  const values = new Set([code, option("--pace")]);
+  const count = flags.find((a) => !a.startsWith("--") && !values.has(a));
+  const players = Number(count ?? (code ? 2 : 3));
   const ranked = flags.includes("--ranked");
-  const keep = flags.includes("--keep");
+  const keep = flags.includes("--keep") || code !== undefined;
+  const paceMs = Number(option("--pace") ?? (code ? 60 : 0)) * 1000;
 
-  console.log(`Setting up ${players} bots (${ranked ? "ranked" : "unranked"})…`);
-  const { gameId } = (await convex("territorySim:setup", { players, ranked })) as { gameId: string };
+  let gameId: string;
+  let botIds: string[];
+  if (code) {
+    console.log(`Seating ${players} bots in lobby ${code}…`);
+    botIds = ((await convex("territorySim:joinLobby", { code, players })) as { userIds: string[] }).userIds;
+    console.log("Bots are in. Start the game from the lobby page when you're ready.");
+    while (true) {
+      const lobby = (await convex("territorySim:lobbyHeartbeat", { code, userIds: botIds })) as {
+        status: string;
+        gameId: string | null;
+      };
+      if (lobby.gameId) {
+        gameId = lobby.gameId;
+        break;
+      }
+      if (lobby.status !== "open") throw new Error(`the lobby is ${lobby.status}`);
+      await sleep(8_000);
+    }
+  } else {
+    console.log(`Setting up ${players} bots (${ranked ? "ranked" : "unranked"})…`);
+    const setup = (await convex("territorySim:setup", { players, ranked })) as { gameId: string; userIds: string[] };
+    gameId = setup.gameId;
+    botIds = setup.userIds;
+  }
   console.log(`Game ${gameId}`);
-  const map = buildMap(players);
+  // Each bot's next move, after its thinking time.
+  const nextMoveAt = new Map<string, number>();
   const started = Date.now();
   let submits = 0;
   let wrong = 0;
   let refused = 0;
   let state: State | null = null;
+  let map: ReturnType<typeof buildMap> | null = null;
 
   while (true) {
     state = (await convex("territorySim:state", { gameId })) as State;
@@ -97,12 +136,15 @@ async function main() {
       await sleep(Math.max(500, state.startsAt - state.now));
       continue;
     }
+    const board = (map ??= buildMap(state.players.length));
     const moves: Promise<void>[] = [];
     for (const bot of state.players) {
-      if (state.timeUp || bot.busy) continue;
+      if (!botIds.includes(bot.userId) || state.timeUp || bot.busy) continue;
       if (bot.lastSubmitAt && state.now - bot.lastSubmitAt < SUBMIT_COOLDOWN_MS) continue;
-      const options = map
-        .map((region) => ({ region, take: checkTake(map, state!.regions, bot.userId, region.index, state!.now) }))
+      if (!nextMoveAt.has(bot.userId)) nextMoveAt.set(bot.userId, Date.now() + paceMs * Math.random());
+      if (Date.now() < nextMoveAt.get(bot.userId)!) continue;
+      const options = board
+        .map((region) => ({ region, take: checkTake(board, state!.regions, bot.userId, region.index, state!.now) }))
         .filter((o) => o.take.ok && bot.cards[(o.take as { level: Level }).level])
         .sort((a, b) => b.region.value - a.region.value || Math.random() - 0.5);
       const choice = options[0];
@@ -112,6 +154,7 @@ async function main() {
       const solution = solutionFor(slug, bot.language, sendWrong);
       if (!solution) continue;
       submits++;
+      nextMoveAt.set(bot.userId, Date.now() + paceMs * (0.5 + Math.random()));
       if (sendWrong && solution.kind === "wrong") wrong++;
       moves.push(
         convex("territorySim:submit", {
@@ -151,6 +194,8 @@ async function main() {
   if (!keep) {
     await convex("territorySim:teardown", {});
     console.log("Bots and their games removed.");
+  } else {
+    console.log("Bots kept. Remove them with: npx convex run territorySim:teardown");
   }
   process.exit(ok ? 0 : 1);
 }

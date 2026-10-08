@@ -1,24 +1,32 @@
 /**
  * Bots for playing whole Territory games on the dev deployment (npm run
- * territory:sim): bot accounts, a lobby started like a host's Start, Submits
- * judged in the real runner, and a teardown that removes every trace.
+ * territory:sim): bot accounts, a lobby started like a host's Start (or
+ * seats in your own lobby, --join), Submits judged in the real runner, and a
+ * teardown that removes the bots and every game only bots played.
  * Internal, so only the CLI can call these.
  */
 import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { internalAction, internalMutation, internalQuery } from "./_generated/server";
-import { randomCode } from "./lib/codes";
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+  type MutationCtx,
+  type QueryCtx,
+} from "./_generated/server";
+import { normalizeCode, randomCode } from "./lib/codes";
 import {
   checkTerritorySubmit,
   currentCard,
+  leaveTerritoryWaiting,
   noteTerritorySubmit,
   openGameOf,
   playersOf,
   regionsOf,
 } from "./lib/territory";
-import { buildMap, LEVELS, winningPoints } from "./lib/territoryMap";
+import { buildMap, LEVELS, MAX_PLAYERS, winningPoints } from "./lib/territoryMap";
 import { language } from "./schemas/problems";
 import { startLobby } from "./territoryLobbies";
 
@@ -29,31 +37,87 @@ function botClerkId(i: number) {
   return `${BOT_PREFIX}${i}`;
 }
 
+/** Makes (or reuses) bots 1 to `players`, none of them in a game. */
+async function makeBots(ctx: MutationCtx, players: number) {
+  const userIds: Id<"users">[] = [];
+  for (let i = 1; i <= players; i++) {
+    const clerkId = botClerkId(i);
+    let user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+      .unique();
+    if (!user) {
+      const id = await ctx.db.insert("users", {
+        clerkId,
+        email: `${clerkId}@example.invalid`,
+        name: `Sim bot ${i}`,
+        imageUrl: "",
+        username: `simbot${i}`,
+        usernameKey: `simbot${i}`,
+      });
+      user = (await ctx.db.get(id))!;
+    }
+    if (await openGameOf(ctx, user._id)) throw new Error(`simbot${i} is still in a game; run the teardown`);
+    userIds.push(user._id);
+  }
+  return userIds;
+}
+
+async function lobbyByCode(ctx: QueryCtx, code: string) {
+  return await ctx.db
+    .query("territoryLobbies")
+    .withIndex("by_code", (q) => q.eq("code", normalizeCode(code)))
+    .unique();
+}
+
+/** Seats `players` bots in someone's open lobby (--join), for its host to start. */
+export const joinLobby = internalMutation({
+  args: { code: v.string(), players: v.number() },
+  handler: async (ctx, { code, players }) => {
+    const lobby = await lobbyByCode(ctx, code);
+    if (!lobby || lobby.status !== "open" || lobby.expiresAt <= Date.now()) throw new Error(`no open lobby ${code}`);
+    const seats = await ctx.db
+      .query("territoryLobbyPlayers")
+      .withIndex("by_lobby", (q) => q.eq("lobbyId", lobby._id))
+      .collect();
+    if (seats.length + players > MAX_PLAYERS) {
+      throw new Error(`the lobby has ${seats.length} players; at most ${MAX_PLAYERS - seats.length} bots fit`);
+    }
+    const userIds = await makeBots(ctx, players);
+    const now = Date.now();
+    for (const [i, userId] of userIds.entries()) {
+      if (seats.some((s) => s.userId === userId)) continue;
+      await leaveTerritoryWaiting(ctx, userId);
+      await ctx.db.insert("territoryLobbyPlayers", { lobbyId: lobby._id, userId, language: LANGUAGES[i % 2], lastSeenAt: now });
+    }
+    return { userIds };
+  },
+});
+
+/**
+ * Keeps the bots' seats alive, as the lobby page's heartbeat does, and says
+ * whether the host has started: the game id, or the lobby's status.
+ */
+export const lobbyHeartbeat = internalMutation({
+  args: { code: v.string(), userIds: v.array(v.id("users")) },
+  handler: async (ctx, { code, userIds }) => {
+    const lobby = await lobbyByCode(ctx, code);
+    if (!lobby) return { status: "closed" as const, gameId: null };
+    const seats = await ctx.db
+      .query("territoryLobbyPlayers")
+      .withIndex("by_lobby", (q) => q.eq("lobbyId", lobby._id))
+      .collect();
+    for (const seat of seats) if (userIds.includes(seat.userId)) await ctx.db.patch(seat._id, { lastSeenAt: Date.now() });
+    const open = lobby.status === "open" && lobby.expiresAt > Date.now();
+    return { status: open ? ("open" as const) : lobby.status, gameId: lobby.gameId ?? null };
+  },
+});
+
 /** Makes (or reuses) the bots, seats them in a lobby hosted by the first, and starts it. */
 export const setup = internalMutation({
   args: { players: v.number(), ranked: v.boolean() },
   handler: async (ctx, { players, ranked }) => {
-    const userIds: Id<"users">[] = [];
-    for (let i = 1; i <= players; i++) {
-      const clerkId = botClerkId(i);
-      let user = await ctx.db
-        .query("users")
-        .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
-        .unique();
-      if (!user) {
-        const id = await ctx.db.insert("users", {
-          clerkId,
-          email: `${clerkId}@example.invalid`,
-          name: `Sim bot ${i}`,
-          imageUrl: "",
-          username: `simbot${i}`,
-          usernameKey: `simbot${i}`,
-        });
-        user = (await ctx.db.get(id))!;
-      }
-      if (await openGameOf(ctx, user._id)) throw new Error(`simbot${i} is still in a game; run the teardown`);
-      userIds.push(user._id);
-    }
+    const userIds = await makeBots(ctx, players);
     const now = Date.now();
     const lobbyId = await ctx.db.insert("territoryLobbies", {
       hostId: userIds[0],
@@ -159,16 +223,24 @@ export const submit = internalMutation({
   },
 });
 
-/** The bots' games, lobbies and Submits, before their accounts go. */
+/**
+ * The bots' games, lobbies and Submits, before their accounts go. A game a
+ * person played in (--join) stays: only the bots' side of it goes, with
+ * their accounts, so its regions show a deleted player's.
+ */
 export const clearGames = internalMutation({
   args: {},
   handler: async (ctx) => {
+    const bots = [];
     for (let i = 1; i <= 6; i++) {
       const user = await ctx.db
         .query("users")
         .withIndex("by_clerkId", (q) => q.eq("clerkId", botClerkId(i)))
         .unique();
-      if (!user) continue;
+      if (user) bots.push(user);
+    }
+    const botIds = new Set(bots.map((b) => b._id));
+    for (const user of bots) {
       const rows = await ctx.db
         .query("territoryPlayers")
         .withIndex("by_user", (q) => q.eq("userId", user._id))
@@ -176,6 +248,11 @@ export const clearGames = internalMutation({
       for (const row of rows) {
         const gameId = row.gameId;
         if (!(await ctx.db.get(gameId))) continue;
+        const everyone = await ctx.db
+          .query("territoryPlayers")
+          .withIndex("by_game", (q) => q.eq("gameId", gameId))
+          .collect();
+        if (everyone.some((p) => !botIds.has(p.userId))) continue;
         const tables = [
           await ctx.db.query("territoryRegions").withIndex("by_game_index", (q) => q.eq("gameId", gameId)).collect(),
           await ctx.db.query("territoryEvents").withIndex("by_game", (q) => q.eq("gameId", gameId)).collect(),

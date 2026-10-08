@@ -26,6 +26,11 @@ Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 8 Oct 2026 · Phase 6: bots in your own lobby
+- `npm run territory:sim -- [bots] --join <code> [--pace <seconds>]`: the bots (default 2) take seats in a lobby you opened, keep them alive with heartbeats, and play once you start it, waiting about 60 s between Submits (`--pace`) so a person has a chance. They stay afterwards; the teardown removes them and every game only bots played, but keeps games a person played in.
+- For testing alone; it doesn't count as the phase check. Clerk's development instance takes test emails (`name+clerk_test…@example.com`, code 424242) for more real accounts, each in its own browser profile or private window.
+- Checked: a bad code fails cleanly. Joining a real lobby needs a signed-in host, so it hasn't been run end to end yet.
+
 ### 8 Oct 2026 · Phase 6: game screen, Territory board, bot games
 - `/territory/<id>`: the countdown (players, ratings, languages, the map's size), then the HUD (server timer, one score bar with a marker at the winning points, everyone's points and regions, Give up) over the map and a solve-style workspace. Picking a region shows why you can or can't take it and the problem that would; the editor follows that problem (drafts per game, problem and language), with Skip, Run and Submit, and says after an accepted Submit whether it took the region, came too late, or is waiting on an earlier one. The game feed, and at the end the placement, rating change, XP, badges and final standings.
 - The map (`components/territory/hex-map.tsx`) is SVG hexes, each a button: held regions in their player's colour with the player's initials, a lock while shielded, regions you can take dashed. Checked in light and dark on a throwaway page with made-up owners (both map sizes). Two player colours added for 5 and 6 players, amber and fuchsia ([design.md 2.4](notes/design.md)).
