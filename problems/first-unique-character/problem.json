@@ -1,0 +1,32 @@
+{
+  "slug": "first-unique-character",
+  "title": "First Unique Character",
+  "difficulty": "easy",
+  "tags": [
+    "strings",
+    "hash-map",
+    "counting"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "firstUniqChar",
+    "params": [
+      {
+        "name": "s",
+        "type": "string"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

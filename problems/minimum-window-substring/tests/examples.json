@@ -1,0 +1,24 @@
+[
+  {
+    "input": {
+      "s": "ADOBECODEBANC",
+      "t": "ABC"
+    },
+    "output": "BANC"
+  },
+  {
+    "input": {
+      "s": "a",
+      "t": "aa"
+    },
+    "output": "",
+    "explanation": "t needs two a's; s has one."
+  },
+  {
+    "input": {
+      "s": "aaflslflsldkalskaaa",
+      "t": "aaa"
+    },
+    "output": "aaa"
+  }
+]

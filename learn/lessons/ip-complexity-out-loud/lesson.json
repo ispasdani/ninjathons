@@ -1,0 +1,8 @@
+{
+  "title": "Stating time and space",
+  "summary": "Work out the complexity of your own code quickly, and say it with the reason.",
+  "tutorial": false,
+  "exercises": [
+    "rotate-array"
+  ]
+}

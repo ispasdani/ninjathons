@@ -1,0 +1,32 @@
+{
+  "slug": "group-anagrams",
+  "title": "Group Anagrams",
+  "difficulty": "medium",
+  "tags": [
+    "strings",
+    "hash-map",
+    "sorting"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "groupAnagrams",
+    "params": [
+      {
+        "name": "words",
+        "type": "string[]"
+      }
+    ],
+    "returns": "string[][]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

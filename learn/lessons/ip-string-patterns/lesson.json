@@ -1,0 +1,8 @@
+{
+  "title": "Which pattern? Strings",
+  "summary": "Counting, canonical forms and windows: what matters about the strings, and how to key them.",
+  "tutorial": false,
+  "exercises": [
+    "group-anagrams"
+  ]
+}

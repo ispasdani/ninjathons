@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with Programming basics, Data structures and algorithms, all 20 tutorials and the docs library built and seeded. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the Interview prep roadmap ([curriculum](notes/curriculum.md), step 3), then the phase check.
+**Now:** Phase 7, Learn, is done: 3 roadmaps, 20 tutorials, HTML and CSS challenges and the docs library, all on dev. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass by hand over the Learn pieces (finishing a lesson, a web Submit, the Docs tab), the pull request for phase 7, then phase 8, Profiles and Pro.
 
 ## Phases
 
@@ -15,16 +15,23 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
 | 6 | Territory | In progress | 8 Oct 2026 | |
-| 7 | Learn | In progress | 8 Oct 2026 | |
+| 7 | Learn | Done | 8 Oct 2026 | 8 Oct 2026 |
 | 8 | Profiles and Pro | Not started | | |
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 78 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tutorials, 2 of 3 roadmaps, 6 of 6 weekly sets.
+Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tutorials, 3 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7 done
+- The check passes: 3 roadmaps (Programming basics, Data structures and algorithms, Interview prep) and 20 tutorials are on dev, and HTML and CSS challenges work (the judge checked in the browser and in `problems:check`; Submit covered by tests).
+- Interview prep, written and seeded: 5 modules (How interviews work free; Edge cases and complexity; Spotting the pattern; From brute force to optimal; Mock interviews), 11 lessons on the interview process itself, each ending in a new problem.
+- 10 new problems, each with JavaScript and Python references and wrong answers: First Unique Character, Merge Sorted Arrays, String to Integer, Rotate Array, Group Anagrams, Top K Frequent, Maximum Product Subarray, Minimum Window Substring, Valid Sudoku, Word Ladder. Five also have slow solutions that time out.
+- `problems:check` passes for 88 problems, 6 weekly sets, 41 lessons and 3 roadmaps.
+- Still open from phase 7, for whenever they come up: the signed-in states haven't been seen in the browser (opening and finishing a lesson, the rewards line, a web challenge Submit, the Docs tab inside the solve view, duel and Territory); tests cover them. The Docs tab has no references yet for Java, C#, C++ and Rust.
 
 ### 8 Oct 2026 · Phase 7: the docs library
 - `npm run docs:import` builds the library from `docs-library/mdn.json` and `python.json`: 498 MDN pages (JavaScript, HTML, CSS) at a pinned commit of mdn/content and 89 Python 3.14 pages, converted to Markdown (`scripts/lib/docs`, 6 tests) and uploaded to Convex, replacing the previous import ([decisions §17](notes/decisions.md#17-learn), as built). Imported to dev.

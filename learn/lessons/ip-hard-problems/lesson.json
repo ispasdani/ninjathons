@@ -1,0 +1,8 @@
+{
+  "title": "Breaking down a hard problem",
+  "summary": "Solve the core, keep the expensive check up to date in O(1), then add the complications back.",
+  "tutorial": false,
+  "exercises": [
+    "minimum-window-substring"
+  ]
+}

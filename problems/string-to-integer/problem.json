@@ -1,0 +1,32 @@
+{
+  "slug": "string-to-integer",
+  "title": "String to Integer",
+  "difficulty": "medium",
+  "tags": [
+    "strings",
+    "parsing",
+    "edge-cases"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "myAtoi",
+    "params": [
+      {
+        "name": "s",
+        "type": "string"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

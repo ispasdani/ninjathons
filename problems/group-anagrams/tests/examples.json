@@ -1,0 +1,57 @@
+[
+  {
+    "input": {
+      "words": [
+        "eat",
+        "tea",
+        "tan",
+        "ate",
+        "nat",
+        "bat"
+      ]
+    },
+    "output": [
+      [
+        "ate",
+        "eat",
+        "tea"
+      ],
+      [
+        "bat"
+      ],
+      [
+        "nat",
+        "tan"
+      ]
+    ]
+  },
+  {
+    "input": {
+      "words": [
+        ""
+      ]
+    },
+    "output": [
+      [
+        ""
+      ]
+    ]
+  },
+  {
+    "input": {
+      "words": [
+        "ab",
+        "ba",
+        "ab"
+      ]
+    },
+    "output": [
+      [
+        "ab",
+        "ab",
+        "ba"
+      ]
+    ],
+    "explanation": "A repeated word stays in its group twice."
+  }
+]

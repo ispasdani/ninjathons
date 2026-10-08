@@ -64,23 +64,23 @@ The techniques interviews and contests lean on, mostly tutorials put in order, w
 | 4. Graphs | Tutorials 11 (grids), 12 (graphs); `dsa-shortest-paths`: Shortest paths with Dijkstra: Lowest-Cost Path ✅, Signal Time\* |
 | 5. Dynamic programming and greedy | Tutorials 13 (DP basics), 14 (DP on sequences), 15 (greedy) |
 
-## Roadmap 3: Interview prep
+## Roadmap 3: Interview prep ✅ written 8 Oct 2026
 
 How to work through a problem with someone watching. Assumes roadmap 2. Its exercises are new problems, so finishing tutorials doesn't finish these lessons at the same time. Badge: Interview ready.
 
 | Module | Lessons | Exercises |
 |---|---|---|
-| 1. How interviews work (free) | `ip-step-by-step`: The coding interview, step by step | First Unique Character **(new)** |
-| | `ip-talking-it-through`: Thinking out loud | Merge Sorted Arrays **(new)** |
-| 2. Edge cases and complexity | `ip-edge-cases`: Finding the edge cases first | String to Integer **(new)** |
-| | `ip-complexity-out-loud`: Stating time and space | Rotate Array **(new)** |
+| 1. How interviews work (free) | `ip-step-by-step`: The coding interview, step by step | First Unique Character ✅ |
+| | `ip-talking-it-through`: Thinking out loud | Merge Sorted Arrays ✅ |
+| 2. Edge cases and complexity | `ip-edge-cases`: Finding the edge cases first | String to Integer ✅ |
+| | `ip-complexity-out-loud`: Stating time and space | Rotate Array ✅ |
 | 3. Spotting the pattern | `ip-array-patterns`: Which pattern? Arrays | Trapping Rain Water |
-| | `ip-string-patterns`: Which pattern? Strings | Group Anagrams **(new)** |
-| | `ip-choosing-a-structure`: Choosing the data structure | Top K Frequent **(new)** |
-| 4. From brute force to optimal | `ip-brute-force-first`: Start with brute force | Maximum Product Subarray **(new)** |
-| | `ip-hard-problems`: Breaking down a hard problem | Minimum Window Substring **(new)** |
-| 5. Mock interviews | `ip-mock-1`: Mock interview: one medium in 30 minutes | Valid Sudoku **(new)** |
-| | `ip-mock-2`: Mock interview: one hard in 45 minutes | Word Ladder **(new)** |
+| | `ip-string-patterns`: Which pattern? Strings | Group Anagrams ✅ |
+| | `ip-choosing-a-structure`: Choosing the data structure | Top K Frequent ✅ |
+| 4. From brute force to optimal | `ip-brute-force-first`: Start with brute force | Maximum Product Subarray ✅ |
+| | `ip-hard-problems`: Breaking down a hard problem | Minimum Window Substring ✅ |
+| 5. Mock interviews | `ip-mock-1`: Mock interview: one medium in 30 minutes | Valid Sudoku ✅ |
+| | `ip-mock-2`: Mock interview: one hard in 45 minutes | Word Ladder ✅ |
 
 ## Totals
 
@@ -97,5 +97,5 @@ How to work through a problem with someone watching. Assumes roadmap 2. Its exer
 
 1. ✅ The 12 Programming basics problems and its 9 lessons, so one roadmap is complete end to end (with tutorials 1, 17, 19, 20 and the 3 HTML and CSS challenges).
 2. ✅ The 6 tutorial problems, the remaining tutorials (15 after step 1), and the DSA roadmap (1 lesson + 1 problem).
-3. The 10 Interview prep problems and its 11 lessons.
+3. ✅ The 10 Interview prep problems and its 11 lessons.
 4. The 3 HTML and CSS challenges go with their lessons, in steps 1 and 2.

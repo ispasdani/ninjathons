@@ -1,0 +1,8 @@
+{
+  "title": "Thinking out loud",
+  "summary": "What to say while you solve, how to explain a plan before coding, and what to do when you're stuck.",
+  "tutorial": false,
+  "exercises": [
+    "merge-sorted-arrays"
+  ]
+}

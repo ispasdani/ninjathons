@@ -1,0 +1,36 @@
+{
+  "slug": "merge-sorted-arrays",
+  "title": "Merge Sorted Arrays",
+  "difficulty": "easy",
+  "tags": [
+    "arrays",
+    "two-pointers",
+    "sorting"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "mergeSorted",
+    "params": [
+      {
+        "name": "a",
+        "type": "int[]"
+      },
+      {
+        "name": "b",
+        "type": "int[]"
+      }
+    ],
+    "returns": "int[]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}
