@@ -1,0 +1,31 @@
+[
+  {
+    "input": {
+      "nums": [
+        3,
+        9,
+        2
+      ]
+    },
+    "output": 9
+  },
+  {
+    "input": {
+      "nums": [
+        -5,
+        -2,
+        -8
+      ]
+    },
+    "output": -2,
+    "explanation": "All negative: the largest is the one closest to zero."
+  },
+  {
+    "input": {
+      "nums": [
+        4
+      ]
+    },
+    "output": 4
+  }
+]

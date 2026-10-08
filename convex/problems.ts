@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalAction, internalMutation, internalQuery } from "./_generated/server";
 import { getCurrentUserOrNull, publicQuery } from "./lib/functions";
-import { isListed, problemView } from "./lib/problems";
+import { isListed, problemView, webView } from "./lib/problems";
 import {
   checker,
   difficulty,
@@ -33,6 +33,15 @@ export const library = publicQuery({
         if (s.verdict?.status === "accepted") status.set(s.problemId, "solved");
         else if (!status.has(s.problemId)) status.set(s.problemId, "attempted");
       }
+      // And HTML and CSS challenges, judged in the browser.
+      const web = await ctx.db
+        .query("webSubmissions")
+        .withIndex("by_user_problem", (q) => q.eq("userId", user._id))
+        .collect();
+      for (const s of web) {
+        if (s.accepted) status.set(s.problemId, "solved");
+        else if (!status.has(s.problemId)) status.set(s.problemId, "attempted");
+      }
     }
     return rows.map((p) => ({
       slug: p.slug,
@@ -46,7 +55,8 @@ export const library = publicQuery({
 });
 
 /**
- * A published problem for its solve page, with starter code per language.
+ * A published problem for its solve page, with starter code per language, or
+ * an HTML and CSS challenge with its target and checks (`mode: "web"`).
  * Hidden tests live in problemTests and are never returned.
  */
 export const getBySlug = publicQuery({
@@ -57,7 +67,7 @@ export const getBySlug = publicQuery({
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
     if (!problem || !isListed(problem)) return null;
-    return problemView(problem);
+    return problem.judge.mode === "web" ? webView(problem) : problemView(problem);
   },
 });
 

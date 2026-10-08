@@ -1,0 +1,35 @@
+{
+  "slug": "rotate-array",
+  "title": "Rotate Array",
+  "difficulty": "medium",
+  "tags": [
+    "arrays",
+    "math"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "rotate",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      },
+      {
+        "name": "k",
+        "type": "int"
+      }
+    ],
+    "returns": "int[]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

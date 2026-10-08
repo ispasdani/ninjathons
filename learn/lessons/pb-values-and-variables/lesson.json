@@ -1,0 +1,9 @@
+{
+  "title": "Values, variables and printing",
+  "summary": "Numbers, text and true-or-false: the values every program works with, and how to keep them in variables.",
+  "tutorial": false,
+  "exercises": [
+    "add-two-integers",
+    "seconds-to-minutes"
+  ]
+}

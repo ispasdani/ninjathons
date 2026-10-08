@@ -57,6 +57,7 @@ function Side({ player, side }: { player: ResultPlayer; side: 0 | 1 }) {
           ? `Solved in ${duration(player.solvedInMs)}`
           : `${player.bestPassed}/${player.total || "?"} tests`}{" "}
         · {player.submits} {player.submits === 1 ? "submit" : "submits"}
+        {player.docPages > 0 ? ` · used ${player.docPages} doc ${player.docPages === 1 ? "page" : "pages"}` : ""}
       </p>
     </div>
   );

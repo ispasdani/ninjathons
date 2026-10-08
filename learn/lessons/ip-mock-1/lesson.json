@@ -1,0 +1,8 @@
+{
+  "title": "Mock interview: one medium in 30 minutes",
+  "summary": "A timed practice round with the full process, and an honest review afterwards.",
+  "tutorial": false,
+  "exercises": [
+    "valid-sudoku"
+  ]
+}

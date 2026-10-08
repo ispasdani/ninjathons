@@ -1,0 +1,32 @@
+{
+  "slug": "is-sorted",
+  "title": "Is Sorted",
+  "difficulty": "easy",
+  "tags": [
+    "arrays",
+    "loops",
+    "testing"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "isSorted",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      }
+    ],
+    "returns": "bool"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

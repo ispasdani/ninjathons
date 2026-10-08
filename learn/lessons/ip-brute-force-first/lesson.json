@@ -1,0 +1,8 @@
+{
+  "title": "Start with brute force",
+  "summary": "Why the slow correct answer comes first, and how removing repeated work leads to the fast one.",
+  "tutorial": false,
+  "exercises": [
+    "maximum-product-subarray"
+  ]
+}

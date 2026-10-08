@@ -9,12 +9,14 @@ import {
   weeklySets,
 } from "./schemas/challenges";
 import { problems, problemTests, testDrives } from "./schemas/problems";
+import { docPages, docSets, docViews } from "./schemas/docs";
 import { groupMembers, groups } from "./schemas/groups";
+import { learningXp, lessonProgress, lessons, roadmapProgress, roadmaps } from "./schemas/learn";
 import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboards";
 import { challenges, matchEvents, matches, matchmaking, matchPlayers, matchQueue } from "./schemas/matches";
 import { badgeCounts, userBadges, xpLedger, xpMonths } from "./schemas/progression";
 import { ratingHistory, ratings } from "./schemas/ratings";
-import { submissions } from "./schemas/submissions";
+import { submissions, webSubmissions } from "./schemas/submissions";
 import {
   territoryEvents,
   territoryGames,
@@ -36,6 +38,7 @@ export default defineSchema({
   problemTests,
   testDrives,
   submissions,
+  webSubmissions,
   xpLedger,
   xpMonths,
   userBadges,
@@ -66,4 +69,12 @@ export default defineSchema({
   territoryLobbyPlayers,
   territoryQueue,
   territoryMatchmaking,
+  lessons,
+  roadmaps,
+  lessonProgress,
+  roadmapProgress,
+  learningXp,
+  docPages,
+  docSets,
+  docViews,
 });

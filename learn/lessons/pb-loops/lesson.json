@@ -1,0 +1,9 @@
+{
+  "title": "Repeating with loops",
+  "summary": "Going through a list, counting, and looping until something changes, without being off by one.",
+  "tutorial": false,
+  "exercises": [
+    "count-evens",
+    "sum-of-digits"
+  ]
+}

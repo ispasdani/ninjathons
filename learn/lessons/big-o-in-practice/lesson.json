@@ -1,0 +1,9 @@
+{
+  "title": "Big O in practice",
+  "summary": "How work grows with input size, and how to read the constraints to know whether a solution will be fast enough.",
+  "tutorial": true,
+  "exercises": [
+    "missing-number",
+    "majority-element"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "count-vowels",
+  "title": "Count Vowels",
+  "difficulty": "easy",
+  "tags": [
+    "strings",
+    "loops",
+    "warm-up"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "countVowels",
+    "params": [
+      {
+        "name": "s",
+        "type": "string"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

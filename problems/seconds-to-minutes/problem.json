@@ -1,0 +1,32 @@
+{
+  "slug": "seconds-to-minutes",
+  "title": "Seconds to Minutes",
+  "difficulty": "easy",
+  "tags": [
+    "math",
+    "strings",
+    "warm-up"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "formatTime",
+    "params": [
+      {
+        "name": "seconds",
+        "type": "int"
+      }
+    ],
+    "returns": "string"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

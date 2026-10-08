@@ -23,6 +23,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 7 Oct 2026 | Ratings per area; 1v1 uses Glicko-2 with one rating period per game | [13](#ratings) |
 | 7 Oct 2026 | Level and 1v1 boards with Global, Country and Group scopes; free private groups | [13](#leaderboards-and-groups) |
 | 8 Oct 2026 | Territory: ring values, one problem deck per difficulty, captures by send time, OpenSkill on the 1v1 scale | [16](#16-territory) |
+| 8 Oct 2026 | Learn: tutorials and 3 roadmaps (no separate courses), lessons finish when their exercises are solved, HTML and CSS checked in the browser, curated MDN and Python docs | [17](#17-learn) |
 
 ---
 
@@ -107,8 +108,8 @@ Most of these tables don't exist yet. **Every new table gets a row here when it 
 | Account and profile | `users`, `profiles`, `notificationPrefs`, `notifications` | Delete (`users` last) |
 | Username | `users.username` | Delete, and reserve the name for 90 days |
 | Uploaded and generated files | avatars, banners, share cards in Convex storage | Delete each storage id |
-| Practice | `submissions`, `drafts`, `docViews`, `integritySignals` | Delete |
-| Learning progress | `lessonProgress`, `roadmapProgress` | Delete |
+| Practice | `submissions`, `webSubmissions`, `drafts`, `docViews`, `integritySignals` | Delete |
+| Learning progress | `lessonProgress`, `roadmapProgress`, `learningXp` | Delete |
 | Progression | `xpLedger`, `userBadges`, `streaks`, `ratings`, `ratingHistory`, `dailyResults`, `weeklyResults` | Delete |
 | Leaderboards | `leaderboardSnapshots` | Remove their rows (also gone on the next rebuild) |
 | Queue and invites | `matchQueue`, `challenges` | Delete in phase 1 |
@@ -547,3 +548,65 @@ Agreed 8 Oct 2026, at the start of phase 6. Adds to the roadmap's rules (Compete
 ### As built
 
 - Territory has its own tables (`territoryGames`, `territoryPlayers`, `territoryRegions`, `territoryEvents`, lobbies and queue) rather than sharing `matches`, which assumes one problem and two players.
+
+## 17. Learn
+
+Agreed 8 Oct 2026, at the start of phase 7. Adds to the roadmap's rules (Learn, Progression) and §8 (HTML and CSS).
+
+### What's in phase 7
+
+- **Tutorials and 3 roadmaps** (Programming basics, Data structures and algorithms, Interview prep). **No separate courses:** a roadmap's modules are its course. Per-language courses ("Learn Rust through 40 problems") wait until after launch, in line with the cut order (§12).
+- **HTML and CSS challenges,** checked in the browser (below).
+- **The docs library:** curated MDN (JavaScript, HTML, CSS) and Python pages. The Java, .NET, C++ and Rust sets come later.
+
+### Lessons, tutorials and roadmaps
+
+- **One kind of lesson:** a page of teaching (Markdown, with code in JavaScript and Python unless the lesson is about one language) that ends in 1 to 3 exercises. Exercises are ordinary library problems (or HTML and CSS challenges), so anyone can still solve them from the library; the teaching around them is what's Pro.
+- **A tutorial is a lesson that stands on its own.** Tutorials are free and public: readable signed out, with their own pages for search. About 20 at launch.
+- **A roadmap is an ordered path of 4 to 6 modules,** each 2 to 4 lessons, drawn as nodes on a path with progress per node. A module can use tutorials (which stay free) as well as lessons written for the roadmap.
+- **Pro (phase 8): the first module of each roadmap is free, the rest is Pro.** Each module records whether it's the free preview now; everything stays open until phase 8 adds the lock and its refusal tests. Lesson text is served by a Convex query, never built into a page, so phase 8 only has to lock the query. A roadmap's title and outline are public.
+- **A tutorial in several roadmaps** shows its place (module, previous and next) in the roadmap it was opened from, passed as `?roadmap=<slug>` by the roadmap page; otherwise in the first roadmap by order.
+- **A lesson is finished when you've opened it signed in and every exercise is solved,** in any language, in any order. Solves from before count, so a player who already solved the exercises finishes the lesson by opening it. No "mark as read" button.
+- **An exercise from a weekly set that hasn't started is left out** of its lesson (and doesn't count) until its week, so a lesson never gives a set away; every lesson needs at least one exercise outside the sets.
+- **A module is finished when all its lessons are; a roadmap when all its modules are.**
+
+### XP, badges and the Learning board
+
+- **XP (roadmap, Progression): 15 per lesson or tutorial, 100 per module,** once each, keyed `lesson:<slug>` and `module:<roadmap>:<module>`. A finished roadmap gives its badge, not more XP. Exercise solves give their normal solve XP on top.
+- **Badges (4):** First lesson (the roadmap's "first tutorial"; any lesson counts), and one per finished roadmap. Names are placeholders.
+- **Learning board:** learning XP (lessons and modules), all time and per calendar month in UTC, with Global, Country and Group scopes and ties to whoever got there first, like the Level board.
+- **Account deletion** removes the player's lesson and roadmap progress.
+
+### HTML and CSS challenges
+
+- **"Build the same output as this one":** a challenge has a target page, starter files and a list of checks. The player edits HTML, CSS or both (the challenge says which) and sees their page next to the target, with a toggle to lay the target over it.
+- **Checked in the browser:** the player's page and the target render in sandboxed iframes at the same width (and at a second, narrow width for responsive challenges), and each check compares the two: elements present and their count and text, chosen computed styles, and position and size within a few pixels. Scripts never run in either page. Run and Submit are instant and free.
+- **Practice only (§8):** web challenges are in the library and lessons, never in the daily, weekly, 1v1 or Territory. An accepted Submit gives normal solve XP (keyed `solve:<slug>:web`) and counts for lessons. The verdict is the browser's own, so it could be faked; the XP at stake is small and each challenge pays once, and V1.1's server-side visual judge will re-check them.
+- **Written like problems:** a folder in `problems/` with `"mode": "web"`, the target, the starter files, the checks, a reference that must pass and at least one wrong answer that must fail. `problems:check` runs them in a headless browser.
+
+### The docs library
+
+- **Curated pages, imported into Convex** with their source and license line (MDN: CC-BY-SA 2.5; Python: PSF License): the JavaScript built-ins, the HTML elements and CSS properties the lessons and challenges use, and the Python built-ins, built-in types and the standard modules problems use (`collections`, `heapq`, `bisect`, `itertools`, `functools`, `math`, `re`).
+- **A docs panel in the solve view,** searchable, for the language you're using. Allowed in ranked 1v1 (§9) for JavaScript, TypeScript and Python; doc pages opened during a match are logged for the result ("used 2 doc pages"). The other languages show "no docs yet" until their sets arrive.
+
+### The docs library as built (8 Oct 2026)
+
+- **`npm run docs:import [mdn|python]`** builds it from the lists in `docs-library/`: 498 MDN pages (409 JavaScript, 53 HTML, 36 CSS) from `github.com/mdn/content` at a pinned commit, and 89 Python pages from the official 3.14 plain-text archive (each built-in function, the main built-in types, and `collections`, `heapq`, `bisect`, `itertools`, `functools`, `math`, `re`). Downloads are cached in `.docs-cache/` (not committed); `--dry` converts without uploading. Each import replaces the set's previous one.
+- **Converted to Markdown** (`scripts/lib/docs`): MDN's cross-reference macros become links, inside the library when the page is there (`doc:mdn/<path>`) and to MDN otherwise; live samples, demo scaffolding, compatibility tables and specification sections are dropped. Python's headings, API entries and code blocks become Markdown, and its quoted code becomes inline code.
+- **Tables** `docPages` (with full-text search on titles and on text, filtered by area), `docSets` (version and license line) and `docViews`. Search with no query lists each area's featured pages; with one, title matches first, an exact name first of all.
+- **A Docs tab** in the solve view, the HTML and CSS challenges, the 1v1 duel screen and the Territory game, for the language in use: JavaScript and TypeScript read MDN's JavaScript, Python reads Python, web challenges read HTML and CSS, and the other languages say their references come later. Every page shows the license line and a link to its source.
+- **In a 1v1 match** each page opened is noted once (`docs.noteMatchView`, only while the match is on), and the result page and share card add "used 2 doc pages". All the library's pages are official references, so nothing is refused yet; the no-docs Hard mode is still to come.
+
+### Content files
+
+- **Lessons** are folders, `learn/lessons/<slug>/`: `lesson.json` (`{ "title", "summary", "tutorial": true|false, "exercises": [slugs] }`) and `lesson.md`. **Roadmaps** are `learn/roadmaps/<slug>/roadmap.json` (`{ "title", "summary", "order", "modules": [{ "slug", "title", "summary", "free", "lessons": [slugs] }] }`) and `intro.md`.
+- **`npm run problems:check` and `problems:seed`** with no slugs also check and seed lessons and roadmaps, as they do weekly sets. A lesson's exercises must exist and not be drafts; a lesson belongs to at most one roadmap module, except tutorials; exactly the first module is free.
+### HTML and CSS challenges as built (8 Oct 2026)
+
+- **A problem with `"mode": "web"`** in `problem.json`, plus `"edit"` (`["html"]`, `["css"]` or both) and `"viewports"` (widths, 800 when left out). Its files: `web/target.html` and `.css`, `web/starter.html` and `.css`, `web/checks.json`, `solutions/reference.html` or `.css` and at least one `solutions/wrong-*`; a solution's missing file is the starter's.
+- **A check** names a selector and compares every match with the target's at the same place: always the count, and as asked the text (`"text": true`), attributes as written (`"attributes": ["href", …]`), computed styles (`"styles": ["color", …]`; an attribute written with no value in the target, like `required`, only has to be present) and position and size (`"box": true`, within `"tolerance"` pixels, default 4). Every check runs at every viewport.
+- **One judge, `lib/web-judge.ts`,** used by the solve view and, through Playwright in an installed Chrome or Edge (`playwright-core`, nothing downloaded), by `problems:check`. The check also requires the starter files to fail and every check to match something in the target.
+- **The solve view** has HTML and CSS tabs (the file you don't edit is read-only, marked "given"), and under them your page and the target side by side, laid over each other at half opacity, or the list of checks with the first difference each found. Drafts stay in the browser, as for code.
+- **`web.submit`** records each Submit in `webSubmissions` with the HTML and CSS (for V1.1's re-check), refuses a total no real run gives and Submits less than 3 s apart, and on an accepted one gives solve XP and counts for lessons. Solves of web challenges count toward the solve milestones but not the language or Polyglot badges. The code runner, daily, 1v1 and Territory never use them, and weekly sets can't list them.
+
+- **Order of work:** the content model, pages, progress, XP and board first; then HTML and CSS challenges; then the content (about 20 tutorials, 3 roadmaps, and the easy problems Programming basics needs); the docs library last.

@@ -1,0 +1,8 @@
+{
+  "title": "The coding interview, step by step",
+  "summary": "What interviewers watch for, and a five-step process for 45 minutes: understand, plan, code, test, improve.",
+  "tutorial": false,
+  "exercises": [
+    "first-unique-character"
+  ]
+}

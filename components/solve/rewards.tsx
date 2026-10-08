@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { CalendarDays, Flame } from "lucide-react";
+import { BookOpen, CalendarDays, Flame } from "lucide-react";
 import Link from "next/link";
 
 import { api } from "@/convex/_generated/api";
@@ -16,8 +16,8 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
   const earned = submission.badgesEarned ?? [];
   const badges = useQuery(api.badges.list, earned.length ? {} : "skip");
 
-  const { daily, weekly } = submission;
-  if (submission.xpAwarded === undefined && !daily && !weekly) {
+  const { daily, weekly, learn } = submission;
+  if (submission.xpAwarded === undefined && !daily && !weekly && !learn) {
     return (
       <p className="text-[13px] text-muted-foreground">
         No XP this time: you&apos;ve already solved this problem in this language. Try another language for more.
@@ -26,7 +26,7 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
   }
 
   const names = earned.map((id) => badges?.find((b) => b.id === id)?.name ?? "…");
-  const xp = (submission.xpAwarded ?? 0) + (daily?.xp ?? 0) + (weekly?.xp ?? 0);
+  const xp = (submission.xpAwarded ?? 0) + (daily?.xp ?? 0) + (weekly?.xp ?? 0) + (learn?.xp ?? 0);
   return (
     <div className="flex flex-wrap items-center gap-2 text-[13px]" role="status">
       {xp > 0 && (
@@ -48,6 +48,21 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
           {weekly.setComplete && <span className="font-normal text-text-secondary">· set complete</span>}
         </Link>
       )}
+      {learn?.lessons.map((lesson) => (
+        <Link key={lesson.slug} href={`/learn/${lesson.slug}`} className="flex items-center gap-1 font-medium hover:underline">
+          <BookOpen className="size-3.5 text-brand-text" aria-hidden />
+          Lesson finished · {lesson.title}
+        </Link>
+      ))}
+      {learn?.modules.map((module) => (
+        <Link
+          key={`${module.roadmap}:${module.module}`}
+          href={`/roadmaps/${module.roadmap}`}
+          className="font-medium hover:underline"
+        >
+          Module finished · {module.title}
+        </Link>
+      ))}
       {submission.levelReached !== undefined && (
         <span className="font-medium">
           Level {submission.levelReached} reached · {titleForLevel(submission.levelReached)}

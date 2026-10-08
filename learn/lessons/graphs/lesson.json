@@ -1,0 +1,10 @@
+{
+  "title": "Graphs from edge lists",
+  "summary": "Adjacency lists, connected groups with union-find, and putting tasks in order with a topological sort.",
+  "tutorial": true,
+  "exercises": [
+    "path-exists",
+    "connected-components",
+    "fewest-terms"
+  ]
+}

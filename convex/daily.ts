@@ -7,7 +7,7 @@ import { LANGUAGES } from "./judge/languages";
 import { dailyFor, difficultyForDay, openDaily, settle, streakOf } from "./lib/daily";
 import { addDays, dayKey, dayStart } from "./lib/days";
 import { getCurrentUserOrNull, publicQuery, userMutation } from "./lib/functions";
-import { isListed, unfinishedWeeklyProblems } from "./lib/problems";
+import { isCodeProblem, isListed, unfinishedWeeklyProblems } from "./lib/problems";
 
 // The pick warns in the logs below this many never-used problems.
 const LOW_POOL = 14;
@@ -30,7 +30,7 @@ export const pick = internalMutation({
     const past = await ctx.db.query("dailyChallenges").collect();
     const lastUsed = new Map(past.map((d) => [d.problemId as string, d.day]));
     const held = await unfinishedWeeklyProblems(ctx, dayStart(day));
-    const pool = (await ctx.db.query("problems").collect()).filter((p) => isListed(p) && !held.has(p._id));
+    const pool = (await ctx.db.query("problems").collect()).filter((p) => isListed(p) && isCodeProblem(p) && !held.has(p._id));
     const unused = pool.filter((p) => !lastUsed.has(p._id));
 
     const wanted = difficultyForDay(day);

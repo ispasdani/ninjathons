@@ -1,0 +1,8 @@
+{
+  "title": "Choosing the data structure",
+  "summary": "Pick the structure whose cheap operations are the ones you need, combine structures, and handle ties.",
+  "tutorial": false,
+  "exercises": [
+    "top-k-frequent"
+  ]
+}

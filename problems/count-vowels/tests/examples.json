@@ -1,0 +1,21 @@
+[
+  {
+    "input": {
+      "s": "hello world"
+    },
+    "output": 3
+  },
+  {
+    "input": {
+      "s": "AEIOU and y"
+    },
+    "output": 6,
+    "explanation": "Upper case counts; y doesn't."
+  },
+  {
+    "input": {
+      "s": ""
+    },
+    "output": 0
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "slug": "valid-sudoku",
+  "title": "Valid Sudoku",
+  "difficulty": "medium",
+  "tags": [
+    "arrays",
+    "hash-set",
+    "matrix"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "isValidSudoku",
+    "params": [
+      {
+        "name": "board",
+        "type": "string[]"
+      }
+    ],
+    "returns": "bool"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

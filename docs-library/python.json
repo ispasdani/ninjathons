@@ -1,0 +1,92 @@
+{
+  "version": "3.14",
+  "archive": "https://docs.python.org/3/archives/python-3.14-docs-text.tar.bz2",
+  "license": "From the Python 3.14 documentation, © Python Software Foundation, PSF License Version 2.",
+  "files": [
+    {
+      "file": "builtins/functions.txt",
+      "page": "library/functions",
+      "split": "entries",
+      "featured": [
+        "sorted()",
+        "len()",
+        "range()",
+        "enumerate()",
+        "zip()",
+        "map()",
+        "max()",
+        "min()",
+        "sum()",
+        "input()",
+        "print()"
+      ]
+    },
+    {
+      "file": "builtins/stdtypes.txt",
+      "page": "library/stdtypes",
+      "split": "sections",
+      "skip": [
+        "Binary Sequence Types — \"bytes\", \"bytearray\", \"memoryview\"",
+        "Context Manager Types",
+        "Type Annotation Types — Generic Alias, Union",
+        "Other Built-in Types",
+        "Special Attributes",
+        "Integer string conversion length limitation"
+      ],
+      "featured": [
+        "Sequence Types — \"list\", \"tuple\", \"range\"",
+        "Text Sequence Type — \"str\"",
+        "Mapping Types — \"dict\"",
+        "Set Types — \"set\", \"frozenset\""
+      ]
+    },
+    {
+      "file": "library/collections.txt",
+      "page": "library/collections",
+      "split": "whole",
+      "featured": [
+        "*"
+      ]
+    },
+    {
+      "file": "library/heapq.txt",
+      "page": "library/heapq",
+      "split": "whole",
+      "featured": [
+        "*"
+      ]
+    },
+    {
+      "file": "library/bisect.txt",
+      "page": "library/bisect",
+      "split": "whole",
+      "featured": [
+        "*"
+      ]
+    },
+    {
+      "file": "library/itertools.txt",
+      "page": "library/itertools",
+      "split": "whole",
+      "featured": []
+    },
+    {
+      "file": "library/functools.txt",
+      "page": "library/functools",
+      "split": "whole",
+      "featured": []
+    },
+    {
+      "file": "library/math.txt",
+      "page": "library/math",
+      "split": "whole",
+      "featured": []
+    },
+    {
+      "file": "library/re.txt",
+      "page": "library/re",
+      "split": "whole",
+      "featured": []
+    }
+  ]
+}

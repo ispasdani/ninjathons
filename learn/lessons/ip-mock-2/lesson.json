@@ -1,0 +1,8 @@
+{
+  "title": "Mock interview: one hard in 45 minutes",
+  "summary": "A timed hard round where the first job is spotting the hidden structure.",
+  "tutorial": false,
+  "exercises": [
+    "word-ladder"
+  ]
+}

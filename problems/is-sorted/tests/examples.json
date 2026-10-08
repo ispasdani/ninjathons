@@ -1,0 +1,30 @@
+[
+  {
+    "input": {
+      "nums": [
+        1,
+        2,
+        2,
+        5
+      ]
+    },
+    "output": true,
+    "explanation": "Equal neighbours are allowed."
+  },
+  {
+    "input": {
+      "nums": [
+        3,
+        1,
+        2
+      ]
+    },
+    "output": false
+  },
+  {
+    "input": {
+      "nums": []
+    },
+    "output": true
+  }
+]

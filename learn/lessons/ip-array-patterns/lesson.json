@@ -1,0 +1,8 @@
+{
+  "title": "Which pattern? Arrays",
+  "summary": "A field guide to array problems: the clues in a statement and the techniques they point to.",
+  "tutorial": false,
+  "exercises": [
+    "trapping-rain-water"
+  ]
+}

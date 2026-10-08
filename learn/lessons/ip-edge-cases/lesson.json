@@ -1,0 +1,8 @@
+{
+  "title": "Finding the edge cases first",
+  "summary": "A checklist of the inputs that break code, turning rules into clear steps, and avoiding overflow.",
+  "tutorial": false,
+  "exercises": [
+    "string-to-integer"
+  ]
+}

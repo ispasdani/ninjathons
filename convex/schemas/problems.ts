@@ -8,7 +8,7 @@ export const difficulty = v.union(
 );
 
 // The 7 code languages (docs/notes/decisions.md §8). HTML and CSS have their
-// own judge, built in phase 7.
+// own judge, in the browser (the "web" mode below, decisions §17).
 export const language = v.union(
   v.literal("javascript"),
   v.literal("typescript"),
@@ -47,6 +47,22 @@ export const signature = v.object({
   returns: valueType,
 });
 
+// One check of an HTML and CSS challenge (decisions §17). Every element the
+// selector matches in the player's page is compared with the one at the same
+// place in the target: always how many there are, and as asked their text,
+// attributes (as written, e.g. href, alt, type), computed styles, and position
+// and size (within `tolerance` pixels, default 4).
+export const webCheck = v.object({
+  selector: v.string(),
+  text: v.optional(v.boolean()),
+  attributes: v.optional(v.array(v.string())),
+  styles: v.optional(v.array(v.string())),
+  box: v.optional(v.boolean()),
+  tolerance: v.optional(v.number()),
+});
+
+export const webFiles = v.object({ html: v.string(), css: v.string() });
+
 // How the user's code is judged (docs/notes/decisions.md). The problem sets the
 // mode, never the player, so both sides of a duel get the same one. Either way
 // the runner only sees stdin/stdout: in function mode a generated driver reads
@@ -61,6 +77,18 @@ export const judge = v.union(
   // The user writes the whole program. The statement must spell out the exact
   // input and output format.
   v.object({ mode: v.literal("stdio") }),
+  // An HTML and CSS challenge, judged in the browser (decisions §17): build the
+  // same output as the target. Never sent to the code runner. The player edits
+  // the files in `edit`, starting from `starter`; the pages are compared at
+  // each viewport width.
+  v.object({
+    mode: v.literal("web"),
+    edit: v.array(v.union(v.literal("html"), v.literal("css"))),
+    target: webFiles,
+    starter: webFiles,
+    checks: v.array(webCheck),
+    viewports: v.array(v.number()),
+  }),
 );
 
 // How an output is compared with the expected one.

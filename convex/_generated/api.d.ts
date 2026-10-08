@@ -13,6 +13,7 @@ import type * as benchmark from "../benchmark.js";
 import type * as challenges from "../challenges.js";
 import type * as crons from "../crons.js";
 import type * as daily from "../daily.js";
+import type * as docs from "../docs.js";
 import type * as ghosts from "../ghosts.js";
 import type * as groups from "../groups.js";
 import type * as http from "../http.js";
@@ -35,6 +36,7 @@ import type * as judge_vercelRunner from "../judge/vercelRunner.js";
 import type * as judge_wire from "../judge/wire.js";
 import type * as judging from "../judging.js";
 import type * as leaderboards from "../leaderboards.js";
+import type * as learn from "../learn.js";
 import type * as lib_badges from "../lib/badges.js";
 import type * as lib_codes from "../lib/codes.js";
 import type * as lib_countries from "../lib/countries.js";
@@ -45,6 +47,7 @@ import type * as lib_ghosts from "../lib/ghosts.js";
 import type * as lib_glicko2 from "../lib/glicko2.js";
 import type * as lib_groups from "../lib/groups.js";
 import type * as lib_leaderboards from "../lib/leaderboards.js";
+import type * as lib_learn from "../lib/learn.js";
 import type * as lib_levels from "../lib/levels.js";
 import type * as lib_matches from "../lib/matches.js";
 import type * as lib_matchmaking from "../lib/matchmaking.js";
@@ -61,8 +64,10 @@ import type * as problems from "../problems.js";
 import type * as queue from "../queue.js";
 import type * as ratings from "../ratings.js";
 import type * as schemas_challenges from "../schemas/challenges.js";
+import type * as schemas_docs from "../schemas/docs.js";
 import type * as schemas_groups from "../schemas/groups.js";
 import type * as schemas_leaderboards from "../schemas/leaderboards.js";
+import type * as schemas_learn from "../schemas/learn.js";
 import type * as schemas_matches from "../schemas/matches.js";
 import type * as schemas_problems from "../schemas/problems.js";
 import type * as schemas_progression from "../schemas/progression.js";
@@ -78,6 +83,7 @@ import type * as territorySim from "../territorySim.js";
 import type * as testDrives from "../testDrives.js";
 import type * as testDrivesFill from "../testDrivesFill.js";
 import type * as user from "../user.js";
+import type * as web from "../web.js";
 import type * as weekly from "../weekly.js";
 
 import type {
@@ -92,6 +98,7 @@ declare const fullApi: ApiFromModules<{
   challenges: typeof challenges;
   crons: typeof crons;
   daily: typeof daily;
+  docs: typeof docs;
   ghosts: typeof ghosts;
   groups: typeof groups;
   http: typeof http;
@@ -114,6 +121,7 @@ declare const fullApi: ApiFromModules<{
   "judge/wire": typeof judge_wire;
   judging: typeof judging;
   leaderboards: typeof leaderboards;
+  learn: typeof learn;
   "lib/badges": typeof lib_badges;
   "lib/codes": typeof lib_codes;
   "lib/countries": typeof lib_countries;
@@ -124,6 +132,7 @@ declare const fullApi: ApiFromModules<{
   "lib/glicko2": typeof lib_glicko2;
   "lib/groups": typeof lib_groups;
   "lib/leaderboards": typeof lib_leaderboards;
+  "lib/learn": typeof lib_learn;
   "lib/levels": typeof lib_levels;
   "lib/matches": typeof lib_matches;
   "lib/matchmaking": typeof lib_matchmaking;
@@ -140,8 +149,10 @@ declare const fullApi: ApiFromModules<{
   queue: typeof queue;
   ratings: typeof ratings;
   "schemas/challenges": typeof schemas_challenges;
+  "schemas/docs": typeof schemas_docs;
   "schemas/groups": typeof schemas_groups;
   "schemas/leaderboards": typeof schemas_leaderboards;
+  "schemas/learn": typeof schemas_learn;
   "schemas/matches": typeof schemas_matches;
   "schemas/problems": typeof schemas_problems;
   "schemas/progression": typeof schemas_progression;
@@ -157,6 +168,7 @@ declare const fullApi: ApiFromModules<{
   testDrives: typeof testDrives;
   testDrivesFill: typeof testDrivesFill;
   user: typeof user;
+  web: typeof web;
   weekly: typeof weekly;
 }>;
 

@@ -1,0 +1,9 @@
+{
+  "title": "Grids: BFS and DFS",
+  "summary": "Explore maps and mazes: flood fill to find connected regions, and breadth-first search for the fewest steps.",
+  "tutorial": true,
+  "exercises": [
+    "number-of-islands",
+    "grid-shortest-path"
+  ]
+}

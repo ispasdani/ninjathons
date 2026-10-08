@@ -1,0 +1,10 @@
+{
+  "title": "Binary search on the answer",
+  "summary": "When checking a candidate answer is easy but finding it isn't, binary search over the answers themselves.",
+  "tutorial": true,
+  "exercises": [
+    "smallest-divisor",
+    "minimum-reading-speed",
+    "delivery-capacity"
+  ]
+}

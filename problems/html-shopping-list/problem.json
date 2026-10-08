@@ -1,0 +1,10 @@
+{
+  "slug": "html-shopping-list",
+  "title": "Shopping List",
+  "difficulty": "easy",
+  "tags": ["html", "lists"],
+  "mode": "web",
+  "edit": ["html"],
+  "status": "beta",
+  "version": 1
+}

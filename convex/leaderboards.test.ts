@@ -151,6 +151,10 @@ describe("monthly Level board", () => {
     expect(boards.map((b) => b.board).sort()).toEqual([
       "1v1",
       "daily",
+      "learning",
+      // Learning months go the same way as Level months.
+      "learning-month:2026-11",
+      "learning-month:2026-12",
       "level",
       "level-month:2026-11",
       "level-month:2026-12",

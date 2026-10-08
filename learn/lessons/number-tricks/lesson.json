@@ -1,0 +1,9 @@
+{
+  "title": "Primes, divisors and number tricks",
+  "summary": "Primality up to the square root, the sieve of Eratosthenes, Euclid's algorithm and modular arithmetic.",
+  "tutorial": true,
+  "exercises": [
+    "count-primes",
+    "greatest-common-divisor"
+  ]
+}

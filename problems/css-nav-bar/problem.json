@@ -1,0 +1,15 @@
+{
+  "slug": "css-nav-bar",
+  "title": "Nav Bar",
+  "difficulty": "easy",
+  "tags": [
+    "css",
+    "flexbox"
+  ],
+  "mode": "web",
+  "edit": [
+    "css"
+  ],
+  "status": "beta",
+  "version": 1
+}

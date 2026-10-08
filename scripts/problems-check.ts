@@ -6,12 +6,16 @@
  * requires every wrong-* solution to fail and every slow-* one to time out.
  * Runs code in the runner image, or with the local Node.js and Python
  * (scripts/lib/local-runner.ts). With no slugs, also checks the weekly sets
- * (weekly/, scripts/lib/weekly.ts).
+ * (weekly/, scripts/lib/weekly.ts) and the lessons and roadmaps (learn/,
+ * scripts/lib/learn.ts).
  */
 import { judgeSubmission } from "../convex/judge/judge";
 import { LANGUAGES, problemLanguages } from "../convex/judge/languages";
 import { allTests, checkTestTypes, generateTests, listProblemDirs, loadProblem, type Problem } from "./lib/problems";
+import { checkLearn, loadLessons, loadRoadmaps } from "./lib/learn";
+import { closeBrowser, judgeInBrowser } from "./lib/browser";
 import { localRunner } from "./lib/local-runner";
+import { isWebProblemDir, loadWebProblem, type WebProblem } from "./lib/web-problems";
 import { checkWeeklySets, loadWeeklySets } from "./lib/weekly";
 
 const MIN_HIDDEN = 10;
@@ -73,6 +77,49 @@ async function checkProblem(problem: Problem): Promise<string[]> {
   return errors;
 }
 
+/**
+ * An HTML and CSS challenge: the reference must match the target, and every
+ * wrong-* solution and the starter files must not. A check that matches
+ * nothing in the target would pass for anything, so that's an error too.
+ */
+async function checkWebProblem(problem: WebProblem): Promise<string[]> {
+  const errors: string[] = [];
+  const { judge } = problem;
+  if (judge.checks.length === 0) errors.push("needs at least one check in web/checks.json");
+  if (judge.edit.length === 0) errors.push('"edit" needs html, css or both');
+  if (judge.viewports.length === 0 || judge.viewports.some((w) => !(w >= 240 && w <= 1600))) {
+    errors.push("viewports must be widths from 240 to 1600");
+  }
+  if (problem.hints.length === 0) errors.push("needs at least one hint in hints.md");
+  if (!problem.solutions.some((s) => s.kind === "reference")) errors.push("needs a solutions/reference.html or .css");
+  if (!problem.solutions.some((s) => s.kind === "wrong")) errors.push("needs at least one solutions/wrong-*.html or .css");
+  if (errors.length) return errors;
+
+  const itself = await judgeInBrowser(judge, judge.target);
+  for (const r of itself.results) if (!r.ok) errors.push(`the target fails its own check ${r.selector}: ${r.message}`);
+  const empty = await judgeInBrowser(judge, { html: "", css: "" });
+  for (const [i, r] of empty.results.entries()) {
+    if (r.ok && i < judge.checks.length) errors.push(`check ${r.selector} matches nothing in the target, so anything passes it`);
+  }
+
+  const starter = await judgeInBrowser(judge, judge.starter);
+  if (starter.passed === starter.total) errors.push("the starter files already pass every check");
+  else console.log(`  ✓ starter: rejected (${starter.passed}/${starter.total} checks)`);
+  for (const solution of problem.solutions) {
+    const verdict = await judgeInBrowser(judge, solution.files);
+    const summary = `${verdict.passed}/${verdict.total} checks`;
+    if (solution.kind === "reference") {
+      if (verdict.passed !== verdict.total) {
+        const failed = verdict.results.filter((r) => !r.ok).map((r) => `${r.message} (${r.viewport}px)`);
+        errors.push(`${solution.name} should pass: ${summary}\n    ${failed.join("\n    ")}`);
+      } else console.log(`  ✓ ${solution.name}: accepted (${summary})`);
+    } else if (verdict.passed === verdict.total) {
+      errors.push(`${solution.name} should fail but passed: the checks are too weak`);
+    } else console.log(`  ✓ ${solution.name}: rejected (${summary})`);
+  }
+  return errors;
+}
+
 async function main() {
   const dirs = listProblemDirs(process.argv.slice(2));
   if (dirs.length === 0) {
@@ -84,13 +131,14 @@ async function main() {
     console.log(`${dir.replace(/\\/g, "/")}`);
     let errors: string[];
     try {
-      errors = await checkProblem(loadProblem(dir));
+      errors = isWebProblemDir(dir) ? await checkWebProblem(loadWebProblem(dir)) : await checkProblem(loadProblem(dir));
     } catch (error) {
       errors = [(error as Error).message];
     }
     for (const error of errors) console.log(`  ✗ ${error}`);
     if (errors.length) failed++;
   }
+  await closeBrowser();
   console.log(failed ? `\n${failed} of ${dirs.length} problems failed.` : `\nAll ${dirs.length} problems passed.`);
 
   // The weekly sets, when checking everything.
@@ -106,7 +154,22 @@ async function main() {
       console.log(`  ✗ ${setErrors[0]}`);
     }
   }
-  process.exit(failed || setErrors.length ? 1 : 0);
+
+  // And the lessons and roadmaps.
+  let learnErrors: string[] = [];
+  if (process.argv.length <= 2) {
+    try {
+      const lessons = loadLessons();
+      const roadmaps = loadRoadmaps();
+      learnErrors = checkLearn(lessons, roadmaps);
+      for (const error of learnErrors) console.log(`  ✗ ${error}`);
+      if (!learnErrors.length) console.log(`All ${lessons.length} ${lessons.length === 1 ? "lesson" : "lessons"} and ${roadmaps.length} ${roadmaps.length === 1 ? "roadmap" : "roadmaps"} passed.`);
+    } catch (error) {
+      learnErrors = [(error as Error).message];
+      console.log(`  ✗ ${learnErrors[0]}`);
+    }
+  }
+  process.exit(failed || setErrors.length || learnErrors.length ? 1 : 0);
 }
 
 void main();

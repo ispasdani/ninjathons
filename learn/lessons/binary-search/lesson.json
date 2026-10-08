@@ -1,0 +1,10 @@
+{
+  "title": "Binary search",
+  "summary": "Halve the search space at every step: finding values and boundaries in sorted data in O(log n), without off-by-one bugs.",
+  "tutorial": true,
+  "exercises": [
+    "binary-search",
+    "first-and-last-position",
+    "integer-square-root"
+  ]
+}

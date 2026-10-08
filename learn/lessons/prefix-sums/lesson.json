@@ -1,0 +1,10 @@
+{
+  "title": "Prefix sums",
+  "summary": "Answer any range-sum question with one subtraction, run products from both ends, and count ranges with a hash map.",
+  "tutorial": true,
+  "exercises": [
+    "product-of-array-except-self",
+    "range-sum-queries",
+    "subarray-sum-equals-k"
+  ]
+}

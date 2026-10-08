@@ -1,0 +1,9 @@
+{
+  "title": "Reading input and printing output",
+  "summary": "Full programs: read the whole input, split it, convert it, and print exactly what is asked.",
+  "tutorial": true,
+  "exercises": [
+    "sum-of-a-list",
+    "word-frequency"
+  ]
+}

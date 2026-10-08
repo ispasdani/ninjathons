@@ -1,0 +1,34 @@
+{
+  "slug": "lowest-cost-path",
+  "title": "Lowest-Cost Path",
+  "difficulty": "medium",
+  "tags": [
+    "graphs",
+    "shortest-path",
+    "dijkstra",
+    "heap",
+    "matrix"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "lowestCost",
+    "params": [
+      {
+        "name": "grid",
+        "type": "int[][]"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

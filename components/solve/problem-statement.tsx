@@ -7,9 +7,9 @@ type Props = {
   title: string;
   difficulty: "easy" | "medium" | "hard";
   tags: string[];
-  mode: "function" | "stdio";
+  mode: "function" | "stdio" | "web";
   statement: string;
-  examples: { input: string; output: string; explanation?: string }[];
+  examples?: { input: string; output: string; explanation?: string }[];
   hints: string[];
 };
 
@@ -25,7 +25,7 @@ function formatInput(input: string, mode: Props["mode"]): string {
   }
 }
 
-export function ProblemStatement({ title, difficulty, tags, mode, statement, examples, hints }: Props) {
+export function ProblemStatement({ title, difficulty, tags, mode, statement, examples = [], hints }: Props) {
   return (
     <article className="space-y-6">
       <header className="space-y-3">
@@ -33,7 +33,7 @@ export function ProblemStatement({ title, difficulty, tags, mode, statement, exa
         <div className="flex flex-wrap items-center gap-3 text-[13px] text-muted-foreground">
           <Difficulty level={difficulty} />
           <span className="font-mono text-xs tracking-[0.12em] uppercase">
-            {mode === "function" ? "Function" : "Full program"}
+            {mode === "function" ? "Function" : mode === "web" ? "HTML & CSS" : "Full program"}
           </span>
           {tags.map((tag) => (
             <span key={tag} className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs">

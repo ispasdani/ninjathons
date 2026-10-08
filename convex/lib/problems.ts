@@ -8,13 +8,16 @@ import { weekKey } from "./days";
  * per language. Hidden tests live in problemTests and are never part of it.
  */
 export function problemView(problem: Doc<"problems">) {
+  const judge = problem.judge;
+  // Pools and pages keep HTML and CSS challenges away from here (isCodeProblem).
+  if (judge.mode === "web") throw new Error(`${problem.slug} is an HTML and CSS challenge`);
   const languages = problemLanguages(problem.languages).map((id) => ({
     id,
     label: LANGUAGES[id].label,
     version: LANGUAGES[id].version,
     starterCode:
-      problem.judge.mode === "function"
-        ? LANGUAGES[id].starterCode(problem.judge.signature)
+      judge.mode === "function"
+        ? LANGUAGES[id].starterCode(judge.signature)
         : LANGUAGES[id].stdioTemplate,
     timeLimitMs: Math.round(problem.limits.timeMs * LANGUAGES[id].timeMultiplier),
   }));
@@ -25,12 +28,42 @@ export function problemView(problem: Doc<"problems">) {
     statement: problem.statement,
     difficulty: problem.difficulty,
     tags: problem.tags,
-    mode: problem.judge.mode,
+    mode: judge.mode,
     examples: problem.examples,
     hints: problem.hints,
     memoryLimitMb: problem.limits.memoryMb,
     languages,
   };
+}
+
+/**
+ * What the solve view gets of an HTML and CSS challenge (decisions §17): the
+ * target, starter files and checks are all public, since the browser judges.
+ */
+export function webView(problem: Doc<"problems">) {
+  const judge = problem.judge;
+  if (judge.mode !== "web") throw new Error(`${problem.slug} isn't an HTML and CSS challenge`);
+  return {
+    _id: problem._id,
+    slug: problem.slug,
+    title: problem.title,
+    statement: problem.statement,
+    difficulty: problem.difficulty,
+    tags: problem.tags,
+    mode: judge.mode,
+    hints: problem.hints,
+    version: problem.version,
+    edit: judge.edit,
+    target: judge.target,
+    starter: judge.starter,
+    checks: judge.checks,
+    viewports: judge.viewports,
+  };
+}
+
+/** A problem the code runner judges: everything but HTML and CSS challenges. */
+export function isCodeProblem(problem: Doc<"problems">) {
+  return problem.judge.mode !== "web";
 }
 
 /**

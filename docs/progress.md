@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 6, Territory: built (rules in [decisions §16](notes/decisions.md#16-territory), engine, lobbies, Find a match, game screen, Territory board) and played in full by 3 and 6 bots on dev. **Next step:** the phase check: a group lobby of 3 to 6 real players finishing a full game, by hand.
+**Now:** Phase 7, Learn, is done: 3 roadmaps, 20 tutorials, HTML and CSS challenges and the docs library, all on dev. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass by hand over the Learn pieces (finishing a lesson, a web Submit, the Docs tab), the pull request for phase 7, then phase 8, Profiles and Pro.
 
 ## Phases
 
@@ -15,16 +15,71 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
 | 6 | Territory | In progress | 8 Oct 2026 | |
-| 7 | Learn | Not started | | |
+| 7 | Learn | Done | 8 Oct 2026 | 8 Oct 2026 |
 | 8 | Profiles and Pro | Not started | | |
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
+Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tutorials, 3 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7 done
+- The check passes: 3 roadmaps (Programming basics, Data structures and algorithms, Interview prep) and 20 tutorials are on dev, and HTML and CSS challenges work (the judge checked in the browser and in `problems:check`; Submit covered by tests).
+- Interview prep, written and seeded: 5 modules (How interviews work free; Edge cases and complexity; Spotting the pattern; From brute force to optimal; Mock interviews), 11 lessons on the interview process itself, each ending in a new problem.
+- 10 new problems, each with JavaScript and Python references and wrong answers: First Unique Character, Merge Sorted Arrays, String to Integer, Rotate Array, Group Anagrams, Top K Frequent, Maximum Product Subarray, Minimum Window Substring, Valid Sudoku, Word Ladder. Five also have slow solutions that time out.
+- `problems:check` passes for 88 problems, 6 weekly sets, 41 lessons and 3 roadmaps.
+- Still open from phase 7, for whenever they come up: the signed-in states haven't been seen in the browser (opening and finishing a lesson, the rewards line, a web challenge Submit, the Docs tab inside the solve view, duel and Territory); tests cover them. The Docs tab has no references yet for Java, C#, C++ and Rust.
+
+### 8 Oct 2026 · Phase 7: the docs library
+- `npm run docs:import` builds the library from `docs-library/mdn.json` and `python.json`: 498 MDN pages (JavaScript, HTML, CSS) at a pinned commit of mdn/content and 89 Python 3.14 pages, converted to Markdown (`scripts/lib/docs`, 6 tests) and uploaded to Convex, replacing the previous import ([decisions §17](notes/decisions.md#17-learn), as built). Imported to dev.
+- `docPages` with full-text search (featured pages first with no query, exact names first with one), `docSets` for each set's version and license line, `docViews` for pages opened in matches.
+- A Docs tab in the solve view, the HTML and CSS challenges, duels and Territory games, for the language in use; links between library pages open in the panel, others on MDN in a new tab, and every page ends with its license line and source.
+- In a 1v1 match each page opened is noted, and the result page and share card say "used 2 doc pages". Account deletion removes the player's doc views.
+- Checked in the browser on a throwaway page (removed): searching "map" and "heapq", reading Array.prototype.map(), following its link to Array, the license footer, no `javascript:` links. Fixed on the way: Python's quoted code was turning into italics, now inline code.
+- 9 new tests (451 in all). Production build passes. Deployed to Convex dev.
+- Open: the Docs tab inside the signed-in screens (solve view, duel, Territory) hasn't been seen, since the pane isn't signed in.
+
+### 8 Oct 2026 · Phase 7: tutorials and the DSA roadmap
+- The 15 remaining tutorials: two pointers, sliding windows, prefix sums, binary search, binary search on the answer, stacks, sorting and intervals, heaps, grids (BFS and DFS), graphs, DP basics, DP on sequences, greedy, matrices, and number tricks. All 20 are written.
+- Data structures and algorithms, written and seeded: 5 modules (Arrays and hashing free; Searching and sorting; Stacks, windows and heaps; Graphs; Dynamic programming and greedy), 15 tutorials and its own lesson, Shortest paths with Dijkstra.
+- 7 new problems, each with JavaScript and Python references and wrong answers: First and Last Position, Smallest Divisor, Last Stone Weight, Path Exists, Spiral Order, Greatest Common Divisor, Lowest-Cost Path (Dijkstra on a grid; rejects right-and-down DP and step-counting BFS). Smallest Divisor, Last Stone Weight and Greatest Common Divisor also have slow solutions that time out.
+- Worked examples in tutorials are now cousins of their exercises, never their solutions ([curriculum](notes/curriculum.md)); the hash maps tutorial written earlier was changed to match.
+- `problems:check` passes for 78 problems, 6 weekly sets, 30 lessons and 2 roadmaps. Both roadmaps and the Learn page checked in the browser; a tutorial opened from the DSA roadmap leads on in DSA. 442 tests pass. Production build passes.
+
+### 8 Oct 2026 · Phase 7: Programming basics roadmap
+- The curriculum outline agreed and written up in [notes/curriculum.md](notes/curriculum.md): 20 tutorials, 3 roadmaps, 41 lessons and 32 new problems; linked lists and trees wait for ListNode and TreeNode types.
+- Programming basics, written and seeded to dev: 5 modules (First steps free; Loops and lists; Functions and collections; Solving problems; Your first web page), 9 lessons of its own and 5 tutorials, 4 of them new (Big O in practice, Reading input and printing output, Your first web page, CSS: the box model and flexbox). Every lesson shows JavaScript and Python side by side.
+- 12 new easy problems, each with JavaScript and Python references and wrong answers for the usual beginner mistakes: Seconds to Minutes, Grade Letter, Count Evens, Sum of Digits, Largest in List, Second Largest, Count Vowels, Reverse Words, Celsius to Fahrenheit, Leap Year, Average of a List, Is Sorted.
+- 3 new HTML and CSS challenges: Links and Images, Nav Bar, Sign-up Form. Web checks can now compare attributes (`href`, `alt`, `type`, `for`; `required` only has to be present).
+- A tutorial in several roadmaps now takes its place and next lesson from the roadmap it was opened from (`?roadmap=`), so the DSA roadmap won't send people into Programming basics.
+- `problems:check` passes for all 71 problems, 6 weekly sets, 14 lessons and the roadmap. The roadmap page and lessons checked in the browser. 1 new test, 442 in all. Production build passes.
+
+### 8 Oct 2026 · Phase 7: HTML and CSS challenges
+- A web challenge is a problem folder with `"mode": "web"`: target and starter pages, the files the player edits, viewport widths and checks comparing elements' count, text, computed styles and boxes with the target's ([decisions §17](notes/decisions.md#17-learn), as built).
+- One judge (`lib/web-judge.ts`) renders both pages in sandboxed iframes, with no scripts, and runs the checks at each width. The solve view runs it on Run and Submit; `problems:check` runs it in headless Chrome or Edge through `playwright-core` (new dev dependency, no browser download; CI uses the runner's Chrome) and requires the reference to pass, the starter and every wrong answer to fail, and every check to match something in the target.
+- The web solve view: HTML and CSS tabs (the given file read-only), your page and the target side by side, an overlay at half opacity, and a Checks list with the first difference per check.
+- `web.submit` records Submits (`webSubmissions`, with the code for V1.1's server re-check) and gives solve XP (`solve:<slug>:web`) and lesson progress on an accepted one. Web challenges count for solve milestones but not language badges, show in the library as HTML & CSS, and never reach the runner, daily, 1v1, Territory or weekly sets.
+- 2 challenges: Shopping List (HTML; checks caught bullets, wrong order, divs for headings) and Profile Card (CSS at 800 and 320 pixels; caught off-centre, overflow on phones, content-box sizing, stacked layout). Seeded to dev.
+- Checked in the browser on a throwaway route (removed): starter 0/10 with each difference named, the reference Accepted 10/10, side by side and overlay rendering, no console errors. Fixed on the way: a preview iframe whose source changed stayed blank, now remounted per source.
+- Fixed a Learning test missed in the last entry (the board list). 3 new tests, 441 in all, all passing. Production build passes. Deployed to Convex dev.
+- Open: Submit and its rewards haven't been seen signed in (tests cover them).
+
+### 8 Oct 2026 · Phase 7: lessons, roadmaps and the Learning board
+- Content as files: `learn/lessons/<slug>/` (`lesson.json`, `lesson.md`) and `learn/roadmaps/<slug>/` (`roadmap.json`, `intro.md`), checked by `problems:check` (1 to 3 exercises, 4 to 6 modules of 2 to 4 lessons, only the first module free, a roadmap lesson in one module, a badge per roadmap) and seeded by `problems:seed`, both when run with no slugs.
+- Tables `lessons`, `roadmaps`, `lessonProgress`, `roadmapProgress`, `learningXp` (`convex/learn.ts`, `convex/lib/learn.ts`). Opening a lesson signed in records it and finishes it if its exercises are already solved; an accepted Submit finishes any opened lesson waiting on that problem, then its module (100 XP) and roadmap (badge). The solve view's rewards line names the lesson and module finished.
+- A weekly set's problem can be an exercise; it stays out of the lesson until its week, and every lesson needs one exercise outside the sets ([decisions §17](notes/decisions.md#17-learn)).
+- Pages: `/learn` (roadmaps with your progress, tutorials), `/learn/<slug>` (the lesson, its exercises with Solve buttons, its place in a roadmap, previous and next), `/roadmaps/<slug>` (modules down a path, each filling in once finished, the free preview marked). Server-rendered with the signed-out view for search, then live. Learn is in the main nav.
+- Learning and Learning this month boards on Leaderboards, Global, Country and Group. 4 badges (First lesson, one per roadmap; 37 in all). Account deletion removes the new rows.
+- First tutorial, Hash maps and sets (Contains Duplicate, Two Sum, Valid Anagram), seeded to dev and checked in the browser at desktop and phone widths: rendered on the server, 404 for unknown slugs, no console errors.
+- 4 new tests (438 in all; the two that judge real Python can still time out when the whole suite runs at once). Production build passes. Deployed to Convex dev.
+- Open: the signed-in states (opening, finishing, the rewards line) haven't been seen in the browser, since the pane isn't signed in; no roadmap page seen yet, as no roadmap is written.
+
+### 8 Oct 2026 · Phase 7: Learn rules
+- Agreed and written up in [decisions §17](notes/decisions.md#17-learn): tutorials and 3 roadmaps, no separate courses; one kind of lesson, finished when opened and its exercises solved (earlier solves count); 15 XP per lesson, 100 per module, 4 badges and a Learning board; the free first module is marked now and locked in phase 8; HTML and CSS challenges checked in the browser against a target page (DOM and computed styles), practice only; curated MDN and Python docs; lessons and roadmaps as files checked and seeded with the problems.
+- Phase 6's check (a real group game by hand) is left for the end; phase 6 stays in progress.
 
 ### 8 Oct 2026 · Phase 6: bots in your own lobby
 - `npm run territory:sim -- [bots] --join <code> [--pace <seconds>]`: the bots (default 2) take seats in a lobby you opened, keep them alive with heartbeats, and play once you start it, waiting about 60 s between Submits (`--pace`) so a person has a chance. They stay afterwards; the teardown removes them and every game only bots played, but keeps games a person played in.

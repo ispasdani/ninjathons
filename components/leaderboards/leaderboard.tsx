@@ -15,7 +15,7 @@ import { duration } from "@/lib/duration";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
 
-export type BoardTab = "level" | "month" | "1v1" | "territory" | "daily" | "weekly";
+export type BoardTab = "level" | "month" | "1v1" | "territory" | "daily" | "weekly" | "learning" | "learning-month";
 export type Scope = "global" | "country" | "group";
 
 const PAGE = 50;
@@ -27,6 +27,8 @@ const BOARDS: [BoardTab, string][] = [
   ["territory", "Territory"],
   ["daily", "Daily"],
   ["weekly", "Weekly"],
+  ["learning", "Learning"],
+  ["learning-month", "Learning this month"],
 ];
 
 const ABOUT: Record<BoardTab, string> = {
@@ -36,6 +38,8 @@ const ABOUT: Record<BoardTab, string> = {
   territory: "Territory rating. Shown after 10 ranked games; hidden after 30 days without one.",
   daily: "Daily challenge streak, then total dailies solved. Miss a day without a freeze and the streak starts again.",
   weekly: "Points from this week's challenge set, then less total time. Starts again every Monday (UTC).",
+  learning: "XP from finished lessons, tutorials and roadmap modules.",
+  "learning-month": "Learning XP earned this calendar month (UTC). Starts again on the 1st.",
 };
 
 // What follows your value in the "You" row.
@@ -191,7 +195,9 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                             ? "No points yet this week. Solve a problem from this week's set."
                             : board === "daily"
                               ? "No streaks yet. Solve today's daily to start one."
-                              : "No one is here yet. Solve a problem to be the first."}
+                              : board === "learning" || board === "learning-month"
+                                ? "No one is here yet. Finish a lesson to be the first."
+                                : "No one is here yet. Solve a problem to be the first."}
                     </td>
                   </tr>
                 ) : (

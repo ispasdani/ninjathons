@@ -1,0 +1,16 @@
+{
+  "slug": "html-links-and-images",
+  "title": "Links and Images",
+  "difficulty": "easy",
+  "tags": [
+    "html",
+    "links",
+    "images"
+  ],
+  "mode": "web",
+  "edit": [
+    "html"
+  ],
+  "status": "beta",
+  "version": 1
+}

@@ -4,10 +4,10 @@ import { Leaderboard, type BoardTab, type Scope } from "@/components/leaderboard
 
 export const metadata: Metadata = {
   title: "Leaderboards",
-  description: "Level, 1v1, daily and weekly challenge leaderboards, worldwide, by country and for your groups.",
+  description: "Level, 1v1, Territory, daily and weekly challenge and learning leaderboards, worldwide, by country and for your groups.",
 };
 
-const BOARDS: BoardTab[] = ["level", "month", "1v1", "territory", "daily", "weekly"];
+const BOARDS: BoardTab[] = ["level", "month", "1v1", "territory", "daily", "weekly", "learning", "learning-month"];
 const SCOPES: Scope[] = ["global", "country", "group"];
 
 function pick<T extends string>(value: string | string[] | undefined, allowed: T[], fallback: T): T {

@@ -5,6 +5,6 @@ export default defineConfig({
     // convex-test runs Convex functions in the same runtime Convex uses.
     environment: "edge-runtime",
     server: { deps: { inline: ["convex-test"] } },
-    include: ["convex/**/*.test.ts"],
+    include: ["convex/**/*.test.ts", "scripts/**/*.test.ts"],
   },
 });

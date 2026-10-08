@@ -1,0 +1,9 @@
+{
+  "title": "Working with matrices",
+  "summary": "Rows, columns and indices: transposing, flipping and rotating, and walking a matrix in a spiral.",
+  "tutorial": true,
+  "exercises": [
+    "rotate-image",
+    "spiral-order"
+  ]
+}

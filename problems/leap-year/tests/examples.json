@@ -1,0 +1,22 @@
+[
+  {
+    "input": {
+      "year": 2024
+    },
+    "output": true
+  },
+  {
+    "input": {
+      "year": 1900
+    },
+    "output": false,
+    "explanation": "Divisible by 100 but not by 400."
+  },
+  {
+    "input": {
+      "year": 2000
+    },
+    "output": true,
+    "explanation": "Divisible by 400."
+  }
+]

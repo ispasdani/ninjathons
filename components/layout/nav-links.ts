@@ -3,6 +3,7 @@ export const NAV_LINKS = [
   { href: "/play", label: "Play" },
   { href: "/daily", label: "Daily" },
   { href: "/weekly", label: "Weekly" },
+  { href: "/learn", label: "Learn" },
   { href: "/problems", label: "Problems" },
   { href: "/leaderboards", label: "Leaderboards" },
   { href: "/badges", label: "Badges" },

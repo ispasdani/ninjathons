@@ -1,0 +1,9 @@
+{
+  "title": "Lists and arrays",
+  "summary": "Reading and building lists, and the best-so-far pattern behind finding the largest, the smallest and more.",
+  "tutorial": false,
+  "exercises": [
+    "largest-in-list",
+    "second-largest"
+  ]
+}

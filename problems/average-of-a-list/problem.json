@@ -1,0 +1,33 @@
+{
+  "slug": "average-of-a-list",
+  "title": "Average of a List",
+  "difficulty": "easy",
+  "tags": [
+    "arrays",
+    "math",
+    "debugging"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "average",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      }
+    ],
+    "returns": "double"
+  },
+  "checker": {
+    "kind": "float",
+    "tolerance": 0.000001
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "input": {
+      "nums": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "output": 2
+  },
+  {
+    "input": {
+      "nums": [
+        0,
+        -4,
+        7
+      ]
+    },
+    "output": 2,
+    "explanation": "0 and -4 are both even."
+  },
+  {
+    "input": {
+      "nums": []
+    },
+    "output": 0
+  }
+]

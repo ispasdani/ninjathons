@@ -6,9 +6,11 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { DocsPanel, docAreasFor } from "@/components/docs/docs-panel";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
+import type { FunctionReturnType } from "convex/server";
 import type { Language } from "@/convex/judge/types";
 import { CodeEditor } from "./code-editor";
 import { ChallengeChips } from "./challenge-chips";
@@ -16,6 +18,7 @@ import { ProblemStatement } from "./problem-statement";
 import { Split } from "./split";
 import { SubmissionsList } from "./submissions-list";
 import { VerdictPanel } from "./verdict-panel";
+import { WebSolveView } from "./web-solve-view";
 
 const ERRORS: Record<string, string> = {
   SUBMISSION_IN_PROGRESS: "Your previous run is still being judged.",
@@ -44,12 +47,13 @@ function writeDraft(slug: string, language: Language, code: string) {
   }
 }
 
-type Tab = "description" | "submissions";
+type Tab = "description" | "docs" | "submissions";
 
 /** Tab buttons above a panel, 13px, the active one underlined. */
 function Tabs({ value, onChange }: { value: Tab; onChange: (tab: Tab) => void }) {
   const tabs: [Tab, string][] = [
     ["description", "Description"],
+    ["docs", "Docs"],
     ["submissions", "Submissions"],
   ];
   return (
@@ -72,13 +76,24 @@ function Tabs({ value, onChange }: { value: Tab; onChange: (tab: Tab) => void })
   );
 }
 
+type Problem = NonNullable<FunctionReturnType<typeof api.problems.getBySlug>>;
+type CodeProblem = Exclude<Problem, { mode: "web" }>;
+
+/** The solve page: a code problem's view, or an HTML and CSS challenge's (decisions §17). */
+export function SolveView({ slug }: { slug: string }) {
+  const problem = useQuery(api.problems.getBySlug, { slug });
+  if (problem === undefined) return <p className="p-6 text-[13px] text-muted-foreground">Loading…</p>;
+  if (problem === null) return <p className="p-6 text-[13px] text-muted-foreground">Problem not found.</p>;
+  if (problem.mode === "web") return <WebSolveView problem={problem} />;
+  return <CodeSolveView slug={slug} problem={problem} />;
+}
+
 /**
  * The solve view (design.md 5.2): a resizable split with the problem and your
  * submissions on the left, the editor on the right and the results docked
  * under it. Run checks the examples; Submit checks every test.
  */
-export function SolveView({ slug }: { slug: string }) {
-  const problem = useQuery(api.problems.getBySlug, { slug });
+function CodeSolveView({ slug, problem }: { slug: string; problem: CodeProblem }) {
   const createSubmission = useMutation(api.submissions.create);
 
   const [tab, setTab] = useState<Tab>("description");
@@ -91,11 +106,11 @@ export function SolveView({ slug }: { slug: string }) {
   const opened = useQuery(api.submissions.get, openId ? { id: openId } : "skip");
   const busy = submission?.status === "queued" || submission?.status === "running";
 
-  const current = problem?.languages.find((l) => l.id === language) ?? problem?.languages[0];
+  const current = problem.languages.find((l) => l.id === language) ?? problem.languages[0];
 
   // Pick the first language once the problem loads, and load its draft.
   useEffect(() => {
-    if (!problem || language) return;
+    if (language) return;
     const first = problem.languages[0];
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial load from props and storage
     setLanguage(first.id);
@@ -115,7 +130,7 @@ export function SolveView({ slug }: { slug: string }) {
   }, [opened, slug]);
 
   function switchLanguage(id: Language) {
-    const next = problem?.languages.find((l) => l.id === id);
+    const next = problem.languages.find((l) => l.id === id);
     if (!next) return;
     setLanguage(id);
     setCode(readDraft(slug, id) ?? next.starterCode);
@@ -145,9 +160,6 @@ export function SolveView({ slug }: { slug: string }) {
     },
     [busy, code, createSubmission, language, slug],
   );
-
-  if (problem === undefined) return <p className="p-6 text-[13px] text-muted-foreground">Loading…</p>;
-  if (problem === null) return <p className="p-6 text-[13px] text-muted-foreground">Problem not found.</p>;
 
   const labels = Object.fromEntries(problem.languages.map((l) => [l.id, l.label]));
 
@@ -212,6 +224,8 @@ export function SolveView({ slug }: { slug: string }) {
             >
               {tab === "description" ? (
                 <ProblemStatement {...problem} />
+              ) : tab === "docs" ? (
+                <DocsPanel areas={docAreasFor(current?.id ?? null)} languageLabel={current?.label ?? ""} />
               ) : (
                 <SubmissionsList slug={slug} labels={labels} onOpen={setOpenId} />
               )}

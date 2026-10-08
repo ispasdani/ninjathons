@@ -121,7 +121,7 @@ export function ProblemLibrary() {
           label="Type"
           value={mode}
           onChange={setMode}
-          options={[["all", "Any type"], ["function", "Function"], ["stdio", "Full program"]]}
+          options={[["all", "Any type"], ["function", "Function"], ["stdio", "Full program"], ["web", "HTML & CSS"]]}
         />
         <select
           aria-label="Topic"
@@ -193,7 +193,7 @@ export function ProblemLibrary() {
                     </span>
                   </td>
                   <td className="hidden pr-4 text-muted-foreground sm:table-cell">
-                    {p.mode === "function" ? "Function" : "Full program"}
+                    {p.mode === "function" ? "Function" : p.mode === "web" ? "HTML & CSS" : "Full program"}
                   </td>
                   <td className="pr-4">
                     <Difficulty level={p.difficulty} />

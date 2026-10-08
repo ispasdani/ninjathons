@@ -1,0 +1,45 @@
+[
+  {
+    "input": {
+      "begin": "hit",
+      "end": "cog",
+      "words": [
+        "hot",
+        "dot",
+        "dog",
+        "lot",
+        "log",
+        "cog"
+      ]
+    },
+    "output": 5,
+    "explanation": "hit → hot → dot → dog → cog."
+  },
+  {
+    "input": {
+      "begin": "hit",
+      "end": "cog",
+      "words": [
+        "hot",
+        "dot",
+        "dog",
+        "lot",
+        "log"
+      ]
+    },
+    "output": 0,
+    "explanation": "cog isn't in the list."
+  },
+  {
+    "input": {
+      "begin": "a",
+      "end": "c",
+      "words": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    "output": 2
+  }
+]

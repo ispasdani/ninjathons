@@ -1,0 +1,61 @@
+{
+  "title": "Programming basics",
+  "summary": "From your first line of code to your first web page: values, decisions, loops, lists, strings and functions, in JavaScript and Python side by side.",
+  "order": 1,
+  "modules": [
+    {
+      "slug": "first-steps",
+      "title": "First steps",
+      "summary": "Values, variables and making decisions.",
+      "free": true,
+      "lessons": [
+        "pb-values-and-variables",
+        "pb-making-decisions"
+      ]
+    },
+    {
+      "slug": "loops-and-lists",
+      "title": "Loops and lists",
+      "summary": "Repeating work and handling many values at once.",
+      "free": false,
+      "lessons": [
+        "pb-loops",
+        "pb-lists",
+        "pb-strings"
+      ]
+    },
+    {
+      "slug": "functions-and-collections",
+      "title": "Functions and collections",
+      "summary": "Writing your own functions, hash maps and sets, and full programs that read their own input.",
+      "free": false,
+      "lessons": [
+        "pb-functions",
+        "hash-maps-and-sets",
+        "reading-input"
+      ]
+    },
+    {
+      "slug": "solving-problems",
+      "title": "Solving problems",
+      "summary": "Debugging, testing your own code, and knowing whether it will be fast enough.",
+      "free": false,
+      "lessons": [
+        "pb-debugging",
+        "pb-testing-with-examples",
+        "big-o-in-practice"
+      ]
+    },
+    {
+      "slug": "first-web-page",
+      "title": "Your first web page",
+      "summary": "HTML for structure, CSS for looks, and forms.",
+      "free": false,
+      "lessons": [
+        "html-first-page",
+        "css-layout-basics",
+        "pb-forms"
+      ]
+    }
+  ]
+}

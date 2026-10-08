@@ -142,6 +142,11 @@ export const result = publicQuery({
           const won = match.winnerId === p.userId;
           // Their rating as this match left it.
           const after = Math.round(p.ratingBefore + (p.ratingChange ?? 0));
+          // Doc pages opened during the match (decisions §9): "used 2 doc pages".
+          const docViews = await ctx.db
+            .query("docViews")
+            .withIndex("by_match_user_page", (q) => q.eq("matchId", match._id).eq("userId", p.userId))
+            .collect();
           return {
             username: user?.username ?? "Deleted player",
             ghost: p.ghost ?? false,
@@ -152,6 +157,7 @@ export const result = publicQuery({
             // From the start to the accepted Submit, by the server clock.
             solvedInMs: p.solvedAt === undefined ? null : p.solvedAt - match.startsAt,
             submits: p.submits,
+            docPages: p.ghost ? 0 : docViews.length,
             rating: trusted && !p.ghost ? after : null,
             tier: trusted && !p.ghost ? tierFor(after) : null,
             ratingChange: trusted && p.ratingChange !== undefined ? Math.round(p.ratingChange) : null,

@@ -1,0 +1,12 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 32px;
+  color: #171717;
+}
+img {
+  display: block;
+  border-radius: 8px;
+}
+a {
+  color: #4d7c0f;
+}

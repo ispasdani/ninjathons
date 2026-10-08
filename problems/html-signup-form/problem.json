@@ -1,0 +1,16 @@
+{
+  "slug": "html-signup-form",
+  "title": "Sign-up Form",
+  "difficulty": "easy",
+  "tags": [
+    "html",
+    "forms",
+    "accessibility"
+  ],
+  "mode": "web",
+  "edit": [
+    "html"
+  ],
+  "status": "beta",
+  "version": 1
+}

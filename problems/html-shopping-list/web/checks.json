@@ -1,0 +1,6 @@
+[
+  { "selector": "h1", "text": true },
+  { "selector": "p", "text": true },
+  { "selector": "ol", "box": true },
+  { "selector": "ol > li", "text": true }
+]

@@ -1,0 +1,10 @@
+{
+  "title": "Sorting and intervals",
+  "summary": "Sort by start and overlaps become neighbours: checking, merging and counting intervals, and the sweep line.",
+  "tutorial": true,
+  "exercises": [
+    "merge-intervals",
+    "can-attend-all",
+    "rooms-needed"
+  ]
+}

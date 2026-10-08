@@ -1,0 +1,40 @@
+{
+  "slug": "word-ladder",
+  "title": "Word Ladder",
+  "difficulty": "hard",
+  "tags": [
+    "graphs",
+    "bfs",
+    "strings"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "ladderLength",
+    "params": [
+      {
+        "name": "begin",
+        "type": "string"
+      },
+      {
+        "name": "end",
+        "type": "string"
+      },
+      {
+        "name": "words",
+        "type": "string[]"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

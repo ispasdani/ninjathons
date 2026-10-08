@@ -299,6 +299,17 @@ export const deleteFromClerk = internalMutation({
     ];
     for (const row of challengeRows) await ctx.db.delete(row._id);
 
+    // Their lesson and roadmap progress, learning XP, HTML and CSS Submits and doc
+    // pages opened in matches (decisions §17, §9).
+    const learnRows = [
+      ...(await ctx.db.query("docViews").withIndex("by_user", (q) => q.eq("userId", user._id)).collect()),
+      ...(await ctx.db.query("webSubmissions").withIndex("by_user_problem", (q) => q.eq("userId", user._id)).collect()),
+      ...(await ctx.db.query("lessonProgress").withIndex("by_user_lesson", (q) => q.eq("userId", user._id)).collect()),
+      ...(await ctx.db.query("roadmapProgress").withIndex("by_user_roadmap", (q) => q.eq("userId", user._id)).collect()),
+      ...(await ctx.db.query("learningXp").withIndex("by_user_period", (q) => q.eq("userId", user._id)).collect()),
+    ];
+    for (const row of learnRows) await ctx.db.delete(row._id);
+
     // Off the leaderboards now; the ranks close up on the next rebuild.
     const snapshots = await ctx.db
       .query("leaderboardSnapshots")

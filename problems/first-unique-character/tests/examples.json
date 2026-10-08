@@ -1,0 +1,21 @@
+[
+  {
+    "input": {
+      "s": "leetcode"
+    },
+    "output": 0
+  },
+  {
+    "input": {
+      "s": "loveleetcode"
+    },
+    "output": 2,
+    "explanation": "l, o and e repeat; v at index 2 doesn't."
+  },
+  {
+    "input": {
+      "s": "aabb"
+    },
+    "output": -1
+  }
+]

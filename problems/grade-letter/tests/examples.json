@@ -1,0 +1,21 @@
+[
+  {
+    "input": {
+      "score": 95
+    },
+    "output": "A"
+  },
+  {
+    "input": {
+      "score": 80
+    },
+    "output": "B",
+    "explanation": "80 is the lowest B."
+  },
+  {
+    "input": {
+      "score": 42
+    },
+    "output": "F"
+  }
+]

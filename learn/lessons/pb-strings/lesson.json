@@ -1,0 +1,9 @@
+{
+  "title": "Working with strings",
+  "summary": "Characters, the everyday string methods, and splitting text into words and back.",
+  "tutorial": false,
+  "exercises": [
+    "count-vowels",
+    "reverse-words"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "slug": "top-k-frequent",
+  "title": "Top K Frequent",
+  "difficulty": "medium",
+  "tags": [
+    "arrays",
+    "hash-map",
+    "sorting",
+    "heap"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "topKFrequent",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      },
+      {
+        "name": "k",
+        "type": "int"
+      }
+    ],
+    "returns": "int[]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

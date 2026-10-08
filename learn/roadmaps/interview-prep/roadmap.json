@@ -1,0 +1,58 @@
+{
+  "title": "Interview prep",
+  "summary": "How to solve a problem with someone watching: a process for 45 minutes, talking it through, edge cases, complexity, spotting patterns, and timed mock interviews.",
+  "order": 3,
+  "modules": [
+    {
+      "slug": "how-interviews-work",
+      "title": "How interviews work",
+      "summary": "The process interviewers look for, and explaining yourself as you go.",
+      "free": true,
+      "lessons": [
+        "ip-step-by-step",
+        "ip-talking-it-through"
+      ]
+    },
+    {
+      "slug": "edge-cases-and-complexity",
+      "title": "Edge cases and complexity",
+      "summary": "The inputs that break code, and stating what your code costs.",
+      "free": false,
+      "lessons": [
+        "ip-edge-cases",
+        "ip-complexity-out-loud"
+      ]
+    },
+    {
+      "slug": "spotting-the-pattern",
+      "title": "Spotting the pattern",
+      "summary": "Reading a problem's shape to find the technique, and choosing the right structure.",
+      "free": false,
+      "lessons": [
+        "ip-array-patterns",
+        "ip-string-patterns",
+        "ip-choosing-a-structure"
+      ]
+    },
+    {
+      "slug": "brute-force-to-optimal",
+      "title": "From brute force to optimal",
+      "summary": "Getting from a slow correct answer to a fast one, on medium and hard problems.",
+      "free": false,
+      "lessons": [
+        "ip-brute-force-first",
+        "ip-hard-problems"
+      ]
+    },
+    {
+      "slug": "mock-interviews",
+      "title": "Mock interviews",
+      "summary": "Two timed rounds to put it all together.",
+      "free": false,
+      "lessons": [
+        "ip-mock-1",
+        "ip-mock-2"
+      ]
+    }
+  ]
+}

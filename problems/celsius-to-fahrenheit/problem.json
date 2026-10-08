@@ -1,0 +1,33 @@
+{
+  "slug": "celsius-to-fahrenheit",
+  "title": "Celsius to Fahrenheit",
+  "difficulty": "easy",
+  "tags": [
+    "math",
+    "functions",
+    "warm-up"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "toFahrenheit",
+    "params": [
+      {
+        "name": "celsius",
+        "type": "double"
+      }
+    ],
+    "returns": "double"
+  },
+  "checker": {
+    "kind": "float",
+    "tolerance": 0.000001
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "input": {
+      "s": "42"
+    },
+    "output": 42
+  },
+  {
+    "input": {
+      "s": "   -042abc"
+    },
+    "output": -42,
+    "explanation": "Spaces skipped, sign read, leading zero fine, stops at a."
+  },
+  {
+    "input": {
+      "s": "91283472332"
+    },
+    "output": 2147483647,
+    "explanation": "Too large: clamped to the maximum."
+  }
+]
