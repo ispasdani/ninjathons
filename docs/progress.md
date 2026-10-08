@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 7, Learn, is done: 3 roadmaps, 20 tutorials, HTML and CSS challenges and the docs library, all on dev. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass by hand over the Learn pieces (finishing a lesson, a web Submit, the Docs tab), the pull request for phase 7, then phase 8, Profiles and Pro.
+**Now:** Phase 8, Profiles and Pro, has started: its rules are agreed ([decisions §18](notes/decisions.md#18-profiles-and-pro)). Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the Stripe webhook, entitlements and the Pro lock with its denial tests, once the Stripe test keys are in the Convex dev environment.
 
 ## Phases
 
@@ -16,7 +16,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
 | 6 | Territory | In progress | 8 Oct 2026 | |
 | 7 | Learn | Done | 8 Oct 2026 | 8 Oct 2026 |
-| 8 | Profiles and Pro | Not started | | |
+| 8 | Profiles and Pro | In progress | 8 Oct 2026 | |
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
@@ -25,6 +25,12 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 8: Profiles and Pro rules
+- Agreed and written up in [decisions §18](notes/decisions.md#18-profiles-and-pro): free profiles at `/u/<username>` with a fixed stats block, pinned solutions (never from a running daily or weekly) and redirects from old usernames; 10 themes (3 free, 4 earned by level and 1v1 tier, 3 Pro); Pro customisation (accent with a contrast check, pattern banners, no uploads in V1, heading font, section order, a short `/<username>` URL), previewable by everyone but saved only by Pro.
+- Payments: Stripe Checkout and the billing portal in test mode; the `/stripe` webhook reads each subscription back from Stripe and is the only writer of `entitlements`. VAT (Stripe Tax or a merchant of record) and regional prices are decided at release ([§2](notes/decisions.md#2-payments-stripe) updated).
+- The Pro lock: roadmap lesson text outside the free module; saving custom profile values. A test calls every Pro function as signed out and free, and another fails if a Pro function is missing from it.
+- Open: the Stripe test keys go into the Convex dev environment before Checkout can be tried.
 
 ### 8 Oct 2026 · Phase 7 done
 - The check passes: 3 roadmaps (Programming basics, Data structures and algorithms, Interview prep) and 20 tutorials are on dev, and HTML and CSS challenges work (the judge checked in the browser and in `problems:check`; Submit covered by tests).
