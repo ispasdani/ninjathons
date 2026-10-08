@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 6, Territory: the rules are agreed ([decisions §16](notes/decisions.md#16-territory)) and the game engine is built. **Next step:** the phase check: a group lobby of 3 to 6 real players finishing a full game, by hand.
+**Now:** Phase 6, Territory: built (rules in [decisions §16](notes/decisions.md#16-territory), engine, lobbies, Find a match, game screen, Territory board) and played in full by 3 and 6 bots on dev. **Next step:** the phase check: a group lobby of 3 to 6 real players finishing a full game, by hand.
 
 ## Phases
 
