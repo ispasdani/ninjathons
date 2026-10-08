@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)). Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the content model, lesson and roadmap pages, progress, learning XP and the Learning board.
+**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP and the Learning board built, with the first tutorial. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** HTML and CSS challenges, then the tutorials and roadmaps.
 
 ## Phases
 
@@ -20,11 +20,21 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
+Content track: 54 of 150–200 problems, 1 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7: lessons, roadmaps and the Learning board
+- Content as files: `learn/lessons/<slug>/` (`lesson.json`, `lesson.md`) and `learn/roadmaps/<slug>/` (`roadmap.json`, `intro.md`), checked by `problems:check` (1 to 3 exercises, 4 to 6 modules of 2 to 4 lessons, only the first module free, a roadmap lesson in one module, a badge per roadmap) and seeded by `problems:seed`, both when run with no slugs.
+- Tables `lessons`, `roadmaps`, `lessonProgress`, `roadmapProgress`, `learningXp` (`convex/learn.ts`, `convex/lib/learn.ts`). Opening a lesson signed in records it and finishes it if its exercises are already solved; an accepted Submit finishes any opened lesson waiting on that problem, then its module (100 XP) and roadmap (badge). The solve view's rewards line names the lesson and module finished.
+- A weekly set's problem can be an exercise; it stays out of the lesson until its week, and every lesson needs one exercise outside the sets ([decisions §17](notes/decisions.md#17-learn)).
+- Pages: `/learn` (roadmaps with your progress, tutorials), `/learn/<slug>` (the lesson, its exercises with Solve buttons, its place in a roadmap, previous and next), `/roadmaps/<slug>` (modules down a path, each filling in once finished, the free preview marked). Server-rendered with the signed-out view for search, then live. Learn is in the main nav.
+- Learning and Learning this month boards on Leaderboards, Global, Country and Group. 4 badges (First lesson, one per roadmap; 37 in all). Account deletion removes the new rows.
+- First tutorial, Hash maps and sets (Contains Duplicate, Two Sum, Valid Anagram), seeded to dev and checked in the browser at desktop and phone widths: rendered on the server, 404 for unknown slugs, no console errors.
+- 4 new tests (438 in all; the two that judge real Python can still time out when the whole suite runs at once). Production build passes. Deployed to Convex dev.
+- Open: the signed-in states (opening, finishing, the rewards line) haven't been seen in the browser, since the pane isn't signed in; no roadmap page seen yet, as no roadmap is written.
 
 ### 8 Oct 2026 · Phase 7: Learn rules
 - Agreed and written up in [decisions §17](notes/decisions.md#17-learn): tutorials and 3 roadmaps, no separate courses; one kind of lesson, finished when opened and its exercises solved (earlier solves count); 15 XP per lesson, 100 per module, 4 badges and a Learning board; the free first module is marked now and locked in phase 8; HTML and CSS challenges checked in the browser against a target page (DOM and computed styles), practice only; curated MDN and Python docs; lessons and roadmaps as files checked and seeded with the problems.

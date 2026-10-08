@@ -6,11 +6,13 @@
  * requires every wrong-* solution to fail and every slow-* one to time out.
  * Runs code in the runner image, or with the local Node.js and Python
  * (scripts/lib/local-runner.ts). With no slugs, also checks the weekly sets
- * (weekly/, scripts/lib/weekly.ts).
+ * (weekly/, scripts/lib/weekly.ts) and the lessons and roadmaps (learn/,
+ * scripts/lib/learn.ts).
  */
 import { judgeSubmission } from "../convex/judge/judge";
 import { LANGUAGES, problemLanguages } from "../convex/judge/languages";
 import { allTests, checkTestTypes, generateTests, listProblemDirs, loadProblem, type Problem } from "./lib/problems";
+import { checkLearn, loadLessons, loadRoadmaps } from "./lib/learn";
 import { localRunner } from "./lib/local-runner";
 import { checkWeeklySets, loadWeeklySets } from "./lib/weekly";
 
@@ -106,7 +108,22 @@ async function main() {
       console.log(`  ✗ ${setErrors[0]}`);
     }
   }
-  process.exit(failed || setErrors.length ? 1 : 0);
+
+  // And the lessons and roadmaps.
+  let learnErrors: string[] = [];
+  if (process.argv.length <= 2) {
+    try {
+      const lessons = loadLessons();
+      const roadmaps = loadRoadmaps();
+      learnErrors = checkLearn(lessons, roadmaps);
+      for (const error of learnErrors) console.log(`  ✗ ${error}`);
+      if (!learnErrors.length) console.log(`All ${lessons.length} ${lessons.length === 1 ? "lesson" : "lessons"} and ${roadmaps.length} ${roadmaps.length === 1 ? "roadmap" : "roadmaps"} passed.`);
+    } catch (error) {
+      learnErrors = [(error as Error).message];
+      console.log(`  ✗ ${learnErrors[0]}`);
+    }
+  }
+  process.exit(failed || setErrors.length || learnErrors.length ? 1 : 0);
 }
 
 void main();

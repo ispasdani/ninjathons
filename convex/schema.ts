@@ -10,6 +10,7 @@ import {
 } from "./schemas/challenges";
 import { problems, problemTests, testDrives } from "./schemas/problems";
 import { groupMembers, groups } from "./schemas/groups";
+import { learningXp, lessonProgress, lessons, roadmapProgress, roadmaps } from "./schemas/learn";
 import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboards";
 import { challenges, matchEvents, matches, matchmaking, matchPlayers, matchQueue } from "./schemas/matches";
 import { badgeCounts, userBadges, xpLedger, xpMonths } from "./schemas/progression";
@@ -66,4 +67,9 @@ export default defineSchema({
   territoryLobbyPlayers,
   territoryQueue,
   territoryMatchmaking,
+  lessons,
+  roadmaps,
+  lessonProgress,
+  roadmapProgress,
+  learningXp,
 });

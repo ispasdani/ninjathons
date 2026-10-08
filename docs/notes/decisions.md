@@ -109,7 +109,7 @@ Most of these tables don't exist yet. **Every new table gets a row here when it 
 | Username | `users.username` | Delete, and reserve the name for 90 days |
 | Uploaded and generated files | avatars, banners, share cards in Convex storage | Delete each storage id |
 | Practice | `submissions`, `drafts`, `docViews`, `integritySignals` | Delete |
-| Learning progress | `lessonProgress`, `roadmapProgress` | Delete |
+| Learning progress | `lessonProgress`, `roadmapProgress`, `learningXp` | Delete |
 | Progression | `xpLedger`, `userBadges`, `streaks`, `ratings`, `ratingHistory`, `dailyResults`, `weeklyResults` | Delete |
 | Leaderboards | `leaderboardSnapshots` | Remove their rows (also gone on the next rebuild) |
 | Queue and invites | `matchQueue`, `challenges` | Delete in phase 1 |
@@ -566,6 +566,7 @@ Agreed 8 Oct 2026, at the start of phase 7. Adds to the roadmap's rules (Learn, 
 - **A roadmap is an ordered path of 4 to 6 modules,** each 2 to 4 lessons, drawn as nodes on a path with progress per node. A module can use tutorials (which stay free) as well as lessons written for the roadmap.
 - **Pro (phase 8): the first module of each roadmap is free, the rest is Pro.** Each module records whether it's the free preview now; everything stays open until phase 8 adds the lock and its refusal tests. Lesson text is served by a Convex query, never built into a page, so phase 8 only has to lock the query. A roadmap's title and outline are public.
 - **A lesson is finished when you've opened it signed in and every exercise is solved,** in any language, in any order. Solves from before count, so a player who already solved the exercises finishes the lesson by opening it. No "mark as read" button.
+- **An exercise from a weekly set that hasn't started is left out** of its lesson (and doesn't count) until its week, so a lesson never gives a set away; every lesson needs at least one exercise outside the sets.
 - **A module is finished when all its lessons are; a roadmap when all its modules are.**
 
 ### XP, badges and the Learning board

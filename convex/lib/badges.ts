@@ -11,7 +11,7 @@ import type { Language } from "../judge/types";
 import { TITLES, levelForXp } from "./levels";
 import { PROVISIONAL_GAMES, TIERS, tierFor } from "./ratings";
 
-export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1" | "territory" | "challenges";
+export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1" | "territory" | "challenges" | "learn";
 
 export type Badge = {
   // Stored in userBadges; never changes once released.
@@ -26,6 +26,12 @@ const SOLVE_MILESTONES = [10, 50, 100, 500];
 const LANGUAGE_SOLVES = 50;
 const POLYGLOT_LANGUAGES = 5;
 export const STREAK_BADGES = [7, 30, 100];
+// The launch roadmaps (decisions §17), by slug: one badge each for finishing it.
+export const ROADMAP_BADGES = [
+  { slug: "programming-basics", title: "Programming basics", name: "Basics done" },
+  { slug: "data-structures-and-algorithms", title: "Data structures and algorithms", name: "Algorithmist" },
+  { slug: "interview-prep", title: "Interview prep", name: "Interview ready" },
+];
 
 const languages = Object.keys(LANGUAGES) as Language[];
 // Initiate is everyone's from the start, so it has no badge.
@@ -93,6 +99,14 @@ export const BADGES: Badge[] = [
     name: "Weekly top 10%",
     description: "Finish a weekly challenge in the top 10%.",
   },
+  // Granted in lib/learn.ts (decisions §17).
+  { id: "first-lesson", group: "learn", name: "First lesson", description: "Finish your first lesson or tutorial." },
+  ...ROADMAP_BADGES.map((roadmap) => ({
+    id: `roadmap-${roadmap.slug}`,
+    group: "learn" as const,
+    name: roadmap.name,
+    description: `Finish every module of the ${roadmap.title} roadmap.`,
+  })),
 ];
 
 /** Grants a badge once; returns whether it was new. */

@@ -80,6 +80,15 @@ export const submissions = defineTable({
   weekly: v.optional(
     v.object({ points: v.number(), xp: v.optional(v.number()), setComplete: v.optional(v.boolean()) }),
   ),
+  // Set when this Submit finished lessons or roadmap modules (decisions §17):
+  // which, and the learning XP they gave.
+  learn: v.optional(
+    v.object({
+      lessons: v.array(v.object({ slug: v.string(), title: v.string() })),
+      modules: v.array(v.object({ roadmap: v.string(), module: v.string(), title: v.string() })),
+      xp: v.number(),
+    }),
+  ),
   // Set when the submission was sent in a match.
   matchId: v.optional(v.id("matches")),
   // Set when it was sent in a Territory game, with the region it means to take

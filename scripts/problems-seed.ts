@@ -7,12 +7,14 @@
  * login (`npx convex run`), so it seeds your dev deployment unless --prod.
  * Then seeds the weekly sets (weekly/, decisions §15) that list any of the
  * problems seeded (every set, with no slugs); a weekly set's problems stay
- * hidden until its week starts.
+ * hidden until its week starts. With no slugs, then seeds the lessons and
+ * roadmaps (learn/, decisions §17).
  * Run problems:check first: this script only validates the shape.
  */
 import { spawnSync } from "node:child_process";
 
 import { allTests, checkTestTypes, generateTests, listProblemDirs, loadProblem } from "./lib/problems";
+import { loadLessons, loadRoadmaps } from "./lib/learn";
 import { loadWeeklySets, weeklySetOf } from "./lib/weekly";
 
 const args = process.argv.slice(2);
@@ -117,7 +119,50 @@ async function main() {
       }
     }
   }
+  // Then, when seeding everything, the lessons and the roadmaps that use them.
+  if (slugs.length === 0) failed += seedLearn();
   process.exit(failed ? 1 : 0);
+}
+
+/** Seeds every lesson, then every roadmap. Returns how many failed. */
+function seedLearn() {
+  let failed = 0;
+  const lessons = loadLessons();
+  const roadmaps = loadRoadmaps();
+  if (lessons.length) console.log(`Seeding ${lessons.length} lessons and ${roadmaps.length} roadmaps`);
+  for (const lesson of lessons) {
+    try {
+      const result = convexRun("learn:seedLesson", {
+        slug: lesson.slug,
+        title: lesson.title,
+        summary: lesson.summary,
+        body: lesson.body,
+        tutorial: lesson.tutorial,
+        exercises: lesson.exercises,
+      }) as { created: boolean };
+      console.log(`  ✓ ${lesson.slug} ${result.created ? "created" : "updated"}`);
+    } catch (error) {
+      failed++;
+      console.log(`  ✗ ${lesson.slug}: ${(error as Error).message}`);
+    }
+  }
+  for (const roadmap of roadmaps) {
+    try {
+      const result = convexRun("learn:seedRoadmap", {
+        slug: roadmap.slug,
+        title: roadmap.title,
+        summary: roadmap.summary,
+        intro: roadmap.intro,
+        order: roadmap.order,
+        modules: roadmap.modules,
+      }) as { created: boolean };
+      console.log(`  ✓ ${roadmap.slug} ${result.created ? "created" : "updated"}`);
+    } catch (error) {
+      failed++;
+      console.log(`  ✗ ${roadmap.slug}: ${(error as Error).message}`);
+    }
+  }
+  return failed;
 }
 
 void main();

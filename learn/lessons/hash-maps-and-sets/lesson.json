@@ -1,0 +1,6 @@
+{
+  "title": "Hash maps and sets",
+  "summary": "Trade a little memory for a lot of speed: look things up in constant time instead of searching.",
+  "tutorial": true,
+  "exercises": ["contains-duplicate", "two-sum", "valid-anagram"]
+}

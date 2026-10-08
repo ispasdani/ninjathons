@@ -7,6 +7,7 @@ import { problemLanguages } from "./judge/languages";
 import { userMutation, userQuery } from "./lib/functions";
 import { checkSolveBadges } from "./lib/badges";
 import { openDaily, recordDailySolve } from "./lib/daily";
+import { recordLessonSolve } from "./lib/learn";
 import { isListed } from "./lib/problems";
 import { openWeekly, recordWeeklySolve } from "./lib/weekly";
 import { noteSubmit, playersOf, recordJudgedSubmit, SUBMIT_COOLDOWN_MS } from "./lib/matches";
@@ -219,13 +220,16 @@ export const finish = internalMutation({
     if (daily) badges.push(...daily.badges);
     const weekly = await recordWeeklySolve(ctx, submission, problem);
     if (weekly) badges.push(...weekly.badges);
+    const learn = await recordLessonSolve(ctx, submission.userId, problem._id);
+    if (learn) badges.push(...learn.badges);
     await ctx.db.patch(submissionId, {
       xpAwarded: xp.awarded ? amount : undefined,
       // The highest level any of this Submit's awards reached: the last one to cross a level.
-      levelReached: weekly?.levelUp ?? daily?.levelUp ?? (xp.awarded ? xp.levelUp : undefined),
+      levelReached: learn?.levelUp ?? weekly?.levelUp ?? daily?.levelUp ?? (xp.awarded ? xp.levelUp : undefined),
       badgesEarned: badges.length ? badges : undefined,
       daily: daily ? { xp: daily.xp, streak: daily.streak, freezeEarned: daily.freezeEarned } : undefined,
       weekly: weekly ? { points: weekly.points, xp: weekly.xp, setComplete: weekly.setComplete } : undefined,
+      learn: learn ? { lessons: learn.lessons, modules: learn.modules, xp: learn.xp } : undefined,
     });
   },
 });

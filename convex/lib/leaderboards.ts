@@ -1,8 +1,8 @@
 /**
  * Leaderboards (roadmap, Progression; decisions §13). Each board ranks players
  * by one value, read in rank order from an index so a rebuild can go page by
- * page. Built now: Level (all time and monthly), 1v1, Territory, Daily and Weekly; the others
- * come with their phase.
+ * page. Built now: Level and Learning (all time and monthly), 1v1, Territory, Daily and
+ * Weekly; Ninjathons comes with its phase.
  */
 import { v, type Infer } from "convex/values";
 
@@ -20,6 +20,8 @@ export const boardKind = v.union(
   v.literal("territory"),
   v.literal("daily"),
   v.literal("weekly"),
+  v.literal("learning"),
+  v.literal("learning-month"),
 );
 export type BoardKind = Infer<typeof boardKind>;
 
@@ -31,13 +33,14 @@ const MONTH = /^\d{4}-\d{2}$/;
 const WEEK = /^\d{4}-W\d{2}$/;
 
 /**
- * The stored key of a board: "level", "level-month:2026-10", "1v1", "territory", "daily"
- * or "weekly:2026-W41". `period` is the month or week, defaulting to now's.
+ * The stored key of a board: "level", "level-month:2026-10", "1v1", "territory", "daily",
+ * "weekly:2026-W41", "learning" or "learning-month:2026-10". `period` is the month or week,
+ * defaulting to now's.
  */
 export function boardKey(kind: BoardKind, period?: string) {
-  if (kind === "level-month") {
+  if (kind === "level-month" || kind === "learning-month") {
     if (period !== undefined && !MONTH.test(period)) throw new Error(`Bad month: ${period}`);
-    return `level-month:${period ?? monthKey(Date.now())}`;
+    return `${kind}:${period ?? monthKey(Date.now())}`;
   }
   if (kind === "weekly") {
     if (period !== undefined && !WEEK.test(period)) throw new Error(`Bad week: ${period}`);
@@ -52,7 +55,18 @@ export function boardKey(kind: BoardKind, period?: string) {
  */
 export function liveBoards(now: number) {
   const week = weekKey(now);
-  return ["level", `level-month:${monthKey(now)}`, "1v1", "territory", "daily", `weekly:${week}`, `weekly:${previousWeek(week)}`];
+  const month = monthKey(now);
+  return [
+    "level",
+    `level-month:${month}`,
+    "1v1",
+    "territory",
+    "daily",
+    `weekly:${week}`,
+    `weekly:${previousWeek(week)}`,
+    "learning",
+    `learning-month:${month}`,
+  ];
 }
 
 /**
@@ -61,11 +75,17 @@ export function liveBoards(now: number) {
  */
 export function isRetired(board: string, now: number) {
   if (board.startsWith("weekly:")) return board.slice("weekly:".length) < previousWeek(weekKey(now));
-  if (!board.startsWith("level-month:")) return false;
+  const monthly = board.match(/^(?:level|learning)-month:(.*)$/);
+  if (!monthly) return false;
   const lastMonth = new Date(now);
   lastMonth.setUTCDate(1);
   lastMonth.setUTCMonth(lastMonth.getUTCMonth() - 1);
-  return board.slice("level-month:".length) < monthKey(lastMonth.getTime());
+  return monthly[1] < monthKey(lastMonth.getTime());
+}
+
+/** The learningXp period a Learning board reads: "all" or the month. */
+function learningPeriod(board: string) {
+  return board === "learning" ? "all" : board.slice("learning-month:".length);
 }
 
 export type Entry = { userId: Id<"users">; value: number };
@@ -129,6 +149,15 @@ export async function sourcePage(
       .paginate(paginationOpts);
     return { ...page, page: page.page.map((r): Entry => ({ userId: r.userId, value: r.points })) };
   }
+  if (board === "learning" || board.startsWith("learning-month:")) {
+    const period = learningPeriod(board);
+    const page = await ctx.db
+      .query("learningXp")
+      .withIndex("by_period_xp", (q) => q.eq("period", period))
+      .order("desc")
+      .paginate(paginationOpts);
+    return { ...page, page: page.page.map((r): Entry => ({ userId: r.userId, value: r.xp })) };
+  }
   throw new Error(`Unknown board: ${board}`);
 }
 
@@ -168,6 +197,12 @@ export async function groupEntries(ctx: QueryCtx, board: string, userIds: Id<"us
         .withIndex("by_user_week", (q) => q.eq("userId", userId).eq("week", board.slice("weekly:".length)))
         .unique();
       if (row) scored.push({ userId, value: row.points, tieBreak: row.tieBreak });
+    } else if (board === "learning" || board.startsWith("learning-month:")) {
+      const row = await ctx.db
+        .query("learningXp")
+        .withIndex("by_user_period", (q) => q.eq("userId", userId).eq("period", learningPeriod(board)))
+        .unique();
+      scored.push({ userId, value: row?.xp ?? 0, tieBreak: row?.tieBreak ?? -Infinity });
     } else {
       throw new Error(`Unknown board: ${board}`);
     }
