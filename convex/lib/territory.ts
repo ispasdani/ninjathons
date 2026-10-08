@@ -11,7 +11,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Language } from "../judge/types";
 import { checkTerritoryBadges } from "./badges";
-import { isListed } from "./problems";
+import { isCodeProblem, isListed } from "./problems";
 import { DEFAULT_OPENSKILL } from "./openskill";
 import { recordTerritory } from "./ratings";
 import {
@@ -65,7 +65,7 @@ async function dealDecks(ctx: QueryCtx, userIds: Id<"users">[]) {
   const pool: Doc<"problems">[] = [];
   for (const status of GAME_POOL) {
     const rows = await ctx.db.query("problems").withIndex("by_status", (q) => q.eq("status", status)).collect();
-    pool.push(...rows.filter(isListed));
+    pool.push(...rows.filter((p) => isListed(p) && isCodeProblem(p)));
   }
   const solved = new Set<string>();
   for (const userId of userIds) for (const slug of await solvedSlugs(ctx, userId)) solved.add(slug);

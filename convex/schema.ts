@@ -15,7 +15,7 @@ import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboard
 import { challenges, matchEvents, matches, matchmaking, matchPlayers, matchQueue } from "./schemas/matches";
 import { badgeCounts, userBadges, xpLedger, xpMonths } from "./schemas/progression";
 import { ratingHistory, ratings } from "./schemas/ratings";
-import { submissions } from "./schemas/submissions";
+import { submissions, webSubmissions } from "./schemas/submissions";
 import {
   territoryEvents,
   territoryGames,
@@ -37,6 +37,7 @@ export default defineSchema({
   problemTests,
   testDrives,
   submissions,
+  webSubmissions,
   xpLedger,
   xpMonths,
   userBadges,

@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP and the Learning board built, with the first tutorial. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** HTML and CSS challenges, then the tutorials and roadmaps.
+**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with the first tutorial and two challenges. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the content: tutorials, the 3 roadmaps, and the easy problems and HTML and CSS challenges they need.
 
 ## Phases
 
@@ -20,11 +20,21 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 54 of 150–200 problems, 1 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
+Content track: 56 of 150–200 problems (2 of them HTML and CSS), 1 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7: HTML and CSS challenges
+- A web challenge is a problem folder with `"mode": "web"`: target and starter pages, the files the player edits, viewport widths and checks comparing elements' count, text, computed styles and boxes with the target's ([decisions §17](notes/decisions.md#17-learn), as built).
+- One judge (`lib/web-judge.ts`) renders both pages in sandboxed iframes, with no scripts, and runs the checks at each width. The solve view runs it on Run and Submit; `problems:check` runs it in headless Chrome or Edge through `playwright-core` (new dev dependency, no browser download; CI uses the runner's Chrome) and requires the reference to pass, the starter and every wrong answer to fail, and every check to match something in the target.
+- The web solve view: HTML and CSS tabs (the given file read-only), your page and the target side by side, an overlay at half opacity, and a Checks list with the first difference per check.
+- `web.submit` records Submits (`webSubmissions`, with the code for V1.1's server re-check) and gives solve XP (`solve:<slug>:web`) and lesson progress on an accepted one. Web challenges count for solve milestones but not language badges, show in the library as HTML & CSS, and never reach the runner, daily, 1v1, Territory or weekly sets.
+- 2 challenges: Shopping List (HTML; checks caught bullets, wrong order, divs for headings) and Profile Card (CSS at 800 and 320 pixels; caught off-centre, overflow on phones, content-box sizing, stacked layout). Seeded to dev.
+- Checked in the browser on a throwaway route (removed): starter 0/10 with each difference named, the reference Accepted 10/10, side by side and overlay rendering, no console errors. Fixed on the way: a preview iframe whose source changed stayed blank, now remounted per source.
+- Fixed a Learning test missed in the last entry (the board list). 3 new tests, 441 in all, all passing. Production build passes. Deployed to Convex dev.
+- Open: Submit and its rewards haven't been seen signed in (tests cover them).
 
 ### 8 Oct 2026 · Phase 7: lessons, roadmaps and the Learning board
 - Content as files: `learn/lessons/<slug>/` (`lesson.json`, `lesson.md`) and `learn/roadmaps/<slug>/` (`roadmap.json`, `intro.md`), checked by `problems:check` (1 to 3 exercises, 4 to 6 modules of 2 to 4 lessons, only the first module free, a roadmap lesson in one module, a badge per roadmap) and seeded by `problems:seed`, both when run with no slugs.

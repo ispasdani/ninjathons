@@ -14,7 +14,9 @@ import type {
 
 export type Language = Infer<typeof language>;
 export type ValueType = Infer<typeof valueType>;
-export type Judge = Infer<typeof judge>;
+// Code problems only: HTML and CSS challenges ("web") are judged in the browser.
+export type Judge = Exclude<Infer<typeof judge>, { mode: "web" }>;
+export type WebJudge = Extract<Infer<typeof judge>, { mode: "web" }>;
 export type Signature = Extract<Judge, { mode: "function" }>["signature"];
 export type Checker = Infer<typeof checker>;
 export type Limits = { timeMs: number; memoryMb: number };

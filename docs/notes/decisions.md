@@ -108,7 +108,7 @@ Most of these tables don't exist yet. **Every new table gets a row here when it 
 | Account and profile | `users`, `profiles`, `notificationPrefs`, `notifications` | Delete (`users` last) |
 | Username | `users.username` | Delete, and reserve the name for 90 days |
 | Uploaded and generated files | avatars, banners, share cards in Convex storage | Delete each storage id |
-| Practice | `submissions`, `drafts`, `docViews`, `integritySignals` | Delete |
+| Practice | `submissions`, `webSubmissions`, `drafts`, `docViews`, `integritySignals` | Delete |
 | Learning progress | `lessonProgress`, `roadmapProgress`, `learningXp` | Delete |
 | Progression | `xpLedger`, `userBadges`, `streaks`, `ratings`, `ratingHistory`, `dailyResults`, `weeklyResults` | Delete |
 | Leaderboards | `leaderboardSnapshots` | Remove their rows (also gone on the next rebuild) |
@@ -592,4 +592,12 @@ Agreed 8 Oct 2026, at the start of phase 7. Adds to the roadmap's rules (Learn, 
 
 - **Lessons** are folders, `learn/lessons/<slug>/`: `lesson.json` (`{ "title", "summary", "tutorial": true|false, "exercises": [slugs] }`) and `lesson.md`. **Roadmaps** are `learn/roadmaps/<slug>/roadmap.json` (`{ "title", "summary", "order", "modules": [{ "slug", "title", "summary", "free", "lessons": [slugs] }] }`) and `intro.md`.
 - **`npm run problems:check` and `problems:seed`** with no slugs also check and seed lessons and roadmaps, as they do weekly sets. A lesson's exercises must exist and not be drafts; a lesson belongs to at most one roadmap module, except tutorials; exactly the first module is free.
+### HTML and CSS challenges as built (8 Oct 2026)
+
+- **A problem with `"mode": "web"`** in `problem.json`, plus `"edit"` (`["html"]`, `["css"]` or both) and `"viewports"` (widths, 800 when left out). Its files: `web/target.html` and `.css`, `web/starter.html` and `.css`, `web/checks.json`, `solutions/reference.html` or `.css` and at least one `solutions/wrong-*`; a solution's missing file is the starter's.
+- **A check** names a selector and compares every match with the target's at the same place: always the count, and as asked the text (`"text": true`), computed styles (`"styles": ["color", …]`) and position and size (`"box": true`, within `"tolerance"` pixels, default 4). Every check runs at every viewport.
+- **One judge, `lib/web-judge.ts`,** used by the solve view and, through Playwright in an installed Chrome or Edge (`playwright-core`, nothing downloaded), by `problems:check`. The check also requires the starter files to fail and every check to match something in the target.
+- **The solve view** has HTML and CSS tabs (the file you don't edit is read-only, marked "given"), and under them your page and the target side by side, laid over each other at half opacity, or the list of checks with the first difference each found. Drafts stay in the browser, as for code.
+- **`web.submit`** records each Submit in `webSubmissions` with the HTML and CSS (for V1.1's re-check), refuses a total no real run gives and Submits less than 3 s apart, and on an accepted one gives solve XP and counts for lessons. Solves of web challenges count toward the solve milestones but not the language or Polyglot badges. The code runner, daily, 1v1 and Territory never use them, and weekly sets can't list them.
+
 - **Order of work:** the content model, pages, progress, XP and board first; then HTML and CSS challenges; then the content (about 20 tutorials, 3 roadmaps, and the easy problems Programming basics needs); the docs library last.

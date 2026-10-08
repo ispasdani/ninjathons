@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { validate } from "convex-helpers/validators";
 import { v, type Infer } from "convex/values";
 
-import { listProblemDirs, loadProblem } from "./problems";
+import { listProblemDirs, loadMeta } from "./problems";
 
 export const WEEKLY_DIR = "weekly";
 const MIN_PROBLEMS = 3;
@@ -49,7 +49,7 @@ export function weeklySetOf(sets: WeeklySet[]) {
 /** Everything wrong with the sets, as messages; empty when they're fine. */
 export function checkWeeklySets(sets: WeeklySet[]): string[] {
   const errors: string[] = [];
-  const problems = new Map(listProblemDirs().map((dir) => loadProblem(dir).meta).map((meta) => [meta.slug, meta]));
+  const problems = new Map(listProblemDirs().map(loadMeta).map((meta) => [meta.slug, meta]));
   const orders = new Map<number, string>();
   const listed = new Map<string, string>();
   for (const set of sets) {
@@ -64,6 +64,7 @@ export function checkWeeklySets(sets: WeeklySet[]): string[] {
       const meta = problems.get(slug);
       if (!meta) errors.push(`${name}: no problem folder for ${slug}`);
       else if (meta.status === "draft") errors.push(`${name}: ${slug} is a draft`);
+      else if (meta.mode === "web") errors.push(`${name}: ${slug} is an HTML and CSS challenge, which are practice only`);
       if (listed.has(slug)) errors.push(`${name}: ${slug} is already in ${listed.get(slug)}`);
       listed.set(slug, set.slug);
     }

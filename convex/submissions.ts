@@ -42,6 +42,8 @@ export const create = userMutation({
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
     if (!problem || !isListed(problem)) throw new ConvexError("PROBLEM_NOT_FOUND");
+    // HTML and CSS challenges are judged in the browser (web.submit).
+    if (problem.judge.mode === "web") throw new ConvexError("LANGUAGE_NOT_ALLOWED");
 
     let player: Doc<"matchPlayers"> | undefined;
     let problemVersion = problem.version;

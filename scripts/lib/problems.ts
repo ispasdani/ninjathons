@@ -122,6 +122,18 @@ function runGenerator(dir: string): string[] {
   return inputs.map((input) => (typeof input === "string" ? input : JSON.stringify(input)));
 }
 
+/**
+ * The few settings every problem folder has, code or HTML and CSS, for checks
+ * that only need to know a problem exists (weekly sets, lessons).
+ */
+export function loadMeta(dir: string): { slug: string; status: ProblemFile["status"]; mode: string } {
+  const raw = readJson(join(dir, "problem.json")) as { slug?: unknown; status?: unknown; mode?: unknown };
+  if (typeof raw.slug !== "string" || typeof raw.status !== "string" || typeof raw.mode !== "string") {
+    throw new Error(`${dir}/problem.json needs a slug, status and mode`);
+  }
+  return { slug: raw.slug, status: raw.status as ProblemFile["status"], mode: raw.mode };
+}
+
 /** Loads and validates one folder. Throws with every problem found, file by file. */
 export function loadProblem(dir: string): Problem {
   const raw = readJson(join(dir, "problem.json"));

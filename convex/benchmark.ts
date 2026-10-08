@@ -49,6 +49,7 @@ export const judgeSource = internalAction({
     const runner = vercelRunner();
     const started = Date.now();
     try {
+      if (problem.judge.mode === "web") throw new Error(`${problem.slug} is judged in the browser`);
       const verdict = await judgeSubmission(runner, {
         judge: problem.judge,
         checker: problem.checker,

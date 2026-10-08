@@ -1,0 +1,16 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 32px;
+  color: #171717;
+}
+h1 {
+  font-size: 32px;
+  margin: 0 0 8px;
+}
+p {
+  color: #525252;
+  margin: 0 0 16px;
+}
+li {
+  line-height: 1.8;
+}

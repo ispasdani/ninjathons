@@ -161,7 +161,8 @@ export async function checkSolveBadges(
   for (const { key } of entries) {
     const [, slug, language] = key.split(":");
     problems.add(slug);
-    perLanguage.set(language, (perLanguage.get(language) ?? 0) + 1);
+    // HTML and CSS solves ("web") count as solves, but not toward language badges.
+    if (language in LANGUAGES) perLanguage.set(language, (perLanguage.get(language) ?? 0) + 1);
   }
 
   const due: string[] = [];

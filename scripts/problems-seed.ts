@@ -13,8 +13,9 @@
  */
 import { spawnSync } from "node:child_process";
 
-import { allTests, checkTestTypes, generateTests, listProblemDirs, loadProblem } from "./lib/problems";
+import { allTests, checkTestTypes, generateTests, listProblemDirs, loadMeta, loadProblem } from "./lib/problems";
 import { loadLessons, loadRoadmaps } from "./lib/learn";
+import { isWebProblemDir, loadWebProblem } from "./lib/web-problems";
 import { loadWeeklySets, weeklySetOf } from "./lib/weekly";
 
 const args = process.argv.slice(2);
@@ -32,7 +33,54 @@ function convexRun(fn: string, fnArgs: object): unknown {
   return JSON.parse(result.stdout.trim());
 }
 
+/**
+ * An HTML and CSS challenge: the target, starter files and checks go in the
+ * problem row; there are no hidden tests, and the code-only settings get
+ * fixed values the runner never reads.
+ */
+async function seedWeb(dir: string) {
+  const problem = loadWebProblem(dir);
+  const { meta } = problem;
+  return {
+    problem: {
+      slug: meta.slug,
+      title: meta.title,
+      statement: problem.statement,
+      difficulty: meta.difficulty,
+      tags: meta.tags,
+      judge: problem.judge,
+      checker: { kind: "exact" },
+      examples: [],
+      limits: { timeMs: 1000, memoryMb: 64 },
+      languages: [],
+      pool: "practice",
+      version: meta.version,
+      hints: problem.hints,
+      status: meta.status,
+    },
+    hidden: [],
+  };
+}
+
+async function upload(pkg: object) {
+  const uploadUrl = convexRun("problems:generateUploadUrl", {}) as string;
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(pkg),
+  });
+  if (!response.ok) throw new Error(`upload failed: ${response.status} ${await response.text()}`);
+  const { storageId } = (await response.json()) as { storageId: string };
+  return convexRun("problems:seedFromUpload", { upload: storageId }) as { created: boolean };
+}
+
 async function seedOne(dir: string, setOf: Map<string, string>) {
+  if (isWebProblemDir(dir)) {
+    const pkg = await seedWeb(dir);
+    const result = await upload(pkg);
+    console.log(`  ✓ ${pkg.problem.slug} v${pkg.problem.version} ${result.created ? "created" : "updated"}, HTML and CSS`);
+    return;
+  }
   const problem = loadProblem(dir);
   const typeErrors = checkTestTypes(problem);
   if (typeErrors.length) throw new Error(typeErrors.join("\n"));
@@ -67,15 +115,7 @@ async function seedOne(dir: string, setOf: Map<string, string>) {
     weeklySet: setOf.get(meta.slug),
   };
 
-  const uploadUrl = convexRun("problems:generateUploadUrl", {}) as string;
-  const response = await fetch(uploadUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(pkg),
-  });
-  if (!response.ok) throw new Error(`upload failed: ${response.status} ${await response.text()}`);
-  const { storageId } = (await response.json()) as { storageId: string };
-  const result = convexRun("problems:seedFromUpload", { upload: storageId }) as { created: boolean };
+  const result = await upload(pkg);
   console.log(`  ✓ ${meta.slug} v${meta.version} ${result.created ? "created" : "updated"}, ${hidden.length} hidden tests`);
 }
 
@@ -98,7 +138,7 @@ async function main() {
     }
   }
   // Then their weekly sets, whose problems must be seeded first.
-  const seeded = new Set(dirs.map((dir) => loadProblem(dir).meta.slug));
+  const seeded = new Set(dirs.map((dir) => loadMeta(dir).slug));
   const due = sets.filter((set) => set.problems.some((slug) => seeded.has(slug)));
   if (due.length) {
     console.log(`Seeding ${due.length} weekly sets`);

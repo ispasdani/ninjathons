@@ -12,7 +12,7 @@ import { validate } from "convex-helpers/validators";
 import { v, type Infer } from "convex/values";
 
 import { ROADMAP_BADGES } from "../../convex/lib/badges";
-import { listProblemDirs, loadProblem } from "./problems";
+import { listProblemDirs, loadMeta } from "./problems";
 import { loadWeeklySets, weeklySetOf } from "./weekly";
 
 export const LESSONS_DIR = "learn/lessons";
@@ -86,7 +86,7 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** Everything wrong with the lessons and roadmaps, as messages; empty when they're fine. */
 export function checkLearn(lessons: Lesson[], roadmaps: Roadmap[]): string[] {
   const errors: string[] = [];
-  const problems = new Map(listProblemDirs().map((dir) => loadProblem(dir).meta).map((meta) => [meta.slug, meta]));
+  const problems = new Map(listProblemDirs().map(loadMeta).map((meta) => [meta.slug, meta]));
   const inWeekly = weeklySetOf(loadWeeklySets());
 
   const bySlug = new Map(lessons.map((l) => [l.slug, l]));

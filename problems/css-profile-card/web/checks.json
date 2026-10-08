@@ -1,0 +1,7 @@
+[
+  { "selector": "body", "styles": ["background-color"] },
+  { "selector": ".card", "styles": ["background-color", "border-top-left-radius", "border-top-width", "border-top-color"], "box": true },
+  { "selector": ".avatar", "styles": ["background-color", "border-top-left-radius"], "box": true },
+  { "selector": ".name", "styles": ["font-size", "font-weight"], "box": true },
+  { "selector": ".role", "styles": ["font-size", "color"], "box": true }
+]

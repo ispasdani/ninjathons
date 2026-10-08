@@ -6,8 +6,11 @@ import { useEffect, useRef } from "react";
 
 import type { Language } from "@/convex/judge/types";
 
+// The code languages, plus HTML and CSS for web challenges (decisions §17).
+export type EditorLanguage = Language | "html" | "css";
+
 // Monaco's own language ids.
-const MONACO_LANGUAGE: Record<Language, string> = {
+const MONACO_LANGUAGE: Record<EditorLanguage, string> = {
   javascript: "javascript",
   typescript: "typescript",
   python: "python",
@@ -15,10 +18,12 @@ const MONACO_LANGUAGE: Record<Language, string> = {
   csharp: "csharp",
   cpp: "cpp",
   rust: "rust",
+  html: "html",
+  css: "css",
 };
 
 // Languages whose usual style indents with 4 spaces.
-const FOUR_SPACES = new Set<Language>(["python", "java", "csharp", "cpp", "rust"]);
+const FOUR_SPACES = new Set<EditorLanguage>(["python", "java", "csharp", "cpp", "rust"]);
 
 // Catppuccin Latte (light) and Mocha (dark), MIT licensed (design.md 6, code
 // and the editor). Backgrounds follow our tokens: --background for the code,
@@ -94,14 +99,17 @@ function defineThemes(monaco: Monaco) {
 }
 
 type Props = {
-  language: Language;
+  language: EditorLanguage;
   value: string;
   onChange: (value: string) => void;
   onRun: () => void;
   onSubmit: () => void;
+  // A model per path keeps each file's undo history when switching between them.
+  path?: string;
+  readOnly?: boolean;
 };
 
-export function CodeEditor({ language, value, onChange, onRun, onSubmit }: Props) {
+export function CodeEditor({ language, value, onChange, onRun, onSubmit, path, readOnly }: Props) {
   const { resolvedTheme } = useTheme();
   // Monaco keeps the commands from mount time, so they call through refs.
   const handlers = useRef({ onRun, onSubmit });
@@ -112,6 +120,7 @@ export function CodeEditor({ language, value, onChange, onRun, onSubmit }: Props
     <Editor
       height="100%"
       language={MONACO_LANGUAGE[language]}
+      path={path}
       value={value}
       onChange={(v) => onChange(v ?? "")}
       theme={resolvedTheme === "dark" ? "catppuccin-mocha" : "catppuccin-latte"}
@@ -122,6 +131,7 @@ export function CodeEditor({ language, value, onChange, onRun, onSubmit }: Props
         fontSize: 13,
         lineHeight: 20,
         minimap: { enabled: false },
+        readOnly,
         scrollBeyondLastLine: false,
         tabSize: FOUR_SPACES.has(language) ? 4 : 2,
         automaticLayout: true,

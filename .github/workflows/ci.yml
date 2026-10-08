@@ -51,6 +51,8 @@ jobs:
         run: npm run test:once
         env:
           RUNNER: docker
+      # HTML and CSS challenges are checked in the runner's preinstalled Chrome
+      # (scripts/lib/browser.ts).
       - name: Check problems
         run: npm run problems:check
         env:

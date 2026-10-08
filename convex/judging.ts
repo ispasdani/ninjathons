@@ -49,6 +49,8 @@ export const judge = internalAction({
         });
       }
 
+      // Submissions refuses HTML and CSS challenges, which the browser judges.
+      if (problem.judge.mode === "web") throw new Error(`${problem.slug} is judged in the browser`);
       const verdict = await judgeSubmission(runner, {
         judge: problem.judge,
         checker: problem.checker,

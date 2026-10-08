@@ -105,3 +105,21 @@ export const submissions = defineTable({
   .index("by_territory_game", ["territoryGameId"])
   .index("by_user_problem", ["userId", "problemId"])
   .index("by_user_status", ["userId", "status"]);
+
+// An HTML and CSS challenge Submit (decisions §17). Judged in the player's
+// browser, so the verdict is what the browser reported; the code is kept so
+// V1.1's server-side visual judge can check it again.
+export const webSubmissions = defineTable({
+  userId: v.id("users"),
+  problemId: v.id("problems"),
+  problemVersion: v.number(),
+  html: v.string(),
+  css: v.string(),
+  passed: v.number(),
+  total: v.number(),
+  accepted: v.boolean(),
+  // Set on an accepted Submit: the solve XP (absent if already awarded),
+  // and anything else it earned, as on `submissions`.
+  xpAwarded: v.optional(v.number()),
+  badgesEarned: v.optional(v.array(v.string())),
+}).index("by_user_problem", ["userId", "problemId"]);

@@ -81,6 +81,7 @@ import type * as territorySim from "../territorySim.js";
 import type * as testDrives from "../testDrives.js";
 import type * as testDrivesFill from "../testDrivesFill.js";
 import type * as user from "../user.js";
+import type * as web from "../web.js";
 import type * as weekly from "../weekly.js";
 
 import type {
@@ -163,6 +164,7 @@ declare const fullApi: ApiFromModules<{
   testDrives: typeof testDrives;
   testDrivesFill: typeof testDrivesFill;
   user: typeof user;
+  web: typeof web;
   weekly: typeof weekly;
 }>;
 

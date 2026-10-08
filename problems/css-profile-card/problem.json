@@ -1,0 +1,11 @@
+{
+  "slug": "css-profile-card",
+  "title": "Profile Card",
+  "difficulty": "easy",
+  "tags": ["css", "box-model", "flexbox"],
+  "mode": "web",
+  "edit": ["css"],
+  "viewports": [800, 320],
+  "status": "beta",
+  "version": 1
+}

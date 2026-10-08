@@ -12,7 +12,7 @@ import type { Language } from "../judge/types";
 import type { difficulty } from "../schemas/problems";
 import { checkMatchBadges } from "./badges";
 import { DEFAULT_GLICKO } from "./glicko2";
-import { isListed } from "./problems";
+import { isCodeProblem, isListed } from "./problems";
 import { recordDuel } from "./ratings";
 import { leaveTerritoryWaiting } from "./territory";
 import { awardXp } from "./xp";
@@ -73,7 +73,7 @@ export async function pickProblem(ctx: QueryCtx, userIds: Id<"users">[], wanted:
   const pool: Doc<"problems">[] = [];
   for (const status of MATCH_POOL) {
     const rows = await ctx.db.query("problems").withIndex("by_status", (q) => q.eq("status", status)).collect();
-    pool.push(...rows.filter(isListed));
+    pool.push(...rows.filter((p) => isListed(p) && isCodeProblem(p)));
   }
   const solved = new Set<string>();
   for (const userId of userIds) for (const slug of await solvedSlugs(ctx, userId)) solved.add(slug);
