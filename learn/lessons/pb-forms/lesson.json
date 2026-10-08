@@ -1,0 +1,8 @@
+{
+  "title": "Forms",
+  "summary": "Fields, labels and the right input types, and letting the browser check answers before they are sent.",
+  "tutorial": false,
+  "exercises": [
+    "html-signup-form"
+  ]
+}

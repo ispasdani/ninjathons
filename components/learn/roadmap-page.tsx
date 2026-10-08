@@ -40,7 +40,7 @@ export function RoadmapPage({ preloaded }: { preloaded: Preloaded<typeof api.lea
         </div>
         {isAuthenticated && next && (
           <Button variant="brand" asChild>
-            <Link href={`/learn/${next.slug}`}>
+            <Link href={`/learn/${next.slug}?roadmap=${roadmap.slug}`}>
               {done === 0 ? "Start" : "Carry on"}: {next.title}
             </Link>
           </Button>
@@ -101,7 +101,7 @@ export function RoadmapPage({ preloaded }: { preloaded: Preloaded<typeof api.lea
                   {module.lessons.map((lesson) => (
                     <li key={lesson.slug}>
                       <Link
-                        href={`/learn/${lesson.slug}`}
+                        href={`/learn/${lesson.slug}?roadmap=${roadmap.slug}`}
                         className="group flex items-center gap-3 py-3 text-[13px] transition-colors hover:text-foreground"
                       >
                         <LessonState state={lesson.state} />

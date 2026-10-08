@@ -1,0 +1,9 @@
+{
+  "title": "Making decisions with if",
+  "summary": "Comparisons, if and else, and combining conditions, with an eye on the edges where bugs live.",
+  "tutorial": false,
+  "exercises": [
+    "fizz-buzz",
+    "grade-letter"
+  ]
+}

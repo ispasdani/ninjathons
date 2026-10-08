@@ -201,11 +201,12 @@ export const roadmap = publicQuery({
 /**
  * A lesson or tutorial: its text, exercises (solved or not, signed in), your
  * progress, and where it sits in a roadmap. Every lesson is open in phase 7;
- * phase 8 locks the text of roadmap lessons outside the free mod.
+ * phase 8 locks the text of roadmap lessons outside the free module.
  */
 export const lesson = publicQuery({
-  args: { slug: v.string() },
-  handler: async (ctx, { slug }) => {
+  // The roadmap it was opened from, when it's a tutorial in several.
+  args: { slug: v.string(), roadmap: v.optional(v.string()) },
+  handler: async (ctx, { slug, roadmap: from }) => {
     const lesson = await ctx.db
       .query("lessons")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -215,9 +216,11 @@ export const lesson = publicQuery({
     const userId = user?._id ?? null;
 
     // The roadmap module it's in, with the lessons either side. A tutorial
-    // can be in several; the first roadmap by order wins.
+    // can be in several: the one it was opened from, else the first by order.
     let place = null;
-    for (const roadmap of await publishedRoadmaps(ctx)) {
+    const roadmaps = await publishedRoadmaps(ctx);
+    roadmaps.sort((a, b) => Number(b.slug === from) - Number(a.slug === from));
+    for (const roadmap of roadmaps) {
       for (const mod of roadmap.modules) {
         const lessons = await moduleLessons(ctx, mod);
         const at = lessons.findIndex((l) => l._id === lesson._id);

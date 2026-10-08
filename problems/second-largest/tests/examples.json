@@ -1,0 +1,34 @@
+[
+  {
+    "input": {
+      "nums": [
+        4,
+        9,
+        9,
+        2
+      ]
+    },
+    "output": 4,
+    "explanation": "The two 9s are the same value, so the answer is 4."
+  },
+  {
+    "input": {
+      "nums": [
+        1,
+        2
+      ]
+    },
+    "output": 1
+  },
+  {
+    "input": {
+      "nums": [
+        7,
+        7,
+        7
+      ]
+    },
+    "output": -1,
+    "explanation": "Every number is the same."
+  }
+]

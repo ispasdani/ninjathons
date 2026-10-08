@@ -1,0 +1,22 @@
+[
+  {
+    "input": {
+      "celsius": 100
+    },
+    "output": 212,
+    "explanation": "Water boils at 100 °C, which is 212 °F."
+  },
+  {
+    "input": {
+      "celsius": 0
+    },
+    "output": 32
+  },
+  {
+    "input": {
+      "celsius": -40
+    },
+    "output": -40,
+    "explanation": "The one temperature that's the same on both scales."
+  }
+]

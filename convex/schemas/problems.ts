@@ -50,10 +50,12 @@ export const signature = v.object({
 // One check of an HTML and CSS challenge (decisions §17). Every element the
 // selector matches in the player's page is compared with the one at the same
 // place in the target: always how many there are, and as asked their text,
-// computed styles, and position and size (within `tolerance` pixels, default 4).
+// attributes (as written, e.g. href, alt, type), computed styles, and position
+// and size (within `tolerance` pixels, default 4).
 export const webCheck = v.object({
   selector: v.string(),
   text: v.optional(v.boolean()),
+  attributes: v.optional(v.array(v.string())),
   styles: v.optional(v.array(v.string())),
   box: v.optional(v.boolean()),
   tolerance: v.optional(v.number()),

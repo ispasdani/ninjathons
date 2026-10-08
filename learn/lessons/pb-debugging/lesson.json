@@ -1,0 +1,8 @@
+{
+  "title": "Finding and fixing bugs",
+  "summary": "A method for debugging: read the result, shrink the input, look inside, and change one thing at a time.",
+  "tutorial": false,
+  "exercises": [
+    "average-of-a-list"
+  ]
+}

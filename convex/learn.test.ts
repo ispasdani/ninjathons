@@ -164,6 +164,25 @@ describe("modules and roadmaps", () => {
   });
 });
 
+describe("tutorials in several roadmaps", () => {
+  it("take their place from the roadmap they were opened from, else the first by order", async () => {
+    const t = setup();
+    await seedContent(t);
+    await t.mutation(internal.learn.seedRoadmap, {
+      slug: "data-structures-and-algorithms",
+      title: "DSA",
+      summary: "",
+      intro: "",
+      order: 2,
+      modules: [{ slug: "arrays", title: "Arrays", summary: "", free: true, lessons: ["solo", "two"] }],
+    });
+    const plain = await t.query(api.learn.lesson, { slug: "solo" });
+    expect(plain?.place).toMatchObject({ roadmap: { slug: "programming-basics" }, next: null });
+    const fromDsa = await t.query(api.learn.lesson, { slug: "solo", roadmap: "data-structures-and-algorithms" });
+    expect(fromDsa?.place).toMatchObject({ roadmap: { slug: "data-structures-and-algorithms" }, next: { slug: "two" } });
+  });
+});
+
 describe("the Learning board", () => {
   it("ranks learning XP only, all time and this month, and is cleared on account deletion", async () => {
     const t = setup();

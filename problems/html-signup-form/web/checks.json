@@ -1,0 +1,28 @@
+[
+  {
+    "selector": "form"
+  },
+  {
+    "selector": "form label",
+    "text": true,
+    "attributes": [
+      "for"
+    ]
+  },
+  {
+    "selector": "form input",
+    "attributes": [
+      "type",
+      "id",
+      "required",
+      "minlength"
+    ]
+  },
+  {
+    "selector": "form button",
+    "text": true,
+    "attributes": [
+      "type"
+    ]
+  }
+]

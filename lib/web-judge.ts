@@ -90,6 +90,18 @@ export async function judgeWebPage(args: {
       const b = theirs[i];
       const which = theirs.length > 1 ? `${check.selector} (${nth(i)})` : check.selector;
       if (check.text && text(a) !== text(b)) return `${which}: the text is "${text(a)}"; the target's is "${text(b)}"`;
+      for (const name of check.attributes ?? []) {
+        const va = a.getAttribute(name);
+        const vb = b.getAttribute(name);
+        // Written with no value in the target (`required`), only being there counts:
+        // `required="required"` is the same thing.
+        const same = vb === "" ? va !== null : va === vb;
+        if (!same) {
+          const mine = va === null ? "isn't set" : `is "${va}"`;
+          const theirs = vb === null ? "isn't set" : `is "${vb}"`;
+          return `${which}: the ${name} attribute ${mine}; the target's ${theirs}`;
+        }
+      }
       if (check.styles?.length) {
         const sa = user.defaultView!.getComputedStyle(a);
         const sb = target.defaultView!.getComputedStyle(b);

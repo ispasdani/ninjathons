@@ -1,0 +1,29 @@
+[
+  {
+    "input": {
+      "nums": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "output": 2.5
+  },
+  {
+    "input": {
+      "nums": [
+        -3,
+        3
+      ]
+    },
+    "output": 0
+  },
+  {
+    "input": {
+      "nums": []
+    },
+    "output": 0,
+    "explanation": "An empty list has no average; return 0."
+  }
+]

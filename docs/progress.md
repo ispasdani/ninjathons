@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with the first tutorial and two challenges. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the content: tutorials, the 3 roadmaps, and the easy problems and HTML and CSS challenges they need.
+**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with the Programming basics roadmap written and seeded. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the remaining 15 tutorials and the Data structures and algorithms roadmap ([curriculum](notes/curriculum.md), step 2), then Interview prep.
 
 ## Phases
 
@@ -20,11 +20,19 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 56 of 150–200 problems (2 of them HTML and CSS), 1 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
+Content track: 71 of 150–200 problems (5 of them HTML and CSS), 5 of ~20 tutorials, 1 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7: Programming basics roadmap
+- The curriculum outline agreed and written up in [notes/curriculum.md](notes/curriculum.md): 20 tutorials, 3 roadmaps, 41 lessons and 32 new problems; linked lists and trees wait for ListNode and TreeNode types.
+- Programming basics, written and seeded to dev: 5 modules (First steps free; Loops and lists; Functions and collections; Solving problems; Your first web page), 9 lessons of its own and 5 tutorials, 4 of them new (Big O in practice, Reading input and printing output, Your first web page, CSS: the box model and flexbox). Every lesson shows JavaScript and Python side by side.
+- 12 new easy problems, each with JavaScript and Python references and wrong answers for the usual beginner mistakes: Seconds to Minutes, Grade Letter, Count Evens, Sum of Digits, Largest in List, Second Largest, Count Vowels, Reverse Words, Celsius to Fahrenheit, Leap Year, Average of a List, Is Sorted.
+- 3 new HTML and CSS challenges: Links and Images, Nav Bar, Sign-up Form. Web checks can now compare attributes (`href`, `alt`, `type`, `for`; `required` only has to be present).
+- A tutorial in several roadmaps now takes its place and next lesson from the roadmap it was opened from (`?roadmap=`), so the DSA roadmap won't send people into Programming basics.
+- `problems:check` passes for all 71 problems, 6 weekly sets, 14 lessons and the roadmap. The roadmap page and lessons checked in the browser. 1 new test, 442 in all. Production build passes.
 
 ### 8 Oct 2026 · Phase 7: HTML and CSS challenges
 - A web challenge is a problem folder with `"mode": "web"`: target and starter pages, the files the player edits, viewport widths and checks comparing elements' count, text, computed styles and boxes with the target's ([decisions §17](notes/decisions.md#17-learn), as built).

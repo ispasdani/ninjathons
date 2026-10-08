@@ -1,0 +1,31 @@
+{
+  "slug": "second-largest",
+  "title": "Second Largest",
+  "difficulty": "easy",
+  "tags": [
+    "arrays",
+    "loops"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "secondLargest",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

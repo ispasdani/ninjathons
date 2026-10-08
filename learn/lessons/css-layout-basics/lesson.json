@@ -1,0 +1,9 @@
+{
+  "title": "CSS: the box model and flexbox",
+  "summary": "Selectors, padding, borders and margins, centring a box, and lining things up with flexbox.",
+  "tutorial": true,
+  "exercises": [
+    "css-profile-card",
+    "css-nav-bar"
+  ]
+}

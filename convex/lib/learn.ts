@@ -11,7 +11,7 @@ import { grantBadge } from "./badges";
 import { isListed } from "./problems";
 import { awardXp, monthKey } from "./xp";
 
-// Roadmap, XP sources: once per lesson, once per mod.
+// Roadmap, XP sources: once per lesson, once per module.
 export const LESSON_XP = 15;
 export const MODULE_XP = 100;
 

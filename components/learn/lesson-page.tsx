@@ -127,7 +127,7 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
         <nav className="mt-8 flex flex-wrap justify-between gap-3" aria-label="Lessons">
           {place.previous ? (
             <Button variant="ghost" size="sm" asChild>
-              <Link href={`/learn/${place.previous.slug}`}>
+              <Link href={`/learn/${place.previous.slug}?roadmap=${place.roadmap.slug}`}>
                 <ArrowLeft aria-hidden />
                 {place.previous.title}
               </Link>
@@ -137,7 +137,7 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
           )}
           {place.next ? (
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/learn/${place.next.slug}`}>
+              <Link href={`/learn/${place.next.slug}?roadmap=${place.roadmap.slug}`}>
                 Next: {place.next.title}
                 <ArrowRight aria-hidden />
               </Link>

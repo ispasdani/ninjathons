@@ -1,0 +1,32 @@
+{
+  "slug": "sum-of-digits",
+  "title": "Sum of Digits",
+  "difficulty": "easy",
+  "tags": [
+    "math",
+    "loops",
+    "warm-up"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "sumOfDigits",
+    "params": [
+      {
+        "name": "n",
+        "type": "int"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

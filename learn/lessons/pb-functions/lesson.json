@@ -1,0 +1,9 @@
+{
+  "title": "Writing functions",
+  "summary": "Parameters, return values and why to return rather than print; formulas and rules with exceptions.",
+  "tutorial": false,
+  "exercises": [
+    "celsius-to-fahrenheit",
+    "leap-year"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "grade-letter",
+  "title": "Grade Letter",
+  "difficulty": "easy",
+  "tags": [
+    "conditionals",
+    "warm-up"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "gradeLetter",
+    "params": [
+      {
+        "name": "score",
+        "type": "int"
+      }
+    ],
+    "returns": "string"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

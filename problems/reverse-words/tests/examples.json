@@ -1,0 +1,21 @@
+[
+  {
+    "input": {
+      "s": "the sky is blue"
+    },
+    "output": "blue is sky the"
+  },
+  {
+    "input": {
+      "s": "  hello   world  "
+    },
+    "output": "world hello",
+    "explanation": "The extra spaces are gone."
+  },
+  {
+    "input": {
+      "s": "one"
+    },
+    "output": "one"
+  }
+]

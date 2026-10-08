@@ -1,0 +1,9 @@
+{
+  "title": "Your first web page",
+  "summary": "Elements, tags and attributes: headings, paragraphs, lists, links and pictures.",
+  "tutorial": true,
+  "exercises": [
+    "html-shopping-list",
+    "html-links-and-images"
+  ]
+}

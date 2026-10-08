@@ -1,0 +1,8 @@
+{
+  "title": "Testing your code with examples",
+  "summary": "List the edge cases before you write the code, then run them yourself before you submit.",
+  "tutorial": false,
+  "exercises": [
+    "is-sorted"
+  ]
+}

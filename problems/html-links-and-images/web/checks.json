@@ -1,0 +1,27 @@
+[
+  {
+    "selector": "h1",
+    "text": true
+  },
+  {
+    "selector": "img",
+    "attributes": [
+      "src",
+      "alt",
+      "width",
+      "height"
+    ],
+    "box": true
+  },
+  {
+    "selector": "p",
+    "text": true
+  },
+  {
+    "selector": "p > a",
+    "text": true,
+    "attributes": [
+      "href"
+    ]
+  }
+]

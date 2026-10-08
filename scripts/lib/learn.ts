@@ -144,7 +144,7 @@ export function checkLearn(lessons: Lesson[], roadmaps: Roadmap[]): string[] {
           errors.push(`${where}: no lesson folder for ${slug}`);
           continue;
         }
-        // Tutorials can be reused anywhere; a roadmap lesson lives in one mod.
+        // Tutorials can be reused anywhere; a roadmap lesson lives in one module.
         if (lesson.tutorial) continue;
         if (placed.has(slug)) errors.push(`${where}: ${slug} is already in ${placed.get(slug)}`);
         placed.set(slug, `${roadmap.slug}/${mod.slug}`);

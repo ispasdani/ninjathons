@@ -1,0 +1,22 @@
+[
+  {
+    "input": {
+      "seconds": 75
+    },
+    "output": "1:15",
+    "explanation": "75 seconds is 1 minute and 15 seconds."
+  },
+  {
+    "input": {
+      "seconds": 5
+    },
+    "output": "0:05",
+    "explanation": "The seconds always have two digits."
+  },
+  {
+    "input": {
+      "seconds": 3600
+    },
+    "output": "60:00"
+  }
+]

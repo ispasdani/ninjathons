@@ -1,0 +1,41 @@
+[
+  {
+    "selector": "body",
+    "styles": [
+      "margin-top",
+      "margin-left"
+    ]
+  },
+  {
+    "selector": ".nav",
+    "styles": [
+      "background-color"
+    ],
+    "box": true
+  },
+  {
+    "selector": ".brand",
+    "styles": [
+      "color",
+      "font-size",
+      "font-weight"
+    ],
+    "box": true
+  },
+  {
+    "selector": ".links",
+    "styles": [
+      "list-style-type"
+    ],
+    "box": true
+  },
+  {
+    "selector": ".links a",
+    "styles": [
+      "color",
+      "font-size",
+      "text-decoration-line"
+    ],
+    "box": true
+  }
+]

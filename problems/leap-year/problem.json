@@ -1,0 +1,32 @@
+{
+  "slug": "leap-year",
+  "title": "Leap Year",
+  "difficulty": "easy",
+  "tags": [
+    "conditionals",
+    "math",
+    "functions"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "isLeapYear",
+    "params": [
+      {
+        "name": "year",
+        "type": "int"
+      }
+    ],
+    "returns": "bool"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}
