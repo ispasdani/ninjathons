@@ -1,0 +1,12 @@
+[
+  {
+    "input": { "pages": [3, 6, 7, 11], "hours": 8 },
+    "output": 4,
+    "explanation": "At 4 pages an hour the books take 1 + 2 + 2 + 3 = 8 hours. At 3 they would take 1 + 2 + 3 + 4 = 10."
+  },
+  {
+    "input": { "pages": [30, 11, 23, 4, 20], "hours": 5 },
+    "output": 30,
+    "explanation": "5 books in 5 hours: one hour each, so the speed must cover the longest book."
+  }
+]

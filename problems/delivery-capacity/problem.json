@@ -1,0 +1,21 @@
+{
+  "slug": "delivery-capacity",
+  "title": "Delivery Capacity",
+  "difficulty": "medium",
+  "tags": ["arrays", "binary-search", "greedy"],
+  "mode": "function",
+  "signature": {
+    "functionName": "minCapacity",
+    "params": [
+      { "name": "weights", "type": "int[]" },
+      { "name": "days", "type": "int" }
+    ],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

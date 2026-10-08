@@ -1,0 +1,10 @@
+{
+  "title": "Guess the Answer",
+  "order": 2,
+  "problems": [
+    "integer-square-root",
+    "minimum-reading-speed",
+    "delivery-capacity",
+    "kth-smallest-pair-distance"
+  ]
+}

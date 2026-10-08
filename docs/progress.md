@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 1 of the 6 weekly sets is written. **Next step:** weekly set 2, Guess the Answer (binary search on the answer).
+**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 2 of the 6 weekly sets are written. **Next step:** weekly set 3, Beyond the Grid (graphs).
 
 ## Phases
 
@@ -20,11 +20,15 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 34 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 1 of 6 weekly sets.
+Content track: 38 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 2 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5: weekly set 2, Guess the Answer
+- Set 2, `weekly/guess-the-answer` (binary search on the answer), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Integer Square Root (easy; the wrong one is a floating-point root, off by one just below squares near 2^53), Minimum Reading Speed (medium), Delivery Capacity (medium), Kth Smallest Pair Distance (hard; `k` passes 32 bits). 900 points in all.
+- `problems:check` passes for all 38 problems and both sets. Seeded to Convex dev: set 2 waits for Monday 19 Oct, and its problems are hidden from the library (checked in the browser).
 
 ### 8 Oct 2026 · Phase 5: weekly set 1, Running Totals
 - The 6 set themes are planned in [decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026): Running Totals, Guess the Answer, Beyond the Grid, Lines on a Timeline, Top of the Heap, Building Up.
