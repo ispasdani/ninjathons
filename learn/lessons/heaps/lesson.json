@@ -1,0 +1,10 @@
+{
+  "title": "Heaps and priority queues",
+  "summary": "Always know the smallest or largest of a changing collection: top k, repeated best choices and running medians.",
+  "tutorial": true,
+  "exercises": [
+    "last-stone-weight",
+    "kth-largest",
+    "running-median"
+  ]
+}

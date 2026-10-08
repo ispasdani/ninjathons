@@ -1,0 +1,3 @@
+This roadmap covers the data structures and algorithms behind most coding interview questions and contest problems. Each lesson takes one technique: what it is, how to recognise a problem that needs it, and the mistakes people make with it, with examples in JavaScript and Python. Then it hands you problems from the library to solve with it.
+
+It assumes you can already write loops, functions and lists in some language; if not, start with Programming basics. Work through the modules in order: each builds on the ones before. A lesson is finished when you've solved its exercises, and problems you've already solved count.

@@ -1,0 +1,10 @@
+{
+  "title": "Greedy choices",
+  "summary": "Take the best-looking choice and never look back: when it works, how to argue it does, and when it fails.",
+  "tutorial": true,
+  "exercises": [
+    "best-time-to-buy-and-sell-stock",
+    "maximum-subarray",
+    "most-meetings"
+  ]
+}

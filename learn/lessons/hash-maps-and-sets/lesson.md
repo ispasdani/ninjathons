@@ -44,54 +44,53 @@ That's 100,000 steps instead of 5 billion. The price is memory: the set can grow
 
 A hash map (a `dict` in Python, a `Map` in JavaScript) stores a value for each key. Use it when you need to remember something *about* what you've seen: where it was, how many times, what it pairs with.
 
-The classic example is finding two numbers that add up to a target. For each number `x`, the partner you need is `target - x`. Instead of searching for it, keep a map from each number you've passed to its index:
+Say you need the positions of the first repeated value in a list. A set can tell you a value was seen before, but not where; a map from each value to its first index can:
 
 ```python
-def two_sum(nums, target):
-    index_of = {}
+def first_repeat_positions(nums):
+    first_index = {}
     for i, x in enumerate(nums):
-        if target - x in index_of:
-            return [index_of[target - x], i]
-        index_of[x] = i
+        if x in first_index:
+            return [first_index[x], i]
+        first_index[x] = i
+    return []
 ```
 
 ```javascript
-function twoSum(nums, target) {
-  const indexOf = new Map();
+function firstRepeatPositions(nums) {
+  const firstIndex = new Map();
   for (let i = 0; i < nums.length; i++) {
-    const need = target - nums[i];
-    if (indexOf.has(need)) return [indexOf.get(need), i];
-    indexOf.set(nums[i], i);
+    if (firstIndex.has(nums[i])) return [firstIndex.get(nums[i]), i];
+    firstIndex.set(nums[i], i);
   }
+  return [];
 }
 ```
 
-Notice the order: look up the partner *before* storing the current number, so a number never pairs with itself.
+Notice the order: look up *before* storing the current number, so a number never matches itself. Two Sum works the same way, except that what you look up for `x` is the partner it needs, `target - x`.
 
 ## Counting
 
-The other everyday use is counting. Two words are anagrams when every letter appears the same number of times in both, so count the letters of one, then count down with the other:
+The other everyday use is counting. The most common character in a word:
 
 ```python
 from collections import Counter
 
-def is_anagram(a, b):
-    return Counter(a) == Counter(b)
+def most_common_char(word):
+    return Counter(word).most_common(1)[0][0]
 ```
 
 ```javascript
-function isAnagram(a, b) {
-  if (a.length !== b.length) return false;
+function mostCommonChar(word) {
   const count = new Map();
-  for (const ch of a) count.set(ch, (count.get(ch) ?? 0) + 1);
-  for (const ch of b) {
-    const left = count.get(ch) ?? 0;
-    if (left === 0) return false;
-    count.set(ch, left - 1);
-  }
-  return true;
+  for (const ch of word) count.set(ch, (count.get(ch) ?? 0) + 1);
+  let best = null;
+  for (const [ch, n] of count) if (best === null || n > count.get(best)) best = ch;
+  return best;
 }
 ```
+
+Two words are anagrams when every letter appears the same number of times in both: count one word's letters up, then count the other's down.
 
 ## When to reach for one
 

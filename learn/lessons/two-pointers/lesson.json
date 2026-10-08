@@ -1,0 +1,10 @@
+{
+  "title": "Two pointers",
+  "summary": "Walk two positions through an array together, from both ends or one chasing the other, to turn O(n²) pair checks into one pass.",
+  "tutorial": true,
+  "exercises": [
+    "valid-palindrome",
+    "move-zeroes",
+    "container-with-most-water"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Dynamic programming, the basics",
+  "summary": "Solve each smaller problem once and remember it: state, transition, base cases and answer.",
+  "tutorial": true,
+  "exercises": [
+    "climbing-stairs",
+    "coin-change",
+    "house-robber"
+  ]
+}

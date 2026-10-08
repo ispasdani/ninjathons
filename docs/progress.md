@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with the Programming basics roadmap written and seeded. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the remaining 15 tutorials and the Data structures and algorithms roadmap ([curriculum](notes/curriculum.md), step 2), then Interview prep.
+**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with Programming basics, Data structures and algorithms, and all 20 tutorials written and seeded. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the docs library (curated MDN and Python pages, the docs panel, docs in ranked 1v1), then the Interview prep roadmap ([curriculum](notes/curriculum.md), step 3).
 
 ## Phases
 
@@ -20,11 +20,18 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 71 of 150–200 problems (5 of them HTML and CSS), 5 of ~20 tutorials, 1 of 3 roadmaps, 6 of 6 weekly sets.
+Content track: 78 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tutorials, 2 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7: tutorials and the DSA roadmap
+- The 15 remaining tutorials: two pointers, sliding windows, prefix sums, binary search, binary search on the answer, stacks, sorting and intervals, heaps, grids (BFS and DFS), graphs, DP basics, DP on sequences, greedy, matrices, and number tricks. All 20 are written.
+- Data structures and algorithms, written and seeded: 5 modules (Arrays and hashing free; Searching and sorting; Stacks, windows and heaps; Graphs; Dynamic programming and greedy), 15 tutorials and its own lesson, Shortest paths with Dijkstra.
+- 7 new problems, each with JavaScript and Python references and wrong answers: First and Last Position, Smallest Divisor, Last Stone Weight, Path Exists, Spiral Order, Greatest Common Divisor, Lowest-Cost Path (Dijkstra on a grid; rejects right-and-down DP and step-counting BFS). Smallest Divisor, Last Stone Weight and Greatest Common Divisor also have slow solutions that time out.
+- Worked examples in tutorials are now cousins of their exercises, never their solutions ([curriculum](notes/curriculum.md)); the hash maps tutorial written earlier was changed to match.
+- `problems:check` passes for 78 problems, 6 weekly sets, 30 lessons and 2 roadmaps. Both roadmaps and the Learn page checked in the browser; a tutorial opened from the DSA roadmap leads on in DSA. 442 tests pass. Production build passes.
 
 ### 8 Oct 2026 · Phase 7: Programming basics roadmap
 - The curriculum outline agreed and written up in [notes/curriculum.md](notes/curriculum.md): 20 tutorials, 3 roadmaps, 41 lessons and 32 new problems; linked lists and trees wait for ListNode and TreeNode types.

@@ -1,0 +1,33 @@
+[
+  {
+    "input": {
+      "stones": [
+        2,
+        7,
+        4,
+        1,
+        8,
+        1
+      ]
+    },
+    "output": 1,
+    "explanation": "8 and 7 leave 1: [2, 4, 1, 1, 1]. 4 and 2 leave 2: [2, 1, 1, 1]. 2 and 1 leave 1: [1, 1, 1]. 1 and 1 are destroyed: [1]."
+  },
+  {
+    "input": {
+      "stones": [
+        3,
+        3
+      ]
+    },
+    "output": 0
+  },
+  {
+    "input": {
+      "stones": [
+        5
+      ]
+    },
+    "output": 5
+  }
+]

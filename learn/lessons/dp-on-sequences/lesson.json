@@ -1,0 +1,9 @@
+{
+  "title": "DP on strings and sequences",
+  "summary": "Two-dimensional tables over prefixes of two strings, and subsequences, including the O(n log n) longest increasing subsequence.",
+  "tutorial": true,
+  "exercises": [
+    "longest-increasing-subsequence",
+    "edit-distance"
+  ]
+}

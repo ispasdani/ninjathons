@@ -1,0 +1,9 @@
+{
+  "title": "Sliding windows",
+  "summary": "Keep a running window over a contiguous run, growing and shrinking it instead of recomputing, including the maximum of every window.",
+  "tutorial": true,
+  "exercises": [
+    "longest-substring-without-repeats",
+    "sliding-window-maximum"
+  ]
+}

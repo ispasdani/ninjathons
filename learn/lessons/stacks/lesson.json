@@ -1,0 +1,9 @@
+{
+  "title": "Stacks and monotonic stacks",
+  "summary": "Last in, first out: matching nested pairs, and finding the next bigger item for every position in one pass.",
+  "tutorial": true,
+  "exercises": [
+    "valid-parentheses",
+    "daily-temperatures"
+  ]
+}

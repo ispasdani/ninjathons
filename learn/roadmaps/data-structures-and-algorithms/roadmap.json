@@ -1,0 +1,63 @@
+{
+  "title": "Data structures and algorithms",
+  "summary": "The techniques coding interviews and contests lean on, in order: hashing and two pointers, searching and sorting, stacks and heaps, graphs, and dynamic programming.",
+  "order": 2,
+  "modules": [
+    {
+      "slug": "arrays-and-hashing",
+      "title": "Arrays and hashing",
+      "summary": "Measuring speed, then the everyday tools for arrays: hash maps, two pointers and prefix sums.",
+      "free": true,
+      "lessons": [
+        "big-o-in-practice",
+        "hash-maps-and-sets",
+        "two-pointers",
+        "prefix-sums"
+      ]
+    },
+    {
+      "slug": "searching-and-sorting",
+      "title": "Searching and sorting",
+      "summary": "Binary search on arrays and on answers, and what sorting makes easy.",
+      "free": false,
+      "lessons": [
+        "binary-search",
+        "binary-search-on-the-answer",
+        "sorting-and-intervals"
+      ]
+    },
+    {
+      "slug": "stacks-windows-and-heaps",
+      "title": "Stacks, windows and heaps",
+      "summary": "Structures that keep just the right items at hand as you walk through the input.",
+      "free": false,
+      "lessons": [
+        "stacks",
+        "sliding-window",
+        "heaps"
+      ]
+    },
+    {
+      "slug": "graphs",
+      "title": "Graphs",
+      "summary": "Grids, edge lists, connected groups, ordering, and the cheapest path.",
+      "free": false,
+      "lessons": [
+        "grids-bfs-and-dfs",
+        "graphs",
+        "dsa-shortest-paths"
+      ]
+    },
+    {
+      "slug": "dynamic-programming-and-greedy",
+      "title": "Dynamic programming and greedy",
+      "summary": "Remembering the answers to smaller problems, and knowing when one bold choice is enough.",
+      "free": false,
+      "lessons": [
+        "dynamic-programming",
+        "dp-on-sequences",
+        "greedy"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "slug": "greatest-common-divisor",
+  "title": "Greatest Common Divisor",
+  "difficulty": "easy",
+  "tags": [
+    "math",
+    "euclid"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "greatestCommonDivisor",
+    "params": [
+      {
+        "name": "a",
+        "type": "int"
+      },
+      {
+        "name": "b",
+        "type": "int"
+      }
+    ],
+    "returns": "int"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

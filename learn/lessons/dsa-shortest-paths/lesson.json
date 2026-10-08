@@ -1,0 +1,9 @@
+{
+  "title": "Shortest paths with Dijkstra",
+  "summary": "When edges have costs, the fewest steps isn't the cheapest path: Dijkstra's algorithm with a priority queue, on graphs and grids.",
+  "tutorial": false,
+  "exercises": [
+    "lowest-cost-path",
+    "signal-time"
+  ]
+}

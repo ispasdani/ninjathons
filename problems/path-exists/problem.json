@@ -1,0 +1,45 @@
+{
+  "slug": "path-exists",
+  "title": "Path Exists",
+  "difficulty": "easy",
+  "tags": [
+    "graphs",
+    "bfs",
+    "dfs",
+    "union-find"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "validPath",
+    "params": [
+      {
+        "name": "n",
+        "type": "int"
+      },
+      {
+        "name": "edges",
+        "type": "int[][]"
+      },
+      {
+        "name": "source",
+        "type": "int"
+      },
+      {
+        "name": "destination",
+        "type": "int"
+      }
+    ],
+    "returns": "bool"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

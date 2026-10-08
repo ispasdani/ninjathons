@@ -1,0 +1,35 @@
+{
+  "slug": "first-and-last-position",
+  "title": "First and Last Position",
+  "difficulty": "medium",
+  "tags": [
+    "arrays",
+    "binary-search"
+  ],
+  "mode": "function",
+  "signature": {
+    "functionName": "searchRange",
+    "params": [
+      {
+        "name": "nums",
+        "type": "int[]"
+      },
+      {
+        "name": "target",
+        "type": "int"
+      }
+    ],
+    "returns": "int[]"
+  },
+  "checker": {
+    "kind": "exact"
+  },
+  "limits": {
+    "timeMs": 1000,
+    "memoryMb": 256
+  },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

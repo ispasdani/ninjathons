@@ -1,0 +1,37 @@
+[
+  {
+    "input": {
+      "nums": [
+        1,
+        2,
+        5,
+        9
+      ],
+      "threshold": 6
+    },
+    "output": 5,
+    "explanation": "With d = 5 the sum is 1 + 1 + 1 + 2 = 5. With d = 4 it's 1 + 1 + 2 + 3 = 7, over 6."
+  },
+  {
+    "input": {
+      "nums": [
+        44,
+        22,
+        33,
+        11,
+        1
+      ],
+      "threshold": 5
+    },
+    "output": 44
+  },
+  {
+    "input": {
+      "nums": [
+        7
+      ],
+      "threshold": 7
+    },
+    "output": 1
+  }
+]
