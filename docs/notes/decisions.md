@@ -495,6 +495,6 @@ Themes chosen to cover techniques the first 30 problems barely touch. Each set h
 | 1 | Running Totals: prefix sums and difference arrays | Range Sum Queries (easy), Flight Bookings (medium), Subarray Sum Equals K (medium), Shortest Subarray with Sum at Least K (hard) |
 | 2 | Guess the Answer: binary search on the answer | Integer Square Root (easy), Minimum Reading Speed (medium), Delivery Capacity (medium), Kth Smallest Pair Distance (hard) |
 | 3 | Beyond the Grid: graphs | Connected Components (easy), Fewest Terms (medium), Signal Time (medium), Critical Links (hard) |
-| 4 | Lines on a Timeline: intervals and sweep lines | planned: can attend all meetings, insert an interval, rooms needed, the skyline |
+| 4 | Lines on a Timeline: intervals and sweep lines | Can Attend All (easy), Most Meetings (medium; replaces Insert Interval, too close to Merge Intervals), Rooms Needed (medium), The Skyline (hard) |
 | 5 | Top of the Heap: heaps and greedy | planned: kth largest, task scheduling, merging sorted lists, a running median |
 | 6 | Building Up: dynamic programming, part two | planned: house robber, paths with obstacles, longest common subsequence, one interval DP |

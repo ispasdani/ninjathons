@@ -1,0 +1,18 @@
+{
+  "slug": "the-skyline",
+  "title": "The Skyline",
+  "difficulty": "hard",
+  "tags": ["intervals", "sweep-line", "heap"],
+  "mode": "function",
+  "signature": {
+    "functionName": "skyline",
+    "params": [{ "name": "buildings", "type": "int[][]" }],
+    "returns": "int[][]"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

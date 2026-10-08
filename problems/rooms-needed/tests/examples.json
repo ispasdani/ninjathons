@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "meetings": [[0, 30], [5, 10], [15, 20]] },
+    "output": 2,
+    "explanation": "The long meeting needs a room all along; the two short ones can share a second."
+  },
+  {
+    "input": { "meetings": [[1, 5], [5, 8], [8, 9]] },
+    "output": 1,
+    "explanation": "Each one starts as the last ends, so one room is enough."
+  },
+  {
+    "input": { "meetings": [[2, 7], [3, 6], [4, 5], [6, 9]] },
+    "output": 3
+  }
+]

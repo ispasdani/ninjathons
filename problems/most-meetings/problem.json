@@ -1,0 +1,18 @@
+{
+  "slug": "most-meetings",
+  "title": "Most Meetings",
+  "difficulty": "medium",
+  "tags": ["intervals", "greedy", "sorting"],
+  "mode": "function",
+  "signature": {
+    "functionName": "mostMeetings",
+    "params": [{ "name": "meetings", "type": "int[][]" }],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

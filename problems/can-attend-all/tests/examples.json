@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "meetings": [[0, 30], [5, 10], [15, 20]] },
+    "output": false,
+    "explanation": "The first meeting runs through both of the others."
+  },
+  {
+    "input": { "meetings": [[7, 10], [2, 4]] },
+    "output": true
+  },
+  {
+    "input": { "meetings": [[1, 5], [5, 8]] },
+    "output": true,
+    "explanation": "The first ends at minute 5, just as the second starts."
+  }
+]

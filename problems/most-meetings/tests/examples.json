@@ -1,0 +1,12 @@
+[
+  {
+    "input": { "meetings": [[1, 4], [3, 5], [0, 6], [5, 7], [3, 9], [5, 9], [6, 10], [8, 11], [8, 12], [2, 14], [12, 16]] },
+    "output": 4,
+    "explanation": "For example [1, 4], [5, 7], [8, 11] and [12, 16]."
+  },
+  {
+    "input": { "meetings": [[0, 100], [10, 20], [30, 40], [50, 60]] },
+    "output": 3,
+    "explanation": "Skip the long meeting and go to the three short ones."
+  }
+]

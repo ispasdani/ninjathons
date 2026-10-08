@@ -1,0 +1,12 @@
+[
+  {
+    "input": { "buildings": [[2, 9, 10], [3, 7, 15], [5, 12, 12], [15, 20, 10], [19, 24, 8]] },
+    "output": [[2, 10], [3, 15], [7, 12], [12, 0], [15, 10], [20, 8], [24, 0]],
+    "explanation": "At x = 7 the tallest building ends and the outline drops to the 12-high one; between 12 and 15 there's nothing."
+  },
+  {
+    "input": { "buildings": [[0, 2, 3], [2, 5, 3]] },
+    "output": [[0, 3], [5, 0]],
+    "explanation": "The two buildings meet at the same height, so nothing changes at x = 2."
+  }
+]
