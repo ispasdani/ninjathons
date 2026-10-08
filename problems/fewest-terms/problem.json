@@ -1,0 +1,21 @@
+{
+  "slug": "fewest-terms",
+  "title": "Fewest Terms",
+  "difficulty": "medium",
+  "tags": ["graphs", "topological-sort", "bfs"],
+  "mode": "function",
+  "signature": {
+    "functionName": "fewestTerms",
+    "params": [
+      { "name": "n", "type": "int" },
+      { "name": "prerequisites", "type": "int[][]" }
+    ],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

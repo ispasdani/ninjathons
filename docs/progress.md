@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 2 of the 6 weekly sets are written. **Next step:** weekly set 3, Beyond the Grid (graphs).
+**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 3 of the 6 weekly sets are written. **Next step:** weekly set 4, Lines on a Timeline (intervals and sweep lines).
 
 ## Phases
 
@@ -20,11 +20,15 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 38 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 2 of 6 weekly sets.
+Content track: 42 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 3 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5: weekly set 3, Beyond the Grid
+- Set 3, `weekly/beyond-the-grid` (graphs from edge lists), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Connected Components (easy; loops and repeated links), Fewest Terms (medium; topological levels, -1 on a cycle), Signal Time (medium; Dijkstra, against a fewest-links BFS and Bellman–Ford), Critical Links (hard; bridges with repeated links and 100,000-deep chains, any order through the `unordered` checker). 900 points in all.
+- `problems:check` passes for all 42 problems and 3 sets. Seeded to Convex dev: set 3 waits for Monday 26 Oct, its problems hidden from the library (checked in the browser).
 
 ### 8 Oct 2026 · Phase 5: weekly set 2, Guess the Answer
 - Set 2, `weekly/guess-the-answer` (binary search on the answer), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Integer Square Root (easy; the wrong one is a floating-point root, off by one just below squares near 2^53), Minimum Reading Speed (medium), Delivery Capacity (medium), Kth Smallest Pair Distance (hard; `k` passes 32 bits). 900 points in all.

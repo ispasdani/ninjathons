@@ -1,0 +1,5 @@
+{
+  "title": "Beyond the Grid",
+  "order": 3,
+  "problems": ["connected-components", "fewest-terms", "signal-time", "critical-links"]
+}

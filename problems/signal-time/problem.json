@@ -1,0 +1,22 @@
+{
+  "slug": "signal-time",
+  "title": "Signal Time",
+  "difficulty": "medium",
+  "tags": ["graphs", "shortest-path", "dijkstra", "heap"],
+  "mode": "function",
+  "signature": {
+    "functionName": "signalTime",
+    "params": [
+      { "name": "n", "type": "int" },
+      { "name": "links", "type": "int[][]" },
+      { "name": "source", "type": "int" }
+    ],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}
