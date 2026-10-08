@@ -23,7 +23,8 @@ const MAX_ROWS_SHOWN = 100;
 // --- Rebuilding (every 5 minutes, from crons.ts) ---
 
 /**
- * Starts a fresh snapshot of every live board and deletes old monthly ones.
+ * Starts a fresh snapshot of every live board and deletes old monthly and
+ * weekly ones.
  * A build that hasn't finished by the next run is replaced by a new one.
  */
 export const rebuildAll = internalMutation({
@@ -159,6 +160,8 @@ export const board = publicQuery({
     board: boardKind,
     // For the monthly board: "2026-10". Defaults to this month.
     month: v.optional(v.string()),
+    // For the weekly board: "2026-W41". Defaults to this week.
+    week: v.optional(v.string()),
     scope: v.union(v.literal("global"), v.literal("country"), v.literal("group")),
     country: v.optional(v.string()),
     groupId: v.optional(v.id("groups")),
@@ -168,9 +171,9 @@ export const board = publicQuery({
   handler: async (ctx, args) => {
     let key: string;
     try {
-      key = boardKey(args.board, args.month);
+      key = boardKey(args.board, args.board === "weekly" ? args.week : args.month);
     } catch {
-      throw new ConvexError("BAD_MONTH");
+      throw new ConvexError(args.board === "weekly" ? "BAD_WEEK" : "BAD_MONTH");
     }
     const from = Math.max(1, Math.floor(args.fromRank ?? 1));
     const limit = Math.min(MAX_ROWS_SHOWN, Math.max(1, Math.floor(args.limit ?? 50)));

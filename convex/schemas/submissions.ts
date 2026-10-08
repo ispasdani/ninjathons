@@ -75,6 +75,11 @@ export const submissions = defineTable({
   daily: v.optional(
     v.object({ xp: v.optional(v.number()), streak: v.number(), freezeEarned: v.optional(v.boolean()) }),
   ),
+  // Set when this Submit solved a problem of the week's set: its points, XP
+  // (absent if already awarded), and whether it finished the set.
+  weekly: v.optional(
+    v.object({ points: v.number(), xp: v.optional(v.number()), setComplete: v.optional(v.boolean()) }),
+  ),
   // Set when the submission was sent in a match.
   matchId: v.optional(v.id("matches")),
   // Set while its sandbox waits for Vercel's per-minute limit, so the page can

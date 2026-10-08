@@ -478,3 +478,10 @@ Agreed 7 Oct 2026, at the start of phase 5. Neither challenge changes a rating (
 - **Daily board:** current streak, then total dailies solved, then who got there first. **Weekly board:** this week's points, then less time; it starts empty each Monday, and last week's stays readable. Both have Global, Country and Group scopes, like the others. Today's daily also lists its fastest solves, live.
 - **Badges (4):** 7-, 30- and 100-day streaks, and Weekly top 10%. Names are placeholders.
 - **Account deletion** removes the player's streak and their daily and weekly results.
+
+### Weekly sets as built (8 Oct 2026)
+
+- **A set is a folder, `weekly/<slug>/`:** `set.json` (`{ "title", "order", "problems": [slugs] }`) and `theme.md`, the introduction shown on the Weekly page. Its problems are ordinary folders in `problems/`, written like any other.
+- **`npm run problems:check`** with no slugs also checks the sets: 3 to 5 problems, each with a folder and not a draft, in no other set, a theme, and a unique order.
+- **`npm run problems:seed`** with no slugs seeds the problems, then the sets. A set's problems are unreleased from their first seed until the set starts. Re-seeding a started set changes only its title and theme.
+- **Starting:** the hourly `weekly.start` starts the next set by order on Mondays (UTC) and settles last week. `npx convex run weekly:start '{"force": true}'` starts one on any other day, for trying a set on dev.

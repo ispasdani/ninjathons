@@ -51,6 +51,7 @@ import type * as lib_matchmaking from "../lib/matchmaking.js";
 import type * as lib_problems from "../lib/problems.js";
 import type * as lib_ratings from "../lib/ratings.js";
 import type * as lib_usernames from "../lib/usernames.js";
+import type * as lib_weekly from "../lib/weekly.js";
 import type * as lib_xp from "../lib/xp.js";
 import type * as matches from "../matches.js";
 import type * as problems from "../problems.js";
@@ -69,6 +70,7 @@ import type * as submissions from "../submissions.js";
 import type * as testDrives from "../testDrives.js";
 import type * as testDrivesFill from "../testDrivesFill.js";
 import type * as user from "../user.js";
+import type * as weekly from "../weekly.js";
 
 import type {
   ApiFromModules,
@@ -120,6 +122,7 @@ declare const fullApi: ApiFromModules<{
   "lib/problems": typeof lib_problems;
   "lib/ratings": typeof lib_ratings;
   "lib/usernames": typeof lib_usernames;
+  "lib/weekly": typeof lib_weekly;
   "lib/xp": typeof lib_xp;
   matches: typeof matches;
   problems: typeof problems;
@@ -138,6 +141,7 @@ declare const fullApi: ApiFromModules<{
   testDrives: typeof testDrives;
   testDrivesFill: typeof testDrivesFill;
   user: typeof user;
+  weekly: typeof weekly;
 }>;
 
 /**

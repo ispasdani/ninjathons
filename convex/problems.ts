@@ -78,7 +78,7 @@ export const seedFromUpload = internalAction({
   handler: async (ctx, { upload }): Promise<{ problemId: string; created: boolean }> => {
     const blob = await ctx.storage.get(upload);
     if (!blob) throw new Error("upload not found");
-    const { problem, hidden } = JSON.parse(await blob.text());
+    const { problem, hidden, weeklySet } = JSON.parse(await blob.text());
     const file = await ctx.storage.store(
       new Blob([JSON.stringify(hidden)], { type: "application/json" }),
     );
@@ -86,6 +86,7 @@ export const seedFromUpload = internalAction({
     return await ctx.runMutation(internal.problems.seed, {
       problem,
       tests: { file, count: hidden.length },
+      weeklySet,
     });
   },
 });
@@ -116,8 +117,10 @@ export const seed = internalMutation({
       status: v.union(v.literal("draft"), v.literal("beta"), v.literal("approved")),
     }),
     tests: v.object({ file: v.id("_storage"), count: v.number() }),
+    // The weekly set (weekly/<slug>/set.json) listing this problem, if any.
+    weeklySet: v.optional(v.string()),
   },
-  handler: async (ctx, { problem, tests }) => {
+  handler: async (ctx, { problem, tests, weeklySet }) => {
     const existing = await ctx.db
       .query("problems")
       .withIndex("by_slug", (q) => q.eq("slug", problem.slug))
@@ -125,9 +128,18 @@ export const seed = internalMutation({
     if (existing && problem.version < existing.version) {
       throw new Error(`${problem.slug}: version ${problem.version} is older than the seeded ${existing.version}`);
     }
+    // A weekly set's problem stays hidden until its set starts, even on its
+    // first seed, before the set itself is seeded (decisions §15).
+    const set = weeklySet
+      ? await ctx.db
+          .query("weeklySets")
+          .withIndex("by_slug", (q) => q.eq("slug", weeklySet))
+          .unique()
+      : null;
+    const row = { ...problem, unreleased: (weeklySet !== undefined && set?.week === undefined) || undefined };
     const problemId = existing
-      ? (await ctx.db.replace(existing._id, problem), existing._id)
-      : await ctx.db.insert("problems", problem);
+      ? (await ctx.db.replace(existing._id, row), existing._id)
+      : await ctx.db.insert("problems", row);
 
     const current = await ctx.db
       .query("problemTests")

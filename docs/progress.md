@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: the daily challenge is playable, with its page and board. **Next step:** the weekly challenge engine.
+**Now:** Phase 5, daily and weekly challenges: the daily challenge is playable; the weekly engine and board are built. **Next step:** the Weekly page.
 
 ## Phases
 
@@ -25,6 +25,15 @@ Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5: weekly challenge engine
+- Sets live in `weekly/<slug>/` (`set.json` and `theme.md`, [decisions §15](notes/decisions.md#weekly-sets-as-built-8-oct-2026)). `problems:check` checks them (3 to 5 problems, each with a folder and in no other set, a theme, a unique order); `problems:seed` seeds the problems, then the sets (`weekly.seedSet`). A set's problems are unreleased from their first seed, so they never show before their week.
+- `weekly.start`, hourly: on Mondays (UTC) the next set by order becomes this week's and its problems join the library; last week is settled (`weekly.settle`: the top 10%, rounded up, of players with points earn Weekly top 10%, once). `force` starts a set on any day, for dev. With no set left it logs an error once.
+- A Submit sent during the week to one of the set's problems scores 100 / 200 / 400 points by difficulty, timed from `weekly.open` (or the first Submit), with 25 XP per problem and 100 for the full set (`submissions.weekly`). After the week they're ordinary problems.
+- Weekly board on Leaderboards: points, then less total time, with the time shown; last week's board stays readable and gets a final rebuild, older ones are deleted. `weekly.current` returns the set, its problems with your progress, and your total, for the Weekly page.
+- An accepted Submit shows "Weekly · +n points" and "set complete".
+- Checked: the set checker against throwaway sets (a missing folder, no theme, too few problems, a duplicate order, a problem in two sets); the Weekly tab in the browser, no console errors. 3 new tests. Production build passes; 393 tests. Deployed to Convex dev.
+- Open: no sets written yet, so nothing has run on dev; the Weekly page comes next.
 
 ### 8 Oct 2026 · Phase 5: Daily page and Daily board
 - `/daily` (public, "Daily" in the nav after Play): today's problem with its difficulty and tags, the time to the next problem, Solve or Carry on with your clock running, or your solve time; your streak, best, total solved and freezes, with a nudge when today isn't solved; today's fastest solves with language and time.

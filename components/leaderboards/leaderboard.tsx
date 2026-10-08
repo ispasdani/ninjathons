@@ -11,10 +11,11 @@ import { Segmented } from "@/components/ui/segmented";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { countryName } from "@/lib/countries";
+import { duration } from "@/lib/duration";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
 
-export type BoardTab = "level" | "month" | "1v1" | "daily";
+export type BoardTab = "level" | "month" | "1v1" | "daily" | "weekly";
 export type Scope = "global" | "country" | "group";
 
 const PAGE = 50;
@@ -24,6 +25,7 @@ const BOARDS: [BoardTab, string][] = [
   ["month", "This month"],
   ["1v1", "1v1"],
   ["daily", "Daily"],
+  ["weekly", "Weekly"],
 ];
 
 const ABOUT: Record<BoardTab, string> = {
@@ -31,6 +33,15 @@ const ABOUT: Record<BoardTab, string> = {
   month: "XP earned this calendar month (UTC). Starts again on the 1st.",
   "1v1": "1v1 rating. Shown after 10 ranked games; hidden after 30 days without one.",
   daily: "Daily challenge streak, then total dailies solved. Miss a day without a freeze and the streak starts again.",
+  weekly: "Points from this week's challenge set, then less total time. Starts again every Monday (UTC).",
+};
+
+// What follows your value in the "You" row.
+const UNIT_SUFFIX: Record<string, (value: number) => string> = {
+  XP: () => "XP",
+  Rating: () => "",
+  Streak: (value) => (value === 1 ? "day" : "days"),
+  Points: () => "points",
 };
 
 function updatedAgo(builtAt: number | null, now: number) {
@@ -81,7 +92,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
     router.replace(params.size ? `${pathname}?${params}` : pathname, { scroll: false });
   }
 
-  const unit = board === "1v1" ? "Rating" : board === "daily" ? "Streak" : "XP";
+  const unit = board === "1v1" ? "Rating" : board === "daily" ? "Streak" : board === "weekly" ? "Points" : "XP";
   const me = data?.me ?? null;
 
   return (
@@ -137,7 +148,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                 {me.rank ? `#${me.rank.toLocaleString("en")}` : "Not ranked yet"}
               </span>
               <span className="font-mono tabular-nums">
-                {me.value.toLocaleString("en")} {unit === "XP" ? "XP" : unit === "Streak" ? (me.value === 1 ? "day" : "days") : ""}
+                {me.value.toLocaleString("en")} {UNIT_SUFFIX[unit](me.value)}
               </span>
               {me.rank === null && scope !== "group" && (
                 <span className="text-muted-foreground">You&apos;ll appear within 5 minutes.</span>
@@ -156,7 +167,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                 <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
                   <th className="w-16 py-3 pl-4 text-right font-medium">Rank</th>
                   <th className="py-3 pl-6 font-medium">Player</th>
-                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" ? "Tier" : board === "daily" ? "Solved" : "Level"}</th>
+                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" ? "Tier" : board === "daily" ? "Solved" : board === "weekly" ? "Time" : "Level"}</th>
                   <th className="py-3 pr-4 text-right font-medium">{unit}</th>
                 </tr>
               </thead>
@@ -174,9 +185,11 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                         ? "No more players."
                         : board === "1v1"
                           ? "No one is ranked yet. Players appear after 10 ranked games."
-                          : board === "daily"
-                            ? "No streaks yet. Solve today's daily to start one."
-                          : "No one is here yet. Solve a problem to be the first."}
+                          : board === "weekly"
+                            ? "No points yet this week. Solve a problem from this week's set."
+                            : board === "daily"
+                              ? "No streaks yet. Solve today's daily to start one."
+                              : "No one is here yet. Solve a problem to be the first."}
                     </td>
                   </tr>
                 ) : (
@@ -211,7 +224,9 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                           </span>
                         </td>
                         <td className="hidden pr-4 sm:table-cell">
-                          {"totalSolved" in row ? (
+                          {"timeMs" in row ? (
+                            <span className="font-mono tabular-nums">{duration(row.timeMs)}</span>
+                          ) : "totalSolved" in row ? (
                             <span className="font-mono tabular-nums">{row.totalSolved.toLocaleString("en")}</span>
                           ) : "tier" in row ? (
                             <TierName tier={row.tier} />

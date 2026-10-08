@@ -15,4 +15,8 @@ crons.daily("purge deleted groups", { hourUTC: 3, minuteUTC: 0 }, internal.group
 crons.hourly("pick daily challenge", { minuteUTC: 0 }, internal.daily.pick, {});
 crons.daily("settle streaks", { hourUTC: 0, minuteUTC: 5 }, internal.daily.settleStreaks, {});
 
+// The weekly challenge: on Mondays the next set starts and last week is
+// settled; hourly, so a missed run is caught up the same day.
+crons.hourly("start weekly challenge", { minuteUTC: 0 }, internal.weekly.start, {});
+
 export default crons;

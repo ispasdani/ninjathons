@@ -148,7 +148,16 @@ describe("monthly Level board", () => {
     await rebuild(t);
     expect((await t.query(api.leaderboards.board, october)).rows).toHaveLength(0);
     const boards = await t.run((ctx) => ctx.db.query("leaderboardVersions").collect());
-    expect(boards.map((b) => b.board).sort()).toEqual(["1v1", "daily", "level", "level-month:2026-11", "level-month:2026-12"]);
+    expect(boards.map((b) => b.board).sort()).toEqual([
+      "1v1",
+      "daily",
+      "level",
+      "level-month:2026-11",
+      "level-month:2026-12",
+      // Weekly boards older than last week go too.
+      "weekly:2026-W50",
+      "weekly:2026-W51",
+    ]);
   });
 
   it("refuses a malformed month", async () => {

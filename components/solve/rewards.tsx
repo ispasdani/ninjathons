@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { Flame } from "lucide-react";
+import { CalendarDays, Flame } from "lucide-react";
 import Link from "next/link";
 
 import { api } from "@/convex/_generated/api";
@@ -16,8 +16,8 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
   const earned = submission.badgesEarned ?? [];
   const badges = useQuery(api.badges.list, earned.length ? {} : "skip");
 
-  const daily = submission.daily;
-  if (submission.xpAwarded === undefined && !daily) {
+  const { daily, weekly } = submission;
+  if (submission.xpAwarded === undefined && !daily && !weekly) {
     return (
       <p className="text-[13px] text-muted-foreground">
         No XP this time: you&apos;ve already solved this problem in this language. Try another language for more.
@@ -26,7 +26,7 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
   }
 
   const names = earned.map((id) => badges?.find((b) => b.id === id)?.name ?? "…");
-  const xp = (submission.xpAwarded ?? 0) + (daily?.xp ?? 0);
+  const xp = (submission.xpAwarded ?? 0) + (daily?.xp ?? 0) + (weekly?.xp ?? 0);
   return (
     <div className="flex flex-wrap items-center gap-2 text-[13px]" role="status">
       {xp > 0 && (
@@ -39,6 +39,13 @@ export function Rewards({ submission }: { submission: Doc<"submissions"> }) {
           <Flame className="size-3.5 text-brand-text" aria-hidden />
           Daily solved · {daily.streak}-day streak
           {daily.freezeEarned && <span className="font-normal text-text-secondary">· freeze earned</span>}
+        </Link>
+      )}
+      {weekly && (
+        <Link href="/weekly" className="flex items-center gap-1 font-medium hover:underline">
+          <CalendarDays className="size-3.5 text-brand-text" aria-hidden />
+          Weekly · +{weekly.points} points
+          {weekly.setComplete && <span className="font-normal text-text-secondary">· set complete</span>}
         </Link>
       )}
       {submission.levelReached !== undefined && (

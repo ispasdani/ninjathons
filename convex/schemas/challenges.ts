@@ -58,6 +58,8 @@ export const weeklySets = defineTable({
   problemIds: v.array(v.id("problems")),
   // The ISO week it ran, "2026-W42"; absent until it starts.
   week: v.optional(v.string()),
+  // Set once the week is over and its top 10% badges are granted.
+  settled: v.optional(v.boolean()),
 })
   .index("by_slug", ["slug"])
   .index("by_week", ["week"])
