@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: both challenges are built, with their pages and boards. **Next step:** write the 6 weekly sets (18 to 30 new problems).
+**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 1 of the 6 weekly sets is written. **Next step:** weekly set 2, Guess the Answer (binary search on the answer).
 
 ## Phases
 
@@ -20,11 +20,18 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 30 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 0 of 6 weekly sets.
+Content track: 34 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 1 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5: weekly set 1, Running Totals
+- The 6 set themes are planned in [decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026): Running Totals, Guess the Answer, Beyond the Grid, Lines on a Timeline, Top of the Heap, Building Up.
+- Set 1, `weekly/running-totals` (prefix sums and difference arrays), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Range Sum Queries (easy), Flight Bookings (medium), Subarray Sum Equals K (medium), Shortest Subarray with Sum at Least K (hard). 900 points in all.
+- `problems:seed` now seeds every set that lists a problem it seeded, so new problems and their set go up without re-uploading the rest.
+- `problems:check` passes for all 34 problems and the set. Seeded to Convex dev: the set waits for Monday 12 Oct, and its problems are hidden from the library until then (checked in the browser). 393 tests.
+- Open: the first unattended start is Monday 12 Oct, 00:00 UTC on dev; the Weekly page with a running set can be checked then.
 
 ### 8 Oct 2026 · Phase 5: Weekly page
 - `/weekly` (public, "Weekly" in the nav after Daily): the set's title and theme (markdown), the time left, its problems in order with difficulty and points, your clock or solve time on each and Solve, Carry on or Open; Your week: points out of the set's total with a bar, solved, total time, and the rewards. With no set this week it says so and points to the daily.

@@ -1,0 +1,21 @@
+{
+  "slug": "shortest-subarray-with-sum-at-least-k",
+  "title": "Shortest Subarray with Sum at Least K",
+  "difficulty": "hard",
+  "tags": ["arrays", "prefix-sums", "deque", "monotonic-queue"],
+  "mode": "function",
+  "signature": {
+    "functionName": "shortestSubarray",
+    "params": [
+      { "name": "nums", "type": "int[]" },
+      { "name": "k", "type": "int" }
+    ],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

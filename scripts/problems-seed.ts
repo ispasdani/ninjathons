@@ -5,8 +5,9 @@
  * instead of duplicating. Examples go into `problems`; hidden and generated
  * tests into a file referenced from `problemTests`. Uses the Convex CLI's
  * login (`npx convex run`), so it seeds your dev deployment unless --prod.
- * With no slugs, then seeds the weekly sets (weekly/, decisions §15); a
- * weekly set's problems stay hidden until its week starts.
+ * Then seeds the weekly sets (weekly/, decisions §15) that list any of the
+ * problems seeded (every set, with no slugs); a weekly set's problems stay
+ * hidden until its week starts.
  * Run problems:check first: this script only validates the shape.
  */
 import { spawnSync } from "node:child_process";
@@ -94,10 +95,12 @@ async function main() {
       console.log(`  ✗ ${dir}: ${(error as Error).message}`);
     }
   }
-  // Then the weekly sets, whose problems must be seeded first.
-  if (!slugs.length && sets.length) {
-    console.log(`Seeding ${sets.length} weekly sets`);
-    for (const set of sets) {
+  // Then their weekly sets, whose problems must be seeded first.
+  const seeded = new Set(dirs.map((dir) => loadProblem(dir).meta.slug));
+  const due = sets.filter((set) => set.problems.some((slug) => seeded.has(slug)));
+  if (due.length) {
+    console.log(`Seeding ${due.length} weekly sets`);
+    for (const set of due) {
       try {
         const result = convexRun("weekly:seedSet", {
           slug: set.slug,

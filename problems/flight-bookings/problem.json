@@ -1,0 +1,21 @@
+{
+  "slug": "flight-bookings",
+  "title": "Flight Bookings",
+  "difficulty": "medium",
+  "tags": ["arrays", "prefix-sums", "difference-array"],
+  "mode": "function",
+  "signature": {
+    "functionName": "seatsBooked",
+    "params": [
+      { "name": "bookings", "type": "int[][]" },
+      { "name": "n", "type": "int" }
+    ],
+    "returns": "int[]"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

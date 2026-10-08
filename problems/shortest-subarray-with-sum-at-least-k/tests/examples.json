@@ -1,0 +1,16 @@
+[
+  {
+    "input": { "nums": [2, -1, 2], "k": 3 },
+    "output": 3,
+    "explanation": "Only the whole array adds up to 3 or more."
+  },
+  {
+    "input": { "nums": [84, -37, 32, 40, 95], "k": 167 },
+    "output": 3,
+    "explanation": "[32, 40, 95] adds up to 167."
+  },
+  {
+    "input": { "nums": [1, 2], "k": 4 },
+    "output": -1
+  }
+]

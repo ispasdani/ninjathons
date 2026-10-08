@@ -1,0 +1,21 @@
+{
+  "slug": "subarray-sum-equals-k",
+  "title": "Subarray Sum Equals K",
+  "difficulty": "medium",
+  "tags": ["arrays", "prefix-sums", "hash-map"],
+  "mode": "function",
+  "signature": {
+    "functionName": "subarraySum",
+    "params": [
+      { "name": "nums", "type": "int[]" },
+      { "name": "k", "type": "int" }
+    ],
+    "returns": "long"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

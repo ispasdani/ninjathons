@@ -1,0 +1,10 @@
+{
+  "title": "Running Totals",
+  "order": 1,
+  "problems": [
+    "range-sum-queries",
+    "flight-bookings",
+    "subarray-sum-equals-k",
+    "shortest-subarray-with-sum-at-least-k"
+  ]
+}

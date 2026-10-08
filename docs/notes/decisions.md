@@ -485,3 +485,16 @@ Agreed 7 Oct 2026, at the start of phase 5. Neither challenge changes a rating (
 - **`npm run problems:check`** with no slugs also checks the sets: 3 to 5 problems, each with a folder and not a draft, in no other set, a theme, and a unique order.
 - **`npm run problems:seed`** with no slugs seeds the problems, then the sets. A set's problems are unreleased from their first seed until the set starts. Re-seeding a started set changes only its title and theme.
 - **Starting:** the hourly `weekly.start` starts the next set by order on Mondays (UTC) and settles last week. `npx convex run weekly:start '{"force": true}'` starts one on any other day, for trying a set on dev.
+
+### The first 6 sets (8 Oct 2026)
+
+Themes chosen to cover techniques the first 30 problems barely touch. Each set has 3 to 5 new problems, easy to hard.
+
+| Order | Set | Problems |
+|---|---|---|
+| 1 | Running Totals: prefix sums and difference arrays | Range Sum Queries (easy), Flight Bookings (medium), Subarray Sum Equals K (medium), Shortest Subarray with Sum at Least K (hard) |
+| 2 | Guess the Answer: binary search on the answer | planned: integer square root, eating speed, shipping capacity, splitting an array |
+| 3 | Beyond the Grid: graphs | planned: connected components (union-find), course order (topological sort), network delay (Dijkstra), one harder path problem |
+| 4 | Lines on a Timeline: intervals and sweep lines | planned: can attend all meetings, insert an interval, rooms needed, the skyline |
+| 5 | Top of the Heap: heaps and greedy | planned: kth largest, task scheduling, merging sorted lists, a running median |
+| 6 | Building Up: dynamic programming, part two | planned: house robber, paths with obstacles, longest common subsequence, one interval DP |
