@@ -8,6 +8,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import type { ratingArea } from "../schemas/ratings";
 import { DEFAULT_GLICKO, rate } from "./glicko2";
+import { DEFAULT_OPENSKILL, rateGame } from "./openskill";
 
 export type RatingArea = Infer<typeof ratingArea>;
 
@@ -96,6 +97,43 @@ export async function recordDuel(
       opponentId: side.opponentId,
     });
     changes.push({ userId: side.userId, rating: next.rating, change, games: record.games });
+  }
+  return changes;
+}
+
+/**
+ * Rates one counted Territory game with OpenSkill (decisions §16): `place` is
+ * each player's placement, ties shared. `rating` and `rd` hold the mean and
+ * uncertainty; volatility isn't used. A 1st place counts as a win.
+ */
+export async function recordTerritory(ctx: MutationCtx, game: { userId: Id<"users">; place: number }[]) {
+  const now = Date.now();
+  const rows = await Promise.all(game.map((p) => current(ctx, p.userId, "territory")));
+  const before = rows.map((row) => (row ? { mu: row.rating, sigma: row.rd } : DEFAULT_OPENSKILL));
+  const after = rateGame(
+    before,
+    game.map((p) => p.place),
+  );
+
+  const changes = [];
+  for (const [i, player] of game.entries()) {
+    const row = rows[i];
+    const won = player.place === 1;
+    const fields = {
+      rating: after[i].mu,
+      rd: after[i].sigma,
+      volatility: 0,
+      games: (row?.games ?? 0) + 1,
+      wins: (row?.wins ?? 0) + (won ? 1 : 0),
+      losses: (row?.losses ?? 0) + (won ? 0 : 1),
+      draws: row?.draws ?? 0,
+      lastGameAt: now,
+    };
+    if (row) await ctx.db.patch(row._id, fields);
+    else await ctx.db.insert("ratings", { userId: player.userId, area: "territory", ...fields });
+    const change = after[i].mu - before[i].mu;
+    await ctx.db.insert("ratingHistory", { userId: player.userId, area: "territory", rating: after[i].mu, change });
+    changes.push({ userId: player.userId, rating: after[i].mu, change, games: fields.games });
   }
   return changes;
 }

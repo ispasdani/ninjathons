@@ -265,6 +265,21 @@ export const deleteFromClerk = internalMutation({
       await ctx.db.delete(row._id);
     }
 
+    // Likewise in Territory: their standing and feed events. Regions they held
+    // show as a deleted player's.
+    const territory = await ctx.db
+      .query("territoryPlayers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of territory) {
+      const events = await ctx.db
+        .query("territoryEvents")
+        .withIndex("by_game", (q) => q.eq("gameId", row.gameId))
+        .collect();
+      for (const e of events) if (e.userId === user._id) await ctx.db.delete(e._id);
+      await ctx.db.delete(row._id);
+    }
+
     const months = await ctx.db
       .query("xpMonths")
       .withIndex("by_user_month", (q) => q.eq("userId", user._id))

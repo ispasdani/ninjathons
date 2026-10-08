@@ -82,11 +82,17 @@ export const submissions = defineTable({
   ),
   // Set when the submission was sent in a match.
   matchId: v.optional(v.id("matches")),
+  // Set when it was sent in a Territory game, with the region it means to take
+  // (decisions §16); `territoryOutcome` once an accepted Submit is applied.
+  territoryGameId: v.optional(v.id("territoryGames")),
+  region: v.optional(v.number()),
+  territoryOutcome: v.optional(v.union(v.literal("captured"), v.literal("missed"))),
   // Set while its sandbox waits for Vercel's per-minute limit, so the page can
   // say why it's taking longer.
   waitingForRunner: v.optional(v.boolean()),
 })
   .index("by_user", ["userId"])
   .index("by_match", ["matchId"])
+  .index("by_territory_game", ["territoryGameId"])
   .index("by_user_problem", ["userId", "problemId"])
   .index("by_user_status", ["userId", "status"]);

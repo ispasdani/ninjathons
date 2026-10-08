@@ -7,6 +7,7 @@ import type { Language } from "./judge/types";
 import { userMutation, userQuery } from "./lib/functions";
 import { createMatch, currentRating, openMatchOf } from "./lib/matches";
 import { pairPlayers } from "./lib/matchmaking";
+import { openGameOf } from "./lib/territory";
 import { language } from "./schemas/problems";
 
 // How often the pass runs while anyone is waiting.
@@ -27,7 +28,9 @@ export const join = userMutation({
   args: { language },
   handler: async (ctx, { language }) => {
     if (!ctx.user.username) throw new ConvexError("USERNAME_REQUIRED");
-    if (await openMatchOf(ctx, ctx.user._id)) throw new ConvexError("ALREADY_IN_MATCH");
+    if ((await openMatchOf(ctx, ctx.user._id)) || (await openGameOf(ctx, ctx.user._id))) {
+      throw new ConvexError("ALREADY_IN_MATCH");
+    }
     const now = Date.now();
     const row = await ctx.db
       .query("matchQueue")
@@ -100,7 +103,8 @@ export const pass = internalMutation({
     const rows = await ctx.db.query("matchQueue").withIndex("by_joined").take(500);
     const waiting = [];
     for (const row of rows) {
-      if (now - row.lastSeenAt > STALE_AFTER_MS || (await openMatchOf(ctx, row.userId))) {
+      const busy = (await openMatchOf(ctx, row.userId)) || (await openGameOf(ctx, row.userId));
+      if (now - row.lastSeenAt > STALE_AFTER_MS || busy) {
         await ctx.db.delete(row._id);
       } else {
         waiting.push(row);

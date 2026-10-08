@@ -95,7 +95,7 @@ export async function openDaily(ctx: MutationCtx, userId: Id<"users">, problemId
  * earned, or null.
  */
 export async function recordDailySolve(ctx: MutationCtx, submission: Doc<"submissions">) {
-  if (submission.kind !== "submit" || submission.matchId) return null;
+  if (submission.kind !== "submit" || submission.matchId || submission.territoryGameId) return null;
   const sentAt = submission._creationTime;
   const day = dayKey(sentAt);
   const daily = await dailyFor(ctx, day);

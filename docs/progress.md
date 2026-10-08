@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges, is done: the daily runs unattended and all 6 weekly sets are written and seeded on dev. **Next step:** start phase 6, Territory.
+**Now:** Phase 6, Territory: the rules are agreed ([decisions §16](notes/decisions.md#16-territory)) and the game engine is built. **Next step:** lobbies and Find a match.
 
 ## Phases
 
@@ -14,7 +14,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
-| 6 | Territory | Not started | | |
+| 6 | Territory | In progress | 8 Oct 2026 | |
 | 7 | Learn | Not started | | |
 | 8 | Profiles and Pro | Not started | | |
 | 9 | Ninjathons | Not started | | |
@@ -25,6 +25,15 @@ Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 6: Territory rules and game engine
+- Rules agreed and written up in [decisions §16](notes/decisions.md#16-territory): ring values on both maps, home bases on corners, one problem deck per difficulty (8 easy, 8 medium, 5 hard, unsolved first), captures by when the Submit was sent, leavers place last with their regions open to attack, Find a match forms at 6 or at 3+ after 30 s, ranked lobbies with the 1v1 limits.
+- The map and its rules are pure (`convex/lib/territoryMap.ts`): 37 regions and 65 points (33 wins) for 3 or 4 players, 61 and 107 (54 wins) for 5 or 6; claims at the region's level, attacks one harder (Hard stays Hard), 60 s shields, placements by points, regions, then who got there first.
+- OpenSkill (Plackett–Luce) in `convex/lib/openskill.ts`, on the 1v1 scale (1500, uncertainty 500), checked against the openskill package's outputs, ties included.
+- The engine (`convex/lib/territory.ts`, `convex/territory.ts`), with its own tables: a Submit names its region and is refused if it can't take it now; accepted Submits for a region apply in send order, waiting up to 2 minutes for an earlier one; a solve that comes too late takes nothing and keeps its problem. A game ends on a majority, at 30 minutes (after Submits sent in time), or when one player is left; leaving in the countdown cancels it. Counted ranked games rate everyone and give 15 / 40 / 20 XP; the Core holder badge (33 badges now).
+- A player in a Territory game can't join the 1v1 queue or accept a challenge; Territory Submits don't count for the daily or weekly; account deletion removes a player's Territory rows.
+- 17 new tests, 419 in all. The two 1v1 tests that judge real Python can time out when the whole suite runs at once; they pass on their own. Deployed to Convex dev.
+- Open: no way into a game yet (lobbies and the queue come next), and no screen.
 
 ### 8 Oct 2026 · Phase 5 done
 - The check passes: the daily pick ran by itself on dev at midnight UTC (8 Oct, Word Frequency), and the 6 weekly sets are written, checked and seeded (24 new problems, 54 in all).

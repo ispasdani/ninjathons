@@ -22,6 +22,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 7 Oct 2026 | 21 badges from solves and levels; rarity among players with a solve | [13](#badges) |
 | 7 Oct 2026 | Ratings per area; 1v1 uses Glicko-2 with one rating period per game | [13](#ratings) |
 | 7 Oct 2026 | Level and 1v1 boards with Global, Country and Group scopes; free private groups | [13](#leaderboards-and-groups) |
+| 8 Oct 2026 | Territory: ring values, one problem deck per difficulty, captures by send time, OpenSkill on the 1v1 scale | [16](#16-territory) |
 
 ---
 
@@ -498,3 +499,51 @@ Themes chosen to cover techniques the first 30 problems barely touch. Each set h
 | 4 | Lines on a Timeline: intervals and sweep lines | Can Attend All (easy), Most Meetings (medium; replaces Insert Interval, too close to Merge Intervals), Rooms Needed (medium), The Skyline (hard) |
 | 5 | Top of the Heap: heaps and greedy | Kth Largest (easy), Join the Ropes (medium), Smallest Covering Range (medium), Running Median (hard). Task scheduling (a counting formula) and merging sorted lists (sorting is as fast) were dropped: neither needs the heap |
 | 6 | Building Up: dynamic programming, part two | House Robber (easy), Paths Around Obstacles (medium), Equal Halves (medium; replaces longest common subsequence, too close to Edit Distance), Pop the Balloons (hard) |
+
+## 16. Territory
+
+Agreed 8 Oct 2026, at the start of phase 6. Adds to the roadmap's rules (Compete, Territory) and the plan's (Territory, 27 Sept 2026).
+
+### The map
+
+- **3 to 6 players.** 3 or 4 play the 37-region map (a hexagon of radius 3), 5 or 6 the 61-region map (radius 4).
+- **Values by ring, from the edge in:** Easy +1 on the edge, Medium +2, Hard +3, and the Core +5 in the centre. The 37-region map is the edge, one Medium ring and one Hard ring: 18 + 24 + 18 + 5 = 65 points, so 33 wins. The 61-region map has two Medium rings: 24 + 36 + 24 + 18 + 5 = 107 points, so 54 wins.
+- **Home bases are corners of the hexagon,** spread evenly: corners 1, 3 and 5 for 3 players, 1, 2, 4 and 5 for 4, five of six for 5, all six for 6. A home base counts its +1, is held from the start and can never be captured.
+
+### Problems: one deck per difficulty
+
+- **The library is too small for a problem per region,** so each game deals one deck per difficulty (up to 8 easy, 8 medium and 5 hard), in the same order for every player. Problems no player in the game has solved come first, then the rest.
+- **Picking a region shows your current problem for the level it needs:** its own difficulty to claim it when empty, one level harder to attack it from a rival (Hard stays Hard, so attacking a Hard region or the Core takes a Hard problem).
+- **Your current problem moves on only when it takes a region.** Skip moves to the next problem of that difficulty for good. When a deck runs out, you can't take regions that need that level.
+
+### Claims, attacks and races
+
+- **Claim** an empty region next to one you hold; **attack** a rival's region next to one you hold. Home bases count for "next to".
+- **A Submit names its region** and is refused if the region isn't one you could take now: not next to yours, a home base, already yours, or shielded.
+- **Captures go by when the Submit was sent,** as in 1v1: an accepted Submit for a region waits while another player's earlier Submit for the same region is still being judged (up to 2 minutes). When it applies, the rules are checked again; if someone got there first and the solve no longer qualifies, it takes nothing, but the problem stays yours to Submit on another region of that level.
+- **A new capture is shielded for 60 seconds.** 10 seconds between Submits, no penalty for a wrong one. Each player picks their own language.
+
+### Winning and placements
+
+- **More than half the points ends the game at once,** won by that player. Otherwise the game ends at 30 minutes (after a 10-second countdown); Submits sent before time up still count when judged within 2 minutes.
+- **Placements:** points, then regions held, then who reached their final score first. Equal on all three is a tie.
+- **Leaving** places you last (players who leave later place above earlier leavers). Your regions stay yours and can be attacked; your home base stays safe. When only one player is left, they win.
+
+### Ways in
+
+- **Find a match** is ranked. The rating range starts at ±100 and widens as in 1v1. A game forms at once when 6 players are in range of each other, or when 3 or more are and the longest-waiting one has waited 30 seconds.
+- **Lobbies:** a player opens one from Play or from a group page and shares its link; a group's lobby also shows on the group page, where members join without the link. The host picks Ranked or Unranked and starts once 3 to 6 players are in; each picks their own language. A lobby closes after 15 minutes without a start, or when the host leaves.
+- **Ranked lobbies** need every player to have 10 ranked Territory games and a rating spread under 400, checked when the host starts.
+- **One thing at a time:** a player is in at most one queue, lobby, 1v1 match or Territory game; starting a game takes its players out of the queues and cancels their 1v1 challenges.
+
+### Ratings, XP and badges
+
+- **OpenSkill (Plackett–Luce) on the 1v1 scale:** the usual defaults multiplied by 60, so a new player is 1500 with an uncertainty of 500. The rating shown is the mean, with the same tiers and trust rules as 1v1 (provisional until 10 ranked games, hidden from boards after 30 days without one).
+- **Which games count:** a ranked game is rated for everyone unless some pair in it has already had 3 counted games together that UTC day; then it is unrated for everyone.
+- **XP (counted games only):** 15 for playing, 40 for 1st, 20 for 2nd (in all, not added to the 15). Keyed by game.
+- **Badge:** Core holder, for holding the Core at the end of a ranked game. Name is a placeholder.
+- **Territory board:** by rating, Global, Country and Group, like 1v1.
+
+### As built
+
+- Territory has its own tables (`territoryGames`, `territoryPlayers`, `territoryRegions`, `territoryEvents`, lobbies and queue) rather than sharing `matches`, which assumes one problem and two players.

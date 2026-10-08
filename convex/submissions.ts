@@ -10,6 +10,7 @@ import { openDaily, recordDailySolve } from "./lib/daily";
 import { isListed } from "./lib/problems";
 import { openWeekly, recordWeeklySolve } from "./lib/weekly";
 import { noteSubmit, playersOf, recordJudgedSubmit, SUBMIT_COOLDOWN_MS } from "./lib/matches";
+import { checkTerritorySubmit, noteTerritorySubmit, recordTerritorySubmit } from "./lib/territory";
 import { awardXp, SOLVE_XP, solveKey } from "./lib/xp";
 import { language } from "./schemas/problems";
 import { submissionKind, verdict } from "./schemas/submissions";
@@ -31,8 +32,10 @@ export const create = userMutation({
     kind: submissionKind,
     // Sent from the duel screen: the match's problem, while the match is on.
     matchId: v.optional(v.id("matches")),
+    // Sent from the Territory screen: the game, and the region the Submit means to take.
+    territory: v.optional(v.object({ gameId: v.id("territoryGames"), region: v.number() })),
   },
-  handler: async (ctx, { slug, language, source, kind, matchId }) => {
+  handler: async (ctx, { slug, language, source, kind, matchId, territory }) => {
     const problem = await ctx.db
       .query("problems")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -51,6 +54,19 @@ export const create = userMutation({
       }
       // Both players are judged on the tests the match started with.
       problemVersion = match.problemVersion;
+    }
+    let territoryPlayer: Doc<"territoryPlayers"> | undefined;
+    if (territory) {
+      if (matchId) throw new ConvexError("GAME_NOT_FOUND");
+      const checked = await checkTerritorySubmit(ctx, {
+        ...territory,
+        userId: ctx.user._id,
+        problemId: problem._id,
+        kind,
+      });
+      territoryPlayer = checked.player;
+      // Every player is judged on the tests the game was dealt with.
+      problemVersion = checked.version;
     }
     if (!problemLanguages(problem.languages).includes(language)) throw new ConvexError("LANGUAGE_NOT_ALLOWED");
     if (new TextEncoder().encode(source).length > MAX_SOURCE_BYTES) throw new ConvexError("SOURCE_TOO_LONG");
@@ -75,10 +91,13 @@ export const create = userMutation({
       kind,
       status: "queued",
       matchId,
+      territoryGameId: territory?.gameId,
+      region: territory?.region,
     });
     if (player && kind === "submit") await noteSubmit(ctx, player);
+    if (territoryPlayer && kind === "submit") await noteTerritorySubmit(ctx, territoryPlayer);
     // A Submit to the daily or a weekly problem starts its clock if the page didn't.
-    if (!matchId && kind === "submit") {
+    if (!matchId && !territory && kind === "submit") {
       await openDaily(ctx, ctx.user._id, problem._id, Date.now());
       await openWeekly(ctx, ctx.user._id, problem._id, Date.now());
     }
@@ -184,6 +203,7 @@ export const finish = internalMutation({
     const submission = await ctx.db.get(submissionId);
     if (submission?.kind !== "submit") return;
     if (submission.matchId) await recordJudgedSubmit(ctx, submission);
+    if (submission.territoryGameId) await recordTerritorySubmit(ctx, submission);
     if (verdict?.status !== "accepted") return;
     const problem = await ctx.db.get(submission.problemId);
     if (!problem) return;

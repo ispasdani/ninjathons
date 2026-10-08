@@ -11,7 +11,7 @@ import type { Language } from "../judge/types";
 import { TITLES, levelForXp } from "./levels";
 import { PROVISIONAL_GAMES, TIERS, tierFor } from "./ratings";
 
-export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1" | "challenges";
+export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1" | "territory" | "challenges";
 
 export type Badge = {
   // Stored in userBadges; never changes once released.
@@ -73,6 +73,13 @@ export const BADGES: Badge[] = [
     name: band.tier,
     description: `Reach a 1v1 rating of ${band.from} once your rating is no longer provisional.`,
   })),
+  // Granted in lib/territory.ts (decisions §16).
+  {
+    id: "core-holder",
+    group: "territory",
+    name: "Core holder",
+    description: "Hold the Core at the end of a ranked Territory game.",
+  },
   // Granted in lib/daily.ts and weekly.ts (decisions §15).
   ...STREAK_BADGES.map((days) => ({
     id: `streak-${days}`,
@@ -173,4 +180,9 @@ export async function checkMatchBadges(
     for (const band of ratingTiers.slice(0, upTo + 1)) due.push(`tier-${band.tier.toLowerCase()}`);
   }
   return await grantAll(ctx, userId, due);
+}
+
+/** Badges from one finished Territory game. Returns the new ones. */
+export async function checkTerritoryBadges(ctx: MutationCtx, userId: Id<"users">, game: { heldCore: boolean }) {
+  return await grantAll(ctx, userId, game.heldCore ? ["core-holder"] : []);
 }
