@@ -52,7 +52,7 @@ export async function openWeekly(ctx: MutationCtx, userId: Id<"users">, problemI
  * it earned, or null.
  */
 export async function recordWeeklySolve(ctx: MutationCtx, submission: Doc<"submissions">, problem: Doc<"problems">) {
-  if (submission.kind !== "submit" || submission.matchId) return null;
+  if (submission.kind !== "submit" || submission.matchId || submission.territoryGameId) return null;
   const sentAt = submission._creationTime;
   const week = weekKey(sentAt);
   const set = await setFor(ctx, week);

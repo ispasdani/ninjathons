@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { recordDuel } from "./lib/ratings";
+import { recordDuel, recordTerritory } from "./lib/ratings";
 import { awardXp } from "./lib/xp";
 import { identity, setup } from "./test.setup";
 
@@ -154,6 +154,7 @@ describe("monthly Level board", () => {
       "level",
       "level-month:2026-11",
       "level-month:2026-12",
+      "territory",
       // Weekly boards older than last week go too.
       "weekly:2026-W50",
       "weekly:2026-W51",
@@ -185,6 +186,30 @@ describe("1v1 board", () => {
 
     vi.advanceTimersByTime(31 * 24 * 60 * 60 * 1000);
     await rebuild(t);
+    expect((await t.query(api.leaderboards.board, { board: "1v1", scope: "global" })).rows).toEqual([]);
+  });
+});
+
+describe("territory board", () => {
+  it("ranks by Territory rating, with the same trust rules as 1v1", async () => {
+    const t = setup();
+    const ada = await player(t, "ada");
+    const bob = await player(t, "bob");
+    const eve = await player(t, "eve");
+    await t.run(async (ctx) => {
+      for (let i = 0; i < 10; i++) {
+        await recordTerritory(ctx, [
+          { userId: bob, place: 1 },
+          { userId: ada, place: 2 },
+          { userId: eve, place: 3 },
+        ]);
+      }
+    });
+    await rebuild(t);
+    const board = await t.query(api.leaderboards.board, { board: "territory", scope: "global" });
+    expect(board.rows.map((r) => r.username)).toEqual(["bob", "ada", "eve"]);
+    expect(board.rows[0]).toHaveProperty("tier");
+    // The 1v1 board is separate.
     expect((await t.query(api.leaderboards.board, { board: "1v1", scope: "global" })).rows).toEqual([]);
   });
 });

@@ -14,6 +14,7 @@ import { checkMatchBadges } from "./badges";
 import { DEFAULT_GLICKO } from "./glicko2";
 import { isListed } from "./problems";
 import { recordDuel } from "./ratings";
+import { leaveTerritoryWaiting } from "./territory";
 import { awardXp } from "./xp";
 
 type Difficulty = Infer<typeof difficulty>;
@@ -130,6 +131,7 @@ export async function createMatch(
       .withIndex("by_user", (q) => q.eq("userId", player.userId))
       .unique();
     if (queued) await ctx.db.delete(queued._id);
+    await leaveTerritoryWaiting(ctx, player.userId);
     // And their other challenges are off: they're busy now.
     const sent = await ctx.db
       .query("challenges")

@@ -8,6 +8,8 @@ const isAppRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/play(.*)",
   "/challenge(.*)",
+  "/lobby(.*)",
+  "/territory(.*)",
   "/duel(.*)",
   "/solve(.*)",
   "/courses(.*)",

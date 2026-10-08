@@ -9,23 +9,15 @@ import { api } from "@/convex/_generated/api";
 import type { Language } from "@/convex/judge/types";
 import { errorMessage } from "@/lib/errors";
 import { useNow } from "@/lib/use-now";
-import { cn } from "@/lib/utils";
 import { ChallengeForm, ChallengeLists } from "./challenges";
+import { LanguagePicker, savedLanguage } from "./language-picker";
+import { PlayTabs } from "./play-tabs";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 // The queue drops rows not seen for 30 s (convex/queue.ts).
 const HEARTBEAT_MS = 10_000;
-const LANGUAGE_KEY = "play:language";
 // Offer a ghost race after this long in the queue, or at once when nobody waits.
 const GHOST_AFTER_MS = 20_000;
-
-function readLanguage(): Language | null {
-  try {
-    return localStorage.getItem(LANGUAGE_KEY) as Language | null;
-  } catch {
-    return null;
-  }
-}
 
 function clock(ms: number) {
   const seconds = Math.max(0, Math.floor(ms / 1000));
@@ -54,7 +46,7 @@ export function FindMatch() {
   const [error, setError] = useState<string | null>(null);
 
   const queued = status?.queued ?? null;
-  const language = picked ?? queued?.language ?? readLanguage() ?? "python";
+  const language = picked ?? queued?.language ?? savedLanguage() ?? "python";
   const rating = ratings?.find((r) => r.area === "1v1");
 
   // Matched: off to the duel screen.
@@ -83,9 +75,6 @@ export function FindMatch() {
 
   function pick(id: Language) {
     setPicked(id);
-    try {
-      localStorage.setItem(LANGUAGE_KEY, id);
-    } catch {}
     // Switching while queued keeps your place.
     if (queued) void run(() => join({ language: id }));
   }
@@ -99,34 +88,16 @@ export function FindMatch() {
 
   return (
     <div className="max-w-4xl">
-      <p className={eyebrow}>1v1 race</p>
-      <h1 className="mt-2 text-3xl sm:text-4xl">Play</h1>
+      <h1 className="text-3xl sm:text-4xl">Play</h1>
+      <div className="mt-4">
+        <PlayTabs />
+      </div>
       <p className="mt-2 text-[15px] text-muted-foreground">
         Same problem for both players; the first to pass every test wins.
       </p>
 
       <section className="mt-8">
-        <p className="text-[13px] font-medium" id="language-label">
-          Your language
-        </p>
-        <div role="radiogroup" aria-labelledby="language-label" className="mt-3 flex flex-wrap gap-2">
-          {status.languages.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              role="radio"
-              aria-checked={language === l.id}
-              onClick={() => pick(l.id)}
-              disabled={busy}
-              className={cn(
-                "h-8 rounded-md border px-3 text-[13px] text-muted-foreground transition-colors duration-150 ease-out-quad hover:border-border-strong hover:text-foreground",
-                "aria-checked:border-foreground aria-checked:font-medium aria-checked:text-foreground",
-              )}
-            >
-              {l.label}
-            </button>
-          ))}
-        </div>
+        <LanguagePicker value={language} onChange={pick} disabled={busy} />
         <p className="mt-3 text-[13px] text-muted-foreground">
           Your opponent may pick another; slower languages get more time per test.
         </p>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { GroupLobbies } from "@/components/territory/group-lobbies";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -148,13 +149,15 @@ export function GroupDetail({ groupId }: { groupId: string }) {
             <p className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
               Leaderboards
             </p>
-            <p className="mt-3 text-[13px] text-muted-foreground">See how the group ranks on Level, this month and 1v1.</p>
+            <p className="mt-3 text-[13px] text-muted-foreground">See how the group ranks on Level, this month, 1v1 and Territory.</p>
           </div>
           <Button variant="outline" size="sm" className="mt-4 self-start" asChild>
             <Link href={`/leaderboards?scope=group&group=${id}`}>Group leaderboard</Link>
           </Button>
         </div>
       </section>
+
+      <GroupLobbies groupId={id} />
 
       <section className="mt-10">
         <h2 className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">Members</h2>

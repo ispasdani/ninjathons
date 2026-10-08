@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges, is done: the daily runs unattended and all 6 weekly sets are written and seeded on dev. **Next step:** start phase 6, Territory.
+**Now:** Phase 6, Territory: built (rules in [decisions §16](notes/decisions.md#16-territory), engine, lobbies, Find a match, game screen, Territory board) and played in full by 3 and 6 bots on dev. **Next step:** the phase check: a group lobby of 3 to 6 real players finishing a full game, by hand.
 
 ## Phases
 
@@ -14,7 +14,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
-| 6 | Territory | Not started | | |
+| 6 | Territory | In progress | 8 Oct 2026 | |
 | 7 | Learn | Not started | | |
 | 8 | Profiles and Pro | Not started | | |
 | 9 | Ninjathons | Not started | | |
@@ -25,6 +25,36 @@ Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 6: bots in your own lobby
+- `npm run territory:sim -- [bots] --join <code> [--pace <seconds>]`: the bots (default 2) take seats in a lobby you opened, keep them alive with heartbeats, and play once you start it, waiting about 60 s between Submits (`--pace`) so a person has a chance. They stay afterwards; the teardown removes them and every game only bots played, but keeps games a person played in.
+- For testing alone; it doesn't count as the phase check. Clerk's development instance takes test emails (`name+clerk_test…@example.com`, code 424242) for more real accounts, each in its own browser profile or private window.
+- Checked: a bad code fails cleanly. Joining a real lobby needs a signed-in host, so it hasn't been run end to end yet.
+
+### 8 Oct 2026 · Phase 6: game screen, Territory board, bot games
+- `/territory/<id>`: the countdown (players, ratings, languages, the map's size), then the HUD (server timer, one score bar with a marker at the winning points, everyone's points and regions, Give up) over the map and a solve-style workspace. Picking a region shows why you can or can't take it and the problem that would; the editor follows that problem (drafts per game, problem and language), with Skip, Run and Submit, and says after an accepted Submit whether it took the region, came too late, or is waiting on an earlier one. The game feed, and at the end the placement, rating change, XP, badges and final standings.
+- The map (`components/territory/hex-map.tsx`) is SVG hexes, each a button: held regions in their player's colour with the player's initials, a lock while shielded, regions you can take dashed. Checked in light and dark on a throwaway page with made-up owners (both map sizes). Two player colours added for 5 and 6 players, amber and fuchsia ([design.md 2.4](notes/design.md)).
+- Territory board on Leaderboards: by rating, with the 1v1 trust rules, Global, Country and Group. 1 new test (434 in all).
+- `npm run territory:sim [players]`: bots in a lobby started like a host's Start (the start is now `startLobby`), Submitting reference solutions (and 1 in 5 wrong ones) for the most valuable region they can take, judged in the real Vercel Sandbox; then every trace removed. 3 bots on dev: 66 Submits, the whole map taken, then attacks, ended at time up after 30 minutes with places 1, 1, 3 (the last capture changed both leaders' scores at once, so they tie): PASS. 6 bots on the 61-region map: 116 Submits, all 107 points taken, time up, places 1 to 6 (two on 17 points split by regions held): PASS.
+- Production build passes. Deployed to Convex dev.
+- Open: none of the signed-in pages (Play's Territory tab, lobbies, the game screen) has been seen in the browser, since the pane isn't signed in; a real game by hand is the phase check. No share card for Territory results yet.
+
+### 8 Oct 2026 · Phase 6: lobbies and Find a match
+- Lobbies (`convex/territoryLobbies.ts`): a host opens one, on its own or for a group (members only), and shares `/lobby/<code>`; up to 6 join, each with their own language; the host starts with the 3 to 6 who sent a heartbeat in the last 30 s. A lobby closes after 15 minutes or when the host leaves. Ranked lobbies need everyone at 10 ranked Territory games and within 400, checked at the start.
+- Find a match (`convex/territoryQueue.ts`): ranked, with the 1v1 range; `groupPlayers` gathers the closest players in range of everyone already gathered and starts at 6, or at 3+ once the longest-waiting has waited 30 s.
+- One thing at a time: joining a queue or lobby leaves the others (a host's lobby closes); a game or 1v1 match takes its players out of every queue and lobby. Account deletion takes a player out too.
+- Pages: Play has a 1v1 race / Territory switch (`/play/territory`), with Find a match and Open a lobby (Ranked or Unranked, for anyone with the link or a group); the lobby page with the link, players and their languages, Join, Start and Leave; a Territory card on group pages with the group's open lobbies and "Start a Territory lobby with the group". The banner under the header covers Territory games too. The language picker is shared by both modes.
+- 14 new tests (433 in all). Production build passes. Deployed to Convex dev.
+- Open: the pages haven't been seen signed in (the browser pane isn't signed in); a started game has no screen yet.
+
+### 8 Oct 2026 · Phase 6: Territory rules and game engine
+- Rules agreed and written up in [decisions §16](notes/decisions.md#16-territory): ring values on both maps, home bases on corners, one problem deck per difficulty (8 easy, 8 medium, 5 hard, unsolved first), captures by when the Submit was sent, leavers place last with their regions open to attack, Find a match forms at 6 or at 3+ after 30 s, ranked lobbies with the 1v1 limits.
+- The map and its rules are pure (`convex/lib/territoryMap.ts`): 37 regions and 65 points (33 wins) for 3 or 4 players, 61 and 107 (54 wins) for 5 or 6; claims at the region's level, attacks one harder (Hard stays Hard), 60 s shields, placements by points, regions, then who got there first.
+- OpenSkill (Plackett–Luce) in `convex/lib/openskill.ts`, on the 1v1 scale (1500, uncertainty 500), checked against the openskill package's outputs, ties included.
+- The engine (`convex/lib/territory.ts`, `convex/territory.ts`), with its own tables: a Submit names its region and is refused if it can't take it now; accepted Submits for a region apply in send order, waiting up to 2 minutes for an earlier one; a solve that comes too late takes nothing and keeps its problem. A game ends on a majority, at 30 minutes (after Submits sent in time), or when one player is left; leaving in the countdown cancels it. Counted ranked games rate everyone and give 15 / 40 / 20 XP; the Core holder badge (33 badges now).
+- A player in a Territory game can't join the 1v1 queue or accept a challenge; Territory Submits don't count for the daily or weekly; account deletion removes a player's Territory rows.
+- 17 new tests, 419 in all. The two 1v1 tests that judge real Python can time out when the whole suite runs at once; they pass on their own. Deployed to Convex dev.
+- Open: no way into a game yet (lobbies and the queue come next), and no screen.
 
 ### 8 Oct 2026 · Phase 5 done
 - The check passes: the daily pick ran by itself on dev at midnight UTC (8 Oct, Word Frequency), and the 6 weekly sets are written, checked and seeded (24 new problems, 54 in all).

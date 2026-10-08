@@ -12,6 +12,7 @@ const GROUPS = [
   ["languages", "Languages"],
   ["levels", "Levels"],
   ["1v1", "1v1"],
+  ["territory", "Territory"],
   ["challenges", "Challenges"],
 ] as const;
 

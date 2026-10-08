@@ -15,7 +15,7 @@ import { duration } from "@/lib/duration";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
 
-export type BoardTab = "level" | "month" | "1v1" | "daily" | "weekly";
+export type BoardTab = "level" | "month" | "1v1" | "territory" | "daily" | "weekly";
 export type Scope = "global" | "country" | "group";
 
 const PAGE = 50;
@@ -24,6 +24,7 @@ const BOARDS: [BoardTab, string][] = [
   ["level", "Level"],
   ["month", "This month"],
   ["1v1", "1v1"],
+  ["territory", "Territory"],
   ["daily", "Daily"],
   ["weekly", "Weekly"],
 ];
@@ -32,6 +33,7 @@ const ABOUT: Record<BoardTab, string> = {
   level: "Total XP from every area. XP only goes up.",
   month: "XP earned this calendar month (UTC). Starts again on the 1st.",
   "1v1": "1v1 rating. Shown after 10 ranked games; hidden after 30 days without one.",
+  territory: "Territory rating. Shown after 10 ranked games; hidden after 30 days without one.",
   daily: "Daily challenge streak, then total dailies solved. Miss a day without a freeze and the streak starts again.",
   weekly: "Points from this week's challenge set, then less total time. Starts again every Monday (UTC).",
 };
@@ -92,7 +94,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
     router.replace(params.size ? `${pathname}?${params}` : pathname, { scroll: false });
   }
 
-  const unit = board === "1v1" ? "Rating" : board === "daily" ? "Streak" : board === "weekly" ? "Points" : "XP";
+  const unit = board === "1v1" || board === "territory" ? "Rating" : board === "daily" ? "Streak" : board === "weekly" ? "Points" : "XP";
   const me = data?.me ?? null;
 
   return (
@@ -167,7 +169,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                 <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
                   <th className="w-16 py-3 pl-4 text-right font-medium">Rank</th>
                   <th className="py-3 pl-6 font-medium">Player</th>
-                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" ? "Tier" : board === "daily" ? "Solved" : board === "weekly" ? "Time" : "Level"}</th>
+                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" || board === "territory" ? "Tier" : board === "daily" ? "Solved" : board === "weekly" ? "Time" : "Level"}</th>
                   <th className="py-3 pr-4 text-right font-medium">{unit}</th>
                 </tr>
               </thead>
@@ -183,7 +185,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                     <td colSpan={4} className="px-4 py-6 text-muted-foreground">
                       {fromRank > 1
                         ? "No more players."
-                        : board === "1v1"
+                        : board === "1v1" || board === "territory"
                           ? "No one is ranked yet. Players appear after 10 ranked games."
                           : board === "weekly"
                             ? "No points yet this week. Solve a problem from this week's set."

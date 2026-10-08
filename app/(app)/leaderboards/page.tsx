@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Level, 1v1, daily and weekly challenge leaderboards, worldwide, by country and for your groups.",
 };
 
-const BOARDS: BoardTab[] = ["level", "month", "1v1", "daily", "weekly"];
+const BOARDS: BoardTab[] = ["level", "month", "1v1", "territory", "daily", "weekly"];
 const SCOPES: Scope[] = ["global", "country", "group"];
 
 function pick<T extends string>(value: string | string[] | undefined, allowed: T[], fallback: T): T {

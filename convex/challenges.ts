@@ -6,6 +6,7 @@ import { normalizeCode, randomCode } from "./lib/codes";
 import { userMutation, userQuery } from "./lib/functions";
 import { createMatch, openMatchOf } from "./lib/matches";
 import { PROVISIONAL_GAMES } from "./lib/ratings";
+import { openGameOf } from "./lib/territory";
 import { usernameKey } from "./lib/usernames";
 import { difficulty, language } from "./schemas/problems";
 
@@ -181,8 +182,12 @@ export const accept = userMutation({
     if (c.fromId === ctx.user._id) throw new ConvexError("OWN_CHALLENGE");
     if (c.status !== "pending") throw new ConvexError("CHALLENGE_CLOSED");
     if (c.expiresAt <= Date.now()) throw new ConvexError("CHALLENGE_EXPIRED");
-    if (await openMatchOf(ctx, ctx.user._id)) throw new ConvexError("ALREADY_IN_MATCH");
-    if (await openMatchOf(ctx, c.fromId)) throw new ConvexError("OPPONENT_IN_MATCH");
+    if ((await openMatchOf(ctx, ctx.user._id)) || (await openGameOf(ctx, ctx.user._id))) {
+      throw new ConvexError("ALREADY_IN_MATCH");
+    }
+    if ((await openMatchOf(ctx, c.fromId)) || (await openGameOf(ctx, c.fromId))) {
+      throw new ConvexError("OPPONENT_IN_MATCH");
+    }
     if (c.ranked) {
       // Ratings may have moved since it was sent.
       const problem = await rankedProblem(ctx, ctx.user._id, c.fromId);

@@ -13,6 +13,7 @@ import {
 import { isCountryCode } from "./lib/countries";
 import { leaveGroup } from "./lib/groups";
 import { levelProgress } from "./lib/levels";
+import { leaveTerritoryWaiting } from "./lib/territory";
 import {
   checkUsernameRules,
   USERNAME_COOLDOWN_MS,
@@ -260,6 +261,24 @@ export const deleteFromClerk = internalMutation({
       const events = await ctx.db
         .query("matchEvents")
         .withIndex("by_match", (q) => q.eq("matchId", row.matchId))
+        .collect();
+      for (const e of events) if (e.userId === user._id) await ctx.db.delete(e._id);
+      await ctx.db.delete(row._id);
+    }
+
+    // Out of the Territory queue and lobbies; a lobby they host closes.
+    await leaveTerritoryWaiting(ctx, user._id);
+
+    // Likewise in Territory: their standing and feed events. Regions they held
+    // show as a deleted player's.
+    const territory = await ctx.db
+      .query("territoryPlayers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of territory) {
+      const events = await ctx.db
+        .query("territoryEvents")
+        .withIndex("by_game", (q) => q.eq("gameId", row.gameId))
         .collect();
       for (const e of events) if (e.userId === user._id) await ctx.db.delete(e._id);
       await ctx.db.delete(row._id);
