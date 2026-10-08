@@ -15,7 +15,8 @@
     "sandbox:bench": "tsx scripts/sandbox-bench.ts",
     "runner:build": "docker build --platform linux/amd64 -t ninjathons-runner:local runner",
     "load:test": "tsx scripts/load-test.ts",
-    "territory:sim": "tsx scripts/territory-sim.ts"
+    "territory:sim": "tsx scripts/territory-sim.ts",
+    "docs:import": "tsx scripts/docs-import.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.8",

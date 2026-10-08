@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CodeEditor } from "@/components/solve/code-editor";
+import { DocsPanel, docAreasFor } from "@/components/docs/docs-panel";
 import { ProblemStatement } from "@/components/solve/problem-statement";
 import { Split } from "@/components/solve/split";
 import { VerdictPanel } from "@/components/solve/verdict-panel";
@@ -46,7 +47,7 @@ function writeDraft(matchId: string, language: Language, code: string) {
   }
 }
 
-type Tab = "description" | "feed";
+type Tab = "description" | "docs" | "feed";
 
 /** "Opponent passed 7/12 tests", bottom-right for a few seconds (design.md, toasts). */
 function useOpponentToast(match: Match | null | undefined) {
@@ -243,6 +244,7 @@ export function DuelView({ matchId }: { matchId: string }) {
               {(
                 [
                   ["description", "Description"],
+                  ["docs", "Docs"],
                   ["feed", `Match feed (${match.events.length})`],
                 ] as [Tab, string][]
               ).map(([id, label]) => (
@@ -266,7 +268,13 @@ export function DuelView({ matchId }: { matchId: string }) {
               aria-labelledby={`tab-${tab}`}
               className="min-h-0 flex-1 overflow-y-auto px-6 py-5"
             >
-              {tab === "description" ? <ProblemStatement {...problem} hints={[]} /> : <DuelFeed match={match} />}
+              {tab === "description" ? (
+                <ProblemStatement {...problem} hints={[]} />
+              ) : tab === "docs" ? (
+                <DocsPanel areas={docAreasFor(current?.id ?? null)} languageLabel={current?.label ?? ""} matchId={match._id} />
+              ) : (
+                <DuelFeed match={match} />
+              )}
             </div>
           </div>
         }

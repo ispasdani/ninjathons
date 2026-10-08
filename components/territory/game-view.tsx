@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CodeEditor } from "@/components/solve/code-editor";
+import { DocsPanel, docAreasFor } from "@/components/docs/docs-panel";
 import { ProblemStatement } from "@/components/solve/problem-statement";
 import { Split } from "@/components/solve/split";
 import { VerdictPanel } from "@/components/solve/verdict-panel";
@@ -16,6 +17,7 @@ import type { Language } from "@/convex/judge/types";
 import { checkTake, levelToTake, type Level, type TakeCheck } from "@/convex/lib/territoryMap";
 import { errorMessage } from "@/lib/errors";
 import { useNow } from "@/lib/use-now";
+import { LANGUAGE_NAMES } from "@/lib/share";
 import { cn } from "@/lib/utils";
 import { HexMap, regionName } from "./hex-map";
 import { clock, GameCountdown, GameFeed, GameHud, GameResult, mapPlayers, nameOf, Standings, type Game } from "./parts";
@@ -56,7 +58,7 @@ function writeDraft(gameId: string, slug: string, language: Language, code: stri
   }
 }
 
-type Tab = "problem" | "feed";
+type Tab = "problem" | "docs" | "feed";
 
 /** What the selected region needs: whether you can take it now, and the problem level that would. */
 function targetFor(game: Game, me: string, index: number | null, now: number) {
@@ -282,6 +284,7 @@ export function GameView({ gameId }: { gameId: string }) {
                     {(
                       [
                         ["problem", problem ? problem.title : "Problem"],
+                        ["docs", "Docs"],
                         ["feed", `Game feed (${game.events.length})`],
                       ] as [Tab, string][]
                     ).map(([id, label]) => (
@@ -307,6 +310,8 @@ export function GameView({ gameId }: { gameId: string }) {
                   >
                     {tab === "feed" ? (
                       <GameFeed game={game} />
+                    ) : tab === "docs" ? (
+                      <DocsPanel areas={docAreasFor(language)} languageLabel={language ? (LANGUAGE_NAMES[language] ?? language) : ""} />
                     ) : problem ? (
                       <ProblemStatement {...problem} hints={[]} />
                     ) : target ? (

@@ -9,6 +9,7 @@ import {
   weeklySets,
 } from "./schemas/challenges";
 import { problems, problemTests, testDrives } from "./schemas/problems";
+import { docPages, docSets, docViews } from "./schemas/docs";
 import { groupMembers, groups } from "./schemas/groups";
 import { learningXp, lessonProgress, lessons, roadmapProgress, roadmaps } from "./schemas/learn";
 import { leaderboardSnapshots, leaderboardVersions } from "./schemas/leaderboards";
@@ -73,4 +74,7 @@ export default defineSchema({
   lessonProgress,
   roadmapProgress,
   learningXp,
+  docPages,
+  docSets,
+  docViews,
 });

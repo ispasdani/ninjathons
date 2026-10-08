@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with Programming basics, Data structures and algorithms, and all 20 tutorials written and seeded. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the docs library (curated MDN and Python pages, the docs panel, docs in ranked 1v1), then the Interview prep roadmap ([curriculum](notes/curriculum.md), step 3).
+**Now:** Phase 7, Learn: rules agreed ([decisions §17](notes/decisions.md#17-learn)); lessons, roadmaps, progress, learning XP, the Learning board and HTML and CSS challenges built, with Programming basics, Data structures and algorithms, all 20 tutorials and the docs library built and seeded. Phase 6 is built and played by bots; its check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the Interview prep roadmap ([curriculum](notes/curriculum.md), step 3), then the phase check.
 
 ## Phases
 
@@ -25,6 +25,15 @@ Content track: 78 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 7: the docs library
+- `npm run docs:import` builds the library from `docs-library/mdn.json` and `python.json`: 498 MDN pages (JavaScript, HTML, CSS) at a pinned commit of mdn/content and 89 Python 3.14 pages, converted to Markdown (`scripts/lib/docs`, 6 tests) and uploaded to Convex, replacing the previous import ([decisions §17](notes/decisions.md#17-learn), as built). Imported to dev.
+- `docPages` with full-text search (featured pages first with no query, exact names first with one), `docSets` for each set's version and license line, `docViews` for pages opened in matches.
+- A Docs tab in the solve view, the HTML and CSS challenges, duels and Territory games, for the language in use; links between library pages open in the panel, others on MDN in a new tab, and every page ends with its license line and source.
+- In a 1v1 match each page opened is noted, and the result page and share card say "used 2 doc pages". Account deletion removes the player's doc views.
+- Checked in the browser on a throwaway page (removed): searching "map" and "heapq", reading Array.prototype.map(), following its link to Array, the license footer, no `javascript:` links. Fixed on the way: Python's quoted code was turning into italics, now inline code.
+- 9 new tests (451 in all). Production build passes. Deployed to Convex dev.
+- Open: the Docs tab inside the signed-in screens (solve view, duel, Territory) hasn't been seen, since the pane isn't signed in.
 
 ### 8 Oct 2026 · Phase 7: tutorials and the DSA roadmap
 - The 15 remaining tutorials: two pointers, sliding windows, prefix sums, binary search, binary search on the answer, stacks, sorting and intervals, heaps, grids (BFS and DFS), graphs, DP basics, DP on sequences, greedy, matrices, and number tricks. All 20 are written.

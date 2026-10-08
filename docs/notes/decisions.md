@@ -589,6 +589,14 @@ Agreed 8 Oct 2026, at the start of phase 7. Adds to the roadmap's rules (Learn, 
 - **Curated pages, imported into Convex** with their source and license line (MDN: CC-BY-SA 2.5; Python: PSF License): the JavaScript built-ins, the HTML elements and CSS properties the lessons and challenges use, and the Python built-ins, built-in types and the standard modules problems use (`collections`, `heapq`, `bisect`, `itertools`, `functools`, `math`, `re`).
 - **A docs panel in the solve view,** searchable, for the language you're using. Allowed in ranked 1v1 (§9) for JavaScript, TypeScript and Python; doc pages opened during a match are logged for the result ("used 2 doc pages"). The other languages show "no docs yet" until their sets arrive.
 
+### The docs library as built (8 Oct 2026)
+
+- **`npm run docs:import [mdn|python]`** builds it from the lists in `docs-library/`: 498 MDN pages (409 JavaScript, 53 HTML, 36 CSS) from `github.com/mdn/content` at a pinned commit, and 89 Python pages from the official 3.14 plain-text archive (each built-in function, the main built-in types, and `collections`, `heapq`, `bisect`, `itertools`, `functools`, `math`, `re`). Downloads are cached in `.docs-cache/` (not committed); `--dry` converts without uploading. Each import replaces the set's previous one.
+- **Converted to Markdown** (`scripts/lib/docs`): MDN's cross-reference macros become links, inside the library when the page is there (`doc:mdn/<path>`) and to MDN otherwise; live samples, demo scaffolding, compatibility tables and specification sections are dropped. Python's headings, API entries and code blocks become Markdown, and its quoted code becomes inline code.
+- **Tables** `docPages` (with full-text search on titles and on text, filtered by area), `docSets` (version and license line) and `docViews`. Search with no query lists each area's featured pages; with one, title matches first, an exact name first of all.
+- **A Docs tab** in the solve view, the HTML and CSS challenges, the 1v1 duel screen and the Territory game, for the language in use: JavaScript and TypeScript read MDN's JavaScript, Python reads Python, web challenges read HTML and CSS, and the other languages say their references come later. Every page shows the license line and a link to its source.
+- **In a 1v1 match** each page opened is noted once (`docs.noteMatchView`, only while the match is on), and the result page and share card add "used 2 doc pages". All the library's pages are official references, so nothing is refused yet; the no-docs Hard mode is still to come.
+
 ### Content files
 
 - **Lessons** are folders, `learn/lessons/<slug>/`: `lesson.json` (`{ "title", "summary", "tutorial": true|false, "exercises": [slugs] }`) and `lesson.md`. **Roadmaps** are `learn/roadmaps/<slug>/roadmap.json` (`{ "title", "summary", "order", "modules": [{ "slug", "title", "summary", "free", "lessons": [slugs] }] }`) and `intro.md`.

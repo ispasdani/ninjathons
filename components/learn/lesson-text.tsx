@@ -12,14 +12,15 @@ const LANGUAGE_NAMES: Record<string, string> = {
   rust: "Rust",
   html: "HTML",
   css: "CSS",
-  text: "Output",
+  pycon: "Python",
 };
 
 /** A fenced code block, with its language named above it (lessons often show the same code in two). */
-function CodeBlock({ children }: { children?: ReactNode }) {
+export function CodeBlock({ children }: { children?: ReactNode }) {
   const code = isValidElement<{ className?: string }>(children) ? children : null;
   const language = code?.props.className?.match(/language-(\w+)/)?.[1];
-  const name = language ? (LANGUAGE_NAMES[language] ?? language) : null;
+  // Plain text (formulas, tables) needs no label.
+  const name = language && language !== "text" ? (LANGUAGE_NAMES[language] ?? language) : null;
   return (
     <div className="overflow-hidden rounded-md border bg-bg-secondary">
       {name && (

@@ -7,6 +7,7 @@ import { ArrowLeft, Check, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { DocsPanel, docAreasFor } from "@/components/docs/docs-panel";
 import { Button } from "@/components/ui/button";
 import { Segmented } from "@/components/ui/segmented";
 import { api } from "@/convex/_generated/api";
@@ -91,6 +92,7 @@ export function WebSolveView({ problem }: { problem: Problem }) {
   const [files, setFiles] = useState<WebFiles>(problem.starter);
   const [preview, setPreview] = useState<WebFiles>(problem.starter);
   const [view, setView] = useState<View>("side");
+  const [left, setLeft] = useState<"description" | "docs">("description");
   const [verdict, setVerdict] = useState<WebVerdict | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [busy, setBusy] = useState(false);
@@ -203,8 +205,33 @@ export function WebSolveView({ problem }: { problem: Problem }) {
         max={70}
         label="Resize the problem and editor panels"
         first={
-          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-            <ProblemStatement {...problem} />
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div role="tablist" aria-label="Challenge" className="flex h-10 shrink-0 items-end gap-4 border-b px-4">
+              {(
+                [
+                  ["description", "Description"],
+                  ["docs", "Docs"],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={left === id}
+                  onClick={() => setLeft(id)}
+                  className="-mb-px border-b-2 border-transparent pb-2 text-[13px] text-muted-foreground transition-colors duration-150 ease-out-quad hover:text-foreground aria-selected:border-foreground aria-selected:font-medium aria-selected:text-foreground"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div role="tabpanel" className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+              {left === "description" ? (
+                <ProblemStatement {...problem} />
+              ) : (
+                <DocsPanel areas={docAreasFor("web")} languageLabel="HTML and CSS" />
+              )}
+            </div>
           </div>
         }
         second={

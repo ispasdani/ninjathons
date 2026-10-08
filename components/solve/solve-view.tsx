@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { DocsPanel, docAreasFor } from "@/components/docs/docs-panel";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -46,12 +47,13 @@ function writeDraft(slug: string, language: Language, code: string) {
   }
 }
 
-type Tab = "description" | "submissions";
+type Tab = "description" | "docs" | "submissions";
 
 /** Tab buttons above a panel, 13px, the active one underlined. */
 function Tabs({ value, onChange }: { value: Tab; onChange: (tab: Tab) => void }) {
   const tabs: [Tab, string][] = [
     ["description", "Description"],
+    ["docs", "Docs"],
     ["submissions", "Submissions"],
   ];
   return (
@@ -222,6 +224,8 @@ function CodeSolveView({ slug, problem }: { slug: string; problem: CodeProblem }
             >
               {tab === "description" ? (
                 <ProblemStatement {...problem} />
+              ) : tab === "docs" ? (
+                <DocsPanel areas={docAreasFor(current?.id ?? null)} languageLabel={current?.label ?? ""} />
               ) : (
                 <SubmissionsList slug={slug} labels={labels} onOpen={setOpenId} />
               )}
