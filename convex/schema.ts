@@ -15,7 +15,16 @@ import { challenges, matchEvents, matches, matchmaking, matchPlayers, matchQueue
 import { badgeCounts, userBadges, xpLedger, xpMonths } from "./schemas/progression";
 import { ratingHistory, ratings } from "./schemas/ratings";
 import { submissions } from "./schemas/submissions";
-import { territoryEvents, territoryGames, territoryPlayers, territoryRegions } from "./schemas/territory";
+import {
+  territoryEvents,
+  territoryGames,
+  territoryLobbies,
+  territoryLobbyPlayers,
+  territoryMatchmaking,
+  territoryPlayers,
+  territoryQueue,
+  territoryRegions,
+} from "./schemas/territory";
 import { entitlements, usernameReservations, users } from "./schemas/users";
 
 // Table definitions live in convex/schemas, grouped by area.
@@ -53,4 +62,8 @@ export default defineSchema({
   territoryPlayers,
   territoryRegions,
   territoryEvents,
+  territoryLobbies,
+  territoryLobbyPlayers,
+  territoryQueue,
+  territoryMatchmaking,
 });

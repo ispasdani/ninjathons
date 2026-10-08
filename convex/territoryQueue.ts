@@ -2,12 +2,11 @@ import { ConvexError } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { internalMutation, type MutationCtx } from "./_generated/server";
-import { LANGUAGES } from "./judge/languages";
-import type { Language } from "./judge/types";
 import { userMutation, userQuery } from "./lib/functions";
-import { createMatch, currentRating, openMatchOf } from "./lib/matches";
-import { pairPlayers } from "./lib/matchmaking";
-import { leaveTerritoryWaiting, openGameOf } from "./lib/territory";
+import { openMatchOf } from "./lib/matches";
+import { groupPlayers } from "./lib/matchmaking";
+import { DEFAULT_OPENSKILL } from "./lib/openskill";
+import { createGame, leave1v1Queue, leaveTerritoryWaiting, openGameOf } from "./lib/territory";
 import { language } from "./schemas/problems";
 
 // How often the pass runs while anyone is waiting.
@@ -15,15 +14,11 @@ const PASS_EVERY_MS = 2_000;
 // The page pings every 10 s; a row not seen for this long is dropped.
 export const STALE_AFTER_MS = 30_000;
 
-/**
- * Starts a pass now. A pass keeps itself scheduled every 2 s while anyone is
- * queued; this one takes over that loop only if none is running.
- */
 async function passNow(ctx: MutationCtx) {
-  await ctx.scheduler.runAfter(0, internal.queue.pass, {});
+  await ctx.scheduler.runAfter(0, internal.territoryQueue.pass, {});
 }
 
-/** Joins the ranked queue, or switches language if already in it. */
+/** Joins the ranked Territory queue, or switches language if already in it. */
 export const join = userMutation({
   args: { language },
   handler: async (ctx, { language }) => {
@@ -31,21 +26,26 @@ export const join = userMutation({
     if ((await openMatchOf(ctx, ctx.user._id)) || (await openGameOf(ctx, ctx.user._id))) {
       throw new ConvexError("ALREADY_IN_MATCH");
     }
-    // One thing at a time: out of any Territory queue or lobby.
-    await leaveTerritoryWaiting(ctx, ctx.user._id);
     const now = Date.now();
     const row = await ctx.db
-      .query("matchQueue")
+      .query("territoryQueue")
       .withIndex("by_user", (q) => q.eq("userId", ctx.user._id))
       .unique();
     if (row) {
       await ctx.db.patch(row._id, { language, lastSeenAt: now });
       return;
     }
-    await ctx.db.insert("matchQueue", {
+    // One thing at a time: out of the 1v1 queue and any lobby.
+    await leave1v1Queue(ctx, ctx.user._id);
+    await leaveTerritoryWaiting(ctx, ctx.user._id);
+    const rating = await ctx.db
+      .query("ratings")
+      .withIndex("by_user_area", (q) => q.eq("userId", ctx.user._id).eq("area", "territory"))
+      .unique();
+    await ctx.db.insert("territoryQueue", {
       userId: ctx.user._id,
       language,
-      rating: await currentRating(ctx, ctx.user._id),
+      rating: rating?.rating ?? DEFAULT_OPENSKILL.mu,
       joinedAt: now,
       lastSeenAt: now,
     });
@@ -57,7 +57,7 @@ export const leave = userMutation({
   args: {},
   handler: async (ctx) => {
     const row = await ctx.db
-      .query("matchQueue")
+      .query("territoryQueue")
       .withIndex("by_user", (q) => q.eq("userId", ctx.user._id))
       .unique();
     if (row) await ctx.db.delete(row._id);
@@ -69,77 +69,67 @@ export const heartbeat = userMutation({
   args: {},
   handler: async (ctx) => {
     const row = await ctx.db
-      .query("matchQueue")
+      .query("territoryQueue")
       .withIndex("by_user", (q) => q.eq("userId", ctx.user._id))
       .unique();
     if (row) await ctx.db.patch(row._id, { lastSeenAt: Date.now() });
   },
 });
 
-/**
- * The caller's place in the queue (or null), how many others are waiting, and
- * the languages to pick from. The match itself comes from matches.current.
- */
+/** The caller's place in the queue (or null) and how many others are waiting. */
 export const status = userQuery({
   args: {},
   handler: async (ctx) => {
-    const rows = await ctx.db.query("matchQueue").withIndex("by_joined").take(500);
+    const rows = await ctx.db.query("territoryQueue").withIndex("by_joined").take(500);
     const mine = rows.find((r) => r.userId === ctx.user._id);
     return {
       queued: mine ? { language: mine.language, joinedAt: mine.joinedAt } : null,
       waiting: rows.filter((r) => r.userId !== ctx.user._id).length,
-      languages: (Object.keys(LANGUAGES) as Language[]).map((id) => ({ id, label: LANGUAGES[id].label })),
     };
   },
 });
 
 /**
- * One pairing pass: drops stale rows and players already in a match, pairs
- * the rest by rating, and makes a ranked match for each pair. Reschedules
+ * One grouping pass: drops stale rows and players already playing, groups
+ * the rest by rating, and makes a ranked game for each group. Reschedules
  * itself while anyone is still waiting.
  */
 export const pass = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
-    const rows = await ctx.db.query("matchQueue").withIndex("by_joined").take(500);
+    const rows = await ctx.db.query("territoryQueue").withIndex("by_joined").take(500);
     const waiting = [];
     for (const row of rows) {
       const busy = (await openMatchOf(ctx, row.userId)) || (await openGameOf(ctx, row.userId));
-      if (now - row.lastSeenAt > STALE_AFTER_MS || busy) {
-        await ctx.db.delete(row._id);
-      } else {
-        waiting.push(row);
-      }
+      if (now - row.lastSeenAt > STALE_AFTER_MS || busy) await ctx.db.delete(row._id);
+      else waiting.push(row);
     }
 
     const byUser = new Map(waiting.map((r) => [r.userId, r]));
-    const pairs = pairPlayers(
+    const groups = groupPlayers(
       waiting.map((r) => ({ id: r.userId, rating: r.rating, joinedAt: r.joinedAt })),
       now,
     );
-    let matched = 0;
-    for (const [a, b] of pairs) {
-      const players = [byUser.get(a)!, byUser.get(b)!];
-      const matchId = await createMatch(ctx, {
-        players: players.map((p) => ({ userId: p.userId, language: p.language })),
+    let placed = 0;
+    for (const group of groups) {
+      const gameId = await createGame(ctx, {
+        players: group.map((id) => ({ userId: id, language: byUser.get(id)!.language })),
         ranked: true,
         source: "queue",
       });
-      // createMatch takes both out of the queue. No problem to play: leave everyone queued.
-      if (!matchId) break;
-      matched += 2;
+      // createGame takes them out of the queue. No problems to play: leave everyone queued.
+      if (!gameId) break;
+      placed += group.length;
     }
 
-    // Keep the loop going while anyone waits; a pass started by a join only
-    // takes over when no loop is scheduled.
-    const state = await ctx.db.query("matchmaking").first();
+    const state = await ctx.db.query("territoryMatchmaking").first();
     const loopAlive = state !== null && state.nextPassAt > now;
-    if (waiting.length - matched > 0 && !loopAlive) {
+    if (waiting.length - placed > 0 && !loopAlive) {
       const nextPassAt = now + PASS_EVERY_MS;
       if (state) await ctx.db.patch(state._id, { nextPassAt });
-      else await ctx.db.insert("matchmaking", { nextPassAt });
-      await ctx.scheduler.runAt(nextPassAt, internal.queue.pass, {});
+      else await ctx.db.insert("territoryMatchmaking", { nextPassAt });
+      await ctx.scheduler.runAt(nextPassAt, internal.territoryQueue.pass, {});
     }
   },
 });

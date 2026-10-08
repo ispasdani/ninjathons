@@ -72,6 +72,8 @@ import type * as schemas_territory from "../schemas/territory.js";
 import type * as schemas_users from "../schemas/users.js";
 import type * as submissions from "../submissions.js";
 import type * as territory from "../territory.js";
+import type * as territoryLobbies from "../territoryLobbies.js";
+import type * as territoryQueue from "../territoryQueue.js";
 import type * as testDrives from "../testDrives.js";
 import type * as testDrivesFill from "../testDrivesFill.js";
 import type * as user from "../user.js";
@@ -148,6 +150,8 @@ declare const fullApi: ApiFromModules<{
   "schemas/users": typeof schemas_users;
   submissions: typeof submissions;
   territory: typeof territory;
+  territoryLobbies: typeof territoryLobbies;
+  territoryQueue: typeof territoryQueue;
   testDrives: typeof testDrives;
   testDrivesFill: typeof testDrivesFill;
   user: typeof user;

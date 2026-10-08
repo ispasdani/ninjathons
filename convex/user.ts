@@ -13,6 +13,7 @@ import {
 import { isCountryCode } from "./lib/countries";
 import { leaveGroup } from "./lib/groups";
 import { levelProgress } from "./lib/levels";
+import { leaveTerritoryWaiting } from "./lib/territory";
 import {
   checkUsernameRules,
   USERNAME_COOLDOWN_MS,
@@ -264,6 +265,9 @@ export const deleteFromClerk = internalMutation({
       for (const e of events) if (e.userId === user._id) await ctx.db.delete(e._id);
       await ctx.db.delete(row._id);
     }
+
+    // Out of the Territory queue and lobbies; a lobby they host closes.
+    await leaveTerritoryWaiting(ctx, user._id);
 
     // Likewise in Territory: their standing and feed events. Regions they held
     // show as a deleted player's.

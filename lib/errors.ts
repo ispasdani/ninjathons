@@ -29,6 +29,22 @@ const MESSAGES: Record<string, string> = {
   OPPONENT_IN_MATCH: "They're in another match right now. Try again in a bit.",
   NO_GHOSTS: "No recorded solves to race yet.",
   NO_PROBLEMS: "No problems are available for a match right now.",
+  LOBBY_NOT_FOUND: "That lobby doesn't exist, or you're not its host.",
+  LOBBY_CLOSED: "That lobby has closed. Ask for a new link.",
+  LOBBY_FULL: "That lobby is full (6 players).",
+  NOT_ENOUGH_PLAYERS: "A Territory game needs 3 players.",
+  PLAYER_IN_MATCH: "Someone in the lobby is in another match. Wait for them to finish.",
+  TERRITORY_NEEDS_GAMES: "Everyone needs 10 ranked Territory games for a ranked game.",
+  RATING_SPREAD: "Your Territory ratings are 400 or more apart. Play unranked.",
+  GAME_NOT_FOUND: "That game doesn't exist, or you're not in it.",
+  GAME_OVER: "This game isn't taking Submits.",
+  REGION_NOT_FOUND: "Pick a region on the map.",
+  NOT_YOUR_PROBLEM: "That region needs a different problem now. Pick it again on the map.",
+  DECK_EMPTY: "You've used every problem of that difficulty.",
+  HOME_BASE: "Home bases can't be taken.",
+  ALREADY_YOURS: "That region is already yours.",
+  NOT_NEXT_TO_YOURS: "You can only take regions next to one you hold.",
+  SHIELDED: "That region was just taken and is shielded for a minute.",
 };
 
 export function errorMessage(error: unknown) {

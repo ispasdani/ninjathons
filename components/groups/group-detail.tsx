@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { GroupLobbies } from "@/components/territory/group-lobbies";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -155,6 +156,8 @@ export function GroupDetail({ groupId }: { groupId: string }) {
           </Button>
         </div>
       </section>
+
+      <GroupLobbies groupId={id} />
 
       <section className="mt-10">
         <h2 className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">Members</h2>

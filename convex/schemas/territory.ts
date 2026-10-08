@@ -101,3 +101,47 @@ export const territoryEvents = defineTable({
   total: v.optional(v.number()),
   accepted: v.optional(v.boolean()),
 }).index("by_game", ["gameId"]);
+
+// A Territory lobby (decisions §16): opened by a host, joined by its link or,
+// for a group's lobby, from the group page. The host starts it with 3 to 6
+// players. Expiry is read from `expiresAt`; nothing rewrites old rows.
+export const territoryLobbies = defineTable({
+  hostId: v.id("users"),
+  // For the link, /lobby/<code>.
+  code: v.string(),
+  groupId: v.optional(v.id("groups")),
+  ranked: v.boolean(),
+  status: v.union(v.literal("open"), v.literal("started"), v.literal("closed")),
+  expiresAt: v.number(),
+  gameId: v.optional(v.id("territoryGames")),
+})
+  .index("by_code", ["code"])
+  .index("by_group_status", ["groupId", "status"]);
+
+// Who is in a lobby, with the language they picked. The lobby page pings; a
+// player not seen for 30 seconds is left out when the host starts.
+export const territoryLobbyPlayers = defineTable({
+  lobbyId: v.id("territoryLobbies"),
+  userId: v.id("users"),
+  language,
+  lastSeenAt: v.number(),
+})
+  .index("by_lobby", ["lobbyId"])
+  .index("by_user", ["userId"]);
+
+// Players looking for a ranked Territory game, like matchQueue for 1v1.
+export const territoryQueue = defineTable({
+  userId: v.id("users"),
+  language,
+  // Their Territory rating when they joined.
+  rating: v.number(),
+  joinedAt: v.number(),
+  lastSeenAt: v.number(),
+})
+  .index("by_user", ["userId"])
+  .index("by_joined", ["joinedAt"]);
+
+// A single row: when the next Territory grouping pass is due, as for 1v1.
+export const territoryMatchmaking = defineTable({
+  nextPassAt: v.number(),
+});

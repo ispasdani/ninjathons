@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 6, Territory: the rules are agreed ([decisions §16](notes/decisions.md#16-territory)) and the game engine is built. **Next step:** lobbies and Find a match.
+**Now:** Phase 6, Territory: the rules are agreed ([decisions §16](notes/decisions.md#16-territory)) and the game engine is built. **Next step:** the game screen.
 
 ## Phases
 
@@ -25,6 +25,14 @@ Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 6: lobbies and Find a match
+- Lobbies (`convex/territoryLobbies.ts`): a host opens one, on its own or for a group (members only), and shares `/lobby/<code>`; up to 6 join, each with their own language; the host starts with the 3 to 6 who sent a heartbeat in the last 30 s. A lobby closes after 15 minutes or when the host leaves. Ranked lobbies need everyone at 10 ranked Territory games and within 400, checked at the start.
+- Find a match (`convex/territoryQueue.ts`): ranked, with the 1v1 range; `groupPlayers` gathers the closest players in range of everyone already gathered and starts at 6, or at 3+ once the longest-waiting has waited 30 s.
+- One thing at a time: joining a queue or lobby leaves the others (a host's lobby closes); a game or 1v1 match takes its players out of every queue and lobby. Account deletion takes a player out too.
+- Pages: Play has a 1v1 race / Territory switch (`/play/territory`), with Find a match and Open a lobby (Ranked or Unranked, for anyone with the link or a group); the lobby page with the link, players and their languages, Join, Start and Leave; a Territory card on group pages with the group's open lobbies and "Start a Territory lobby with the group". The banner under the header covers Territory games too. The language picker is shared by both modes.
+- 14 new tests (433 in all). Production build passes. Deployed to Convex dev.
+- Open: the pages haven't been seen signed in (the browser pane isn't signed in); a started game has no screen yet.
 
 ### 8 Oct 2026 · Phase 6: Territory rules and game engine
 - Rules agreed and written up in [decisions §16](notes/decisions.md#16-territory): ring values on both maps, home bases on corners, one problem deck per difficulty (8 easy, 8 medium, 5 hard, unsolved first), captures by when the Submit was sent, leavers place last with their regions open to attack, Find a match forms at 6 or at 3+ after 30 s, ranked lobbies with the 1v1 limits.

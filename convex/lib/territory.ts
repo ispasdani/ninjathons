@@ -160,13 +160,40 @@ export async function createGame(
   return gameId;
 }
 
-/** Takes a player out of the 1v1 queue and cancels the 1v1 challenges they sent: they're busy now. */
-async function leaveEverythingElse(ctx: MutationCtx, userId: Id<"users">) {
+/**
+ * Takes a player out of the Territory queue and any lobby they're in, since a
+ * player waits for one thing at a time. A host leaving closes their lobby.
+ */
+export async function leaveTerritoryWaiting(ctx: MutationCtx, userId: Id<"users">) {
+  const queued = await ctx.db
+    .query("territoryQueue")
+    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .unique();
+  if (queued) await ctx.db.delete(queued._id);
+  const seats = await ctx.db
+    .query("territoryLobbyPlayers")
+    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .collect();
+  for (const seat of seats) {
+    const lobby = await ctx.db.get(seat.lobbyId);
+    if (lobby?.status === "open" && lobby.hostId === userId) await ctx.db.patch(lobby._id, { status: "closed" });
+    await ctx.db.delete(seat._id);
+  }
+}
+
+/** Takes a player out of the 1v1 queue. */
+export async function leave1v1Queue(ctx: MutationCtx, userId: Id<"users">) {
   const queued = await ctx.db
     .query("matchQueue")
     .withIndex("by_user", (q) => q.eq("userId", userId))
     .unique();
   if (queued) await ctx.db.delete(queued._id);
+}
+
+/** Takes a player out of every queue and lobby and cancels the 1v1 challenges they sent: they're busy now. */
+async function leaveEverythingElse(ctx: MutationCtx, userId: Id<"users">) {
+  await leave1v1Queue(ctx, userId);
+  await leaveTerritoryWaiting(ctx, userId);
   const sent = await ctx.db
     .query("challenges")
     .withIndex("by_from_status", (q) => q.eq("fromId", userId).eq("status", "pending"))

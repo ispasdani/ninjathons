@@ -45,3 +45,39 @@ export function pairPlayers<T>(queue: Waiting<T>[], now: number): [T, T][] {
   }
   return pairs;
 }
+
+// Territory (decisions §16): a game forms at once with 6 players in range of
+// each other, or with 3 or more once the longest-waiting has waited 30 s.
+export const GROUP_MIN = 3;
+export const GROUP_MAX = 6;
+export const GROUP_WAIT_MS = 30_000;
+
+/**
+ * Groups the Territory queue, longest waiting first: each player gathers the
+ * closest-rated others who are in range of everyone gathered so far (the
+ * wider of each two players' ranges), up to 6.
+ */
+export function groupPlayers<T>(queue: Waiting<T>[], now: number): T[][] {
+  const waiting = [...queue].sort((a, b) => a.joinedAt - b.joinedAt);
+  const inRange = (a: Waiting<T>, b: Waiting<T>) =>
+    Math.abs(a.rating - b.rating) <= Math.max(ratingRange(a.joinedAt, now), ratingRange(b.joinedAt, now));
+  const taken = new Set<T>();
+  const groups: T[][] = [];
+  for (const anchor of waiting) {
+    if (taken.has(anchor.id)) continue;
+    const others = waiting
+      .filter((p) => p.id !== anchor.id && !taken.has(p.id))
+      .sort((a, b) => Math.abs(a.rating - anchor.rating) - Math.abs(b.rating - anchor.rating));
+    const group = [anchor];
+    for (const other of others) {
+      if (group.length === GROUP_MAX) break;
+      if (group.every((p) => inRange(p, other))) group.push(other);
+    }
+    const full = group.length === GROUP_MAX;
+    const waitedEnough = group.length >= GROUP_MIN && now - anchor.joinedAt >= GROUP_WAIT_MS;
+    if (!full && !waitedEnough) continue;
+    for (const p of group) taken.add(p.id);
+    groups.push(group.map((p) => p.id));
+  }
+  return groups;
+}
