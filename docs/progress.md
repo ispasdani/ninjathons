@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 5, daily and weekly challenges: both challenges are built, and 5 of the 6 weekly sets are written. **Next step:** weekly set 6, Building Up (dynamic programming, part two), the last piece of phase 5.
+**Now:** Phase 5, daily and weekly challenges, is done: the daily runs unattended and all 6 weekly sets are written and seeded on dev. **Next step:** start phase 6, Territory.
 
 ## Phases
 
@@ -13,18 +13,27 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 2 | Foundation | Done | 6 Oct 2026 | 6 Oct 2026 |
 | 3 | Progression engine | Done | 7 Oct 2026 | 7 Oct 2026 |
 | 4 | 1v1 and private alpha | Done | 7 Oct 2026 | 7 Oct 2026 |
-| 5 | Daily and weekly challenges | In progress | 7 Oct 2026 | |
+| 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
 | 6 | Territory | Not started | | |
 | 7 | Learn | Not started | | |
 | 8 | Profiles and Pro | Not started | | |
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
-Content track: 50 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 5 of 6 weekly sets.
+Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 of 6 weekly sets.
 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 5 done
+- The check passes: the daily pick ran by itself on dev at midnight UTC (8 Oct, Word Frequency), and the 6 weekly sets are written, checked and seeded (24 new problems, 54 in all).
+- Still open from phase 5, for whenever they come up: the signed-in states of the Daily and Weekly pages, the solve-view chips and the rewards haven't been seen in the browser; the first unattended weekly start is Monday 12 Oct on dev (set 1, Running Totals), and the first settle with the top 10% badge on Monday 19 Oct. The six sets cover six weeks; more are needed before launch so the weekly never runs dry. `weekly.settle` reads a whole week at once, fine until a few thousand players a week.
+
+### 8 Oct 2026 · Phase 5: weekly set 6, Building Up
+- Set 6, `weekly/building-up` (dynamic programming, part two), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: House Robber (easy), Paths Around Obstacles (medium; modulo 10^9 + 7, blocked first row and column), Equal Halves (medium; subset sum, beats handing items to whoever has less), Pop the Balloons (hard; interval DP, up to 200 balloons so O(n³) fits in Python too). 900 points in all.
+- Equal Halves replaces the planned longest common subsequence, too close to Edit Distance in the library ([decisions §15](notes/decisions.md#the-first-6-sets-8-oct-2026)). Two fixes found by `problems:check`: a miscounted example in Paths Around Obstacles, and Equal Halves' first "no split" tests had odd totals, so the brute force ruled them out at once; now they have even totals with an odd half.
+- `problems:check` passes for all 54 problems and 6 sets. Seeded to Convex dev: set 6 waits for Monday 16 Nov, its problems hidden from the library (checked in the browser). Production build passes; 393 tests.
 
 ### 8 Oct 2026 · Phase 5: weekly set 5, Top of the Heap
 - Set 5, `weekly/top-of-the-heap` (heaps and greedy), 4 new problems, each with JavaScript and Python references, a wrong solution and a slow one: Kth Largest (easy; repeats count), Join the Ropes (medium; sorting once isn't enough), Smallest Covering Range (medium; up to 10,000 lists, ties go to the smaller start, widths past 32 bits), Running Median (hard; two heaps, the lower middle on even counts). 900 points in all.

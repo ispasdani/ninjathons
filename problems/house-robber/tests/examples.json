@@ -1,0 +1,12 @@
+[
+  {
+    "input": { "houses": [2, 7, 9, 3, 1] },
+    "output": 12,
+    "explanation": "Houses 0, 2 and 4: 2 + 9 + 1 = 12."
+  },
+  {
+    "input": { "houses": [5, 1, 1, 5] },
+    "output": 10,
+    "explanation": "The first and the last house, skipping two in the middle."
+  }
+]

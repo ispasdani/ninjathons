@@ -1,0 +1,18 @@
+{
+  "slug": "pop-the-balloons",
+  "title": "Pop the Balloons",
+  "difficulty": "hard",
+  "tags": ["dynamic-programming", "interval-dp"],
+  "mode": "function",
+  "signature": {
+    "functionName": "maxCoins",
+    "params": [{ "name": "balloons", "type": "int[]" }],
+    "returns": "int"
+  },
+  "checker": { "kind": "exact" },
+  "limits": { "timeMs": 1000, "memoryMb": 256 },
+  "languages": "all",
+  "pool": "practice",
+  "status": "beta",
+  "version": 1
+}

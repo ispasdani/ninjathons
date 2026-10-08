@@ -354,7 +354,7 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | 2 | Foundation ✅ | The 7 code languages, stdio mode, username onboarding, designed library and solve view, about 30 problems |
 | 3 | Progression engine ✅ | Solves award XP and badges, and leaderboards update |
 | 4 | 1v1 and private alpha ✅ | Runner load test passes; real matches play end to end (the friends alpha moved to the release stage, below) |
-| 5 | Daily and weekly challenges | Daily pick runs unattended; 6 weekly sets written |
+| 5 | Daily and weekly challenges ✅ | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
 | 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
 | 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
@@ -497,4 +497,4 @@ Themes chosen to cover techniques the first 30 problems barely touch. Each set h
 | 3 | Beyond the Grid: graphs | Connected Components (easy), Fewest Terms (medium), Signal Time (medium), Critical Links (hard) |
 | 4 | Lines on a Timeline: intervals and sweep lines | Can Attend All (easy), Most Meetings (medium; replaces Insert Interval, too close to Merge Intervals), Rooms Needed (medium), The Skyline (hard) |
 | 5 | Top of the Heap: heaps and greedy | Kth Largest (easy), Join the Ropes (medium), Smallest Covering Range (medium), Running Median (hard). Task scheduling (a counting formula) and merging sorted lists (sorting is as fast) were dropped: neither needs the heap |
-| 6 | Building Up: dynamic programming, part two | planned: house robber, paths with obstacles, longest common subsequence, one interval DP |
+| 6 | Building Up: dynamic programming, part two | House Robber (easy), Paths Around Obstacles (medium), Equal Halves (medium; replaces longest common subsequence, too close to Edit Distance), Pop the Balloons (hard) |
