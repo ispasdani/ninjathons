@@ -1,7 +1,7 @@
 /**
  * Leaderboards (roadmap, Progression; decisions §13). Each board ranks players
  * by one value, read in rank order from an index so a rebuild can go page by
- * page. Built now: Level (all time and monthly), 1v1 and Daily; the others
+ * page. Built now: Level (all time and monthly), 1v1, Territory, Daily and Weekly; the others
  * come with their phase.
  */
 import { v, type Infer } from "convex/values";
@@ -17,12 +17,13 @@ export const boardKind = v.union(
   v.literal("level"),
   v.literal("level-month"),
   v.literal("1v1"),
+  v.literal("territory"),
   v.literal("daily"),
   v.literal("weekly"),
 );
 export type BoardKind = Infer<typeof boardKind>;
 
-// 1v1 players drop off the board after this long without a game, and come
+// 1v1 and Territory players drop off their board after this long without a game, and come
 // back with their next one; their rating doesn't decay (plan, trust rules).
 export const INACTIVE_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -30,7 +31,7 @@ const MONTH = /^\d{4}-\d{2}$/;
 const WEEK = /^\d{4}-W\d{2}$/;
 
 /**
- * The stored key of a board: "level", "level-month:2026-10", "1v1", "daily"
+ * The stored key of a board: "level", "level-month:2026-10", "1v1", "territory", "daily"
  * or "weekly:2026-W41". `period` is the month or week, defaulting to now's.
  */
 export function boardKey(kind: BoardKind, period?: string) {
@@ -51,7 +52,7 @@ export function boardKey(kind: BoardKind, period?: string) {
  */
 export function liveBoards(now: number) {
   const week = weekKey(now);
-  return ["level", `level-month:${monthKey(now)}`, "1v1", "daily", `weekly:${week}`, `weekly:${previousWeek(week)}`];
+  return ["level", `level-month:${monthKey(now)}`, "1v1", "territory", "daily", `weekly:${week}`, `weekly:${previousWeek(week)}`];
 }
 
 /**
@@ -69,7 +70,8 @@ export function isRetired(board: string, now: number) {
 
 export type Entry = { userId: Id<"users">; value: number };
 
-function eligible1v1(row: Doc<"ratings">, now: number) {
+/** The trust rules for a rating board: 10 ranked games, and one in the last 30 days. */
+function eligibleRating(row: Doc<"ratings">, now: number) {
   return row.games >= PROVISIONAL_GAMES && now - row.lastGameAt <= INACTIVE_AFTER_MS;
 }
 
@@ -100,15 +102,15 @@ export async function sourcePage(
       .paginate(paginationOpts);
     return { ...page, page: page.page.map((m): Entry => ({ userId: m.userId, value: m.xp })) };
   }
-  if (board === "1v1") {
+  if (board === "1v1" || board === "territory") {
     const page = await ctx.db
       .query("ratings")
-      .withIndex("by_area_rating", (q) => q.eq("area", "1v1"))
+      .withIndex("by_area_rating", (q) => q.eq("area", board))
       .order("desc")
       .paginate(paginationOpts);
     return {
       ...page,
-      page: page.page.filter((r) => eligible1v1(r, now)).map((r): Entry => ({ userId: r.userId, value: r.rating })),
+      page: page.page.filter((r) => eligibleRating(r, now)).map((r): Entry => ({ userId: r.userId, value: r.rating })),
     };
   }
   if (board === "daily") {
@@ -132,7 +134,7 @@ export async function sourcePage(
 
 /**
  * A group's board, computed live from its members (at most 100). Members with
- * nothing yet on a Level board are listed at 0; 1v1 follows the trust rules.
+ * nothing yet on a Level board are listed at 0; rating boards follow the trust rules.
  */
 export async function groupEntries(ctx: QueryCtx, board: string, userIds: Id<"users">[]) {
   const now = Date.now();
@@ -148,12 +150,12 @@ export async function groupEntries(ctx: QueryCtx, board: string, userIds: Id<"us
         .withIndex("by_user_month", (q) => q.eq("userId", userId).eq("month", board.slice("level-month:".length)))
         .unique();
       scored.push({ userId, value: row?.xp ?? 0, tieBreak: row?.tieBreak ?? -Infinity });
-    } else if (board === "1v1") {
+    } else if (board === "1v1" || board === "territory") {
       const row = await ctx.db
         .query("ratings")
-        .withIndex("by_user_area", (q) => q.eq("userId", userId).eq("area", "1v1"))
+        .withIndex("by_user_area", (q) => q.eq("userId", userId).eq("area", board))
         .unique();
-      if (row && eligible1v1(row, now)) scored.push({ userId, value: row.rating, tieBreak: -row.lastGameAt });
+      if (row && eligibleRating(row, now)) scored.push({ userId, value: row.rating, tieBreak: -row.lastGameAt });
     } else if (board === "daily") {
       const row = await ctx.db
         .query("streaks")
@@ -191,8 +193,8 @@ export async function presentRow(
     imageUrl: user?.imageUrl ?? "",
     country: user?.country ?? null,
     value,
-    // Level boards show level and title; 1v1 shows the tier.
-    ...(board === "1v1" ? { tier: tierFor(value) } : { level, title }),
+    // Level boards show level and title; rating boards show the tier.
+    ...(board === "1v1" || board === "territory" ? { tier: tierFor(value) } : { level, title }),
   };
   if (board === "daily") {
     // The Daily board's second column: total dailies solved.

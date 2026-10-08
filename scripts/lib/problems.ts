@@ -101,7 +101,7 @@ function readHints(path: string): string[] {
     .filter(Boolean);
 }
 
-function readSolutions(dir: string): Solution[] {
+export function readSolutions(dir: string): Solution[] {
   const solutionsDir = join(dir, "solutions");
   if (!existsSync(solutionsDir)) return [];
   const byExt = Object.fromEntries(Object.entries(EXTENSIONS).map(([lang, ext]) => [`.${ext}`, lang as Language]));

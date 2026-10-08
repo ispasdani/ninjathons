@@ -149,7 +149,7 @@ export function GroupDetail({ groupId }: { groupId: string }) {
             <p className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
               Leaderboards
             </p>
-            <p className="mt-3 text-[13px] text-muted-foreground">See how the group ranks on Level, this month and 1v1.</p>
+            <p className="mt-3 text-[13px] text-muted-foreground">See how the group ranks on Level, this month, 1v1 and Territory.</p>
           </div>
           <Button variant="outline" size="sm" className="mt-4 self-start" asChild>
             <Link href={`/leaderboards?scope=group&group=${id}`}>Group leaderboard</Link>

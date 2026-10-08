@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 6, Territory: the rules are agreed ([decisions §16](notes/decisions.md#16-territory)) and the game engine is built. **Next step:** the game screen.
+**Now:** Phase 6, Territory: the rules are agreed ([decisions §16](notes/decisions.md#16-territory)) and the game engine is built. **Next step:** the phase check: a group lobby of 3 to 6 real players finishing a full game, by hand.
 
 ## Phases
 
@@ -25,6 +25,14 @@ Content track: 54 of 150–200 problems, 0 of ~20 tutorials, 0 of 3 roadmaps, 6 
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 8 Oct 2026 · Phase 6: game screen, Territory board, bot games
+- `/territory/<id>`: the countdown (players, ratings, languages, the map's size), then the HUD (server timer, one score bar with a marker at the winning points, everyone's points and regions, Give up) over the map and a solve-style workspace. Picking a region shows why you can or can't take it and the problem that would; the editor follows that problem (drafts per game, problem and language), with Skip, Run and Submit, and says after an accepted Submit whether it took the region, came too late, or is waiting on an earlier one. The game feed, and at the end the placement, rating change, XP, badges and final standings.
+- The map (`components/territory/hex-map.tsx`) is SVG hexes, each a button: held regions in their player's colour with the player's initials, a lock while shielded, regions you can take dashed. Checked in light and dark on a throwaway page with made-up owners (both map sizes). Two player colours added for 5 and 6 players, amber and fuchsia ([design.md 2.4](notes/design.md)).
+- Territory board on Leaderboards: by rating, with the 1v1 trust rules, Global, Country and Group. 1 new test (434 in all).
+- `npm run territory:sim [players]`: bots in a lobby started like a host's Start (the start is now `startLobby`), Submitting reference solutions (and 1 in 5 wrong ones) for the most valuable region they can take, judged in the real Vercel Sandbox; then every trace removed. 3 bots on dev: 66 Submits, the whole map taken, then attacks, ended at time up after 30 minutes with places 1, 1, 3 (the last capture changed both leaders' scores at once, so they tie): PASS.
+- Production build passes. Deployed to Convex dev.
+- Open: none of the signed-in pages (Play's Territory tab, lobbies, the game screen) has been seen in the browser, since the pane isn't signed in; a real game by hand is the phase check. No share card for Territory results yet.
 
 ### 8 Oct 2026 · Phase 6: lobbies and Find a match
 - Lobbies (`convex/territoryLobbies.ts`): a host opens one, on its own or for a group (members only), and shares `/lobby/<code>`; up to 6 join, each with their own language; the host starts with the 3 to 6 who sent a heartbeat in the last 30 s. A lobby closes after 15 minutes or when the host leaves. Ranked lobbies need everyone at 10 ranked Territory games and within 400, checked at the start.

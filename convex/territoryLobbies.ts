@@ -213,30 +213,35 @@ export const start = userMutation({
   handler: async (ctx, { code }) => {
     const lobby = await byCode(ctx, code);
     if (!lobby || lobby.hostId !== ctx.user._id) throw new ConvexError("LOBBY_NOT_FOUND");
-    const now = Date.now();
-    if (!isOpen(lobby, now)) throw new ConvexError("LOBBY_CLOSED");
-    const seats = await seatsOf(ctx, lobby._id);
-    const present = [];
-    for (const seat of seats) {
-      if (now - seat.lastSeenAt > LOBBY_STALE_MS) continue;
-      if (await busy(ctx, seat.userId)) throw new ConvexError("PLAYER_IN_MATCH");
-      present.push(seat);
-    }
-    if (present.length < MIN_PLAYERS) throw new ConvexError("NOT_ENOUGH_PLAYERS");
-    if (lobby.ranked) {
-      const problem = await rankedProblem(ctx, present.map((s) => s.userId));
-      if (problem) throw new ConvexError(problem);
-    }
-    const gameId = await createGame(ctx, {
-      players: present.map((s) => ({ userId: s.userId, language: s.language })),
-      ranked: lobby.ranked,
-      source: "lobby",
-    });
-    if (!gameId) throw new ConvexError("NO_PROBLEMS");
-    await ctx.db.patch(lobby._id, { status: "started", gameId });
-    return gameId;
+    return await startLobby(ctx, lobby);
   },
 });
+
+/** Starts a lobby's game: the host's Start, and the bots in territorySim.ts on dev. */
+export async function startLobby(ctx: MutationCtx, lobby: Doc<"territoryLobbies">) {
+  const now = Date.now();
+  if (!isOpen(lobby, now)) throw new ConvexError("LOBBY_CLOSED");
+  const seats = await seatsOf(ctx, lobby._id);
+  const present = [];
+  for (const seat of seats) {
+    if (now - seat.lastSeenAt > LOBBY_STALE_MS) continue;
+    if (await busy(ctx, seat.userId)) throw new ConvexError("PLAYER_IN_MATCH");
+    present.push(seat);
+  }
+  if (present.length < MIN_PLAYERS) throw new ConvexError("NOT_ENOUGH_PLAYERS");
+  if (lobby.ranked) {
+    const problem = await rankedProblem(ctx, present.map((s) => s.userId));
+    if (problem) throw new ConvexError(problem);
+  }
+  const gameId = await createGame(ctx, {
+    players: present.map((s) => ({ userId: s.userId, language: s.language })),
+    ranked: lobby.ranked,
+    source: "lobby",
+  });
+  if (!gameId) throw new ConvexError("NO_PROBLEMS");
+  await ctx.db.patch(lobby._id, { status: "started", gameId });
+  return gameId;
+}
 
 /** The caller's lobby, if they're in an open one, so Play can take them back to it. */
 export const mine = userQuery({

@@ -99,7 +99,7 @@ Use each color as text or a 1px border on a tinted fill (the same color at 10% o
 | `--duel-opponent` | `#e11d48` | `#fb7185` | Opponent progress, their territory |
 | `--duel-neutral` | `#a3a3a3` | `#525252` | Unclaimed territory |
 
-For 3+ players in territory mode, add `#7c3aed` / `#a78bfa` (violet) and `#0d9488` / `#2dd4bf` (teal). Never use more than 4 player colors at once.
+For 3+ players in territory mode, add `#7c3aed` / `#a78bfa` (violet) and `#0d9488` / `#2dd4bf` (teal). Never use more than 4 player colors at once, except in Territory games of 5 or 6 players (decisions §16), which add `#d97706` / `#fbbf24` (amber) and `#c026d3` / `#e879f9` (fuchsia). There, every held region also carries its player's initial, so color is never the only cue.
 
 ### 2.5 Our additions: rating tiers
 

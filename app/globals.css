@@ -50,6 +50,9 @@
   --duel-neutral: #a3a3a3;
   --duel-p3: #7c3aed;
   --duel-p4: #0d9488;
+  /* Territory with 5 or 6 players */
+  --duel-p5: #d97706;
+  --duel-p6: #c026d3;
 
   /* Rating tiers (2.5) */
   --tier-newbie: #737373;
@@ -129,6 +132,8 @@
   --duel-neutral: #525252;
   --duel-p3: #a78bfa;
   --duel-p4: #2dd4bf;
+  --duel-p5: #fbbf24;
+  --duel-p6: #e879f9;
 
   --tier-newbie: #a3a3a3;
   --tier-apprentice: #4ade80;
@@ -202,6 +207,8 @@
   --color-duel-neutral: var(--duel-neutral);
   --color-duel-p3: var(--duel-p3);
   --color-duel-p4: var(--duel-p4);
+  --color-duel-p5: var(--duel-p5);
+  --color-duel-p6: var(--duel-p6);
 
   --color-tier-newbie: var(--tier-newbie);
   --color-tier-apprentice: var(--tier-apprentice);
