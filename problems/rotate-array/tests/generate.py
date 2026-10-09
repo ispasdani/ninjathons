@@ -12,4 +12,8 @@ for _ in range(8):
 big = [rng.randint(-10**9, 10**9) for _ in range(100000)]
 tests.append({"nums": big, "k": 99999})
 tests.append({"nums": big, "k": 10**9})
+# The worst case at the largest size: a solution that moves one value per step
+# (O(n × k)) must time out here with a clear margin, not just under the limit.
+huge = [rng.randint(-10**9, 10**9) for _ in range(200000)]
+tests.append({"nums": huge, "k": 199999})
 print(json.dumps(tests))
