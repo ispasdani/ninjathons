@@ -37,7 +37,7 @@ Every user picks a unique username. It lives in Convex, not Clerk. Clerk only ha
 - **Rules.** 3 to 20 characters, `a-z`, `0-9`, `_` and `-`, starting with a letter.
 - **Reserved names.** Route and system words (`admin`, `api`, `dashboard`, `settings`, `u`, `support`, `help`, `login`, `signup`…) and the brand name are blocked.
 - **When it's chosen.** In an onboarding step right after sign-up, before the first match. Until then the user can't be challenged by name.
-- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for 90 days (and redirects to the new one, once profile pages exist in phase 8; the cooldown and reservations are built), so nobody can grab a well-known player's old name right after they change it. The same 90 days apply to the username of a deleted account.
+- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for 90 days (and `/u/<old>` redirects permanently to the new one, built in phase 8, [§18](#18-profiles-and-pro)), so nobody can grab a well-known player's old name right after they change it. The same 90 days apply to the username of a deleted account.
 
 ## 2. Payments: Stripe
 
@@ -360,7 +360,7 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | 5 | Daily and weekly challenges ✅ | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
 | 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
-| 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
+| 8 | Profiles and Pro ✅ | Every Pro function has a test that calls it as a free user and is refused |
 | 9 | Ninjathons | One event runs from creation to results (first to cut) |
 | 10 | Closed beta and launch | Hosting, then the private alpha (10 to 20 friends), then 2 or 3 office teams plus 20 to 50 players; issues fixed |
 
@@ -692,3 +692,9 @@ Agreed 8 Oct 2026, at the start of phase 8. Adds to the roadmap's rules (Profile
 - **`/pro`**, public: what Pro adds and what stays free (the roadmap's table), a monthly or yearly toggle with Stripe's prices, and one button: "Sign in to get Pro" signed out, "Get Pro" (`billing.checkout`, then Stripe's hosted Checkout) for free players, and the renewal or end date with "Manage billing" (`billing.portal`) for Pro players. Linked from Settings (Plan), the locked lesson panel and the profile editor.
 - **Prices** come from a `stripePrices` table that `billing.syncPrices` copies from Stripe every hour (crons.ts) and on demand, so the page never calls Stripe and never shows a stale hard-coded price. In test mode the page shows Stripe's test card.
 - **Coming back from Checkout:** `?checkout=success` says the payment is in and turns into a welcome once the webhook has written the plan (the page watches `billing.plan`); `?checkout=cancelled` says nothing was charged.
+
+### Phase 8 done (9 Oct 2026)
+
+- **The check passes:** 6 Pro functions (`learn.lesson`, `learn.open`, `learn.roadmap`, `profiles.get`, `profiles.saveTheme`, `profiles.saveCustom`) are each called signed out, free and with a lapsed plan in `convex/pro.test.ts` and refuse, and the coverage test fails for any function that checks Pro without a denial test.
+- **Roadmap pages** mark Pro modules with the Pro tag and their lessons with a lock, through `locked` on each lesson of `learn.roadmap`; tutorials inside Pro modules stay open.
+- **The live webhook was checked end to end in test mode:** a throwaway function (removed) created a subscription through Stripe's API for a throwaway player; Stripe's real, signed `customer.subscription.created` reached `/stripe` and wrote Pro to the period's end plus 2 days, and cancelling it sent `customer.subscription.deleted`, which ended Pro at once. The player, its Stripe customer and the function were deleted afterwards.

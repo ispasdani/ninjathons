@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements, the Pro lock on roadmap lessons, public profiles, the profile editor, themes, the Pro options and the Pro page are built, and every Pro function has a denial test. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a test purchase on `/pro`, signed in with Stripe's test card, that reaches the webhook; then phase 8 is done.
+**Now:** Phase 8, Profiles and Pro, is done: Stripe in test mode with the webhook checked end to end, entitlements, the Pro lock with a denial test for every Pro function, public profiles with the editor, themes and Pro options, and the Pro page. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass over the Pro and profile screens (a test purchase, the editor), the pull request for phase 8, then phase 9, Ninjathons.
 
 ## Phases
 
@@ -16,7 +16,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 5 | Daily and weekly challenges | Done | 7 Oct 2026 | 8 Oct 2026 |
 | 6 | Territory | In progress | 8 Oct 2026 | |
 | 7 | Learn | Done | 8 Oct 2026 | 8 Oct 2026 |
-| 8 | Profiles and Pro | In progress | 8 Oct 2026 | |
+| 8 | Profiles and Pro | Done | 8 Oct 2026 | 9 Oct 2026 |
 | 9 | Ninjathons | Not started | | |
 | 10 | Closed beta and launch | Not started | | |
 
@@ -25,6 +25,14 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 9 Oct 2026 · Phase 8 done
+- The check passes ([decisions §18](notes/decisions.md#phase-8-done-9-oct-2026)): every Pro function (6 now) is called signed out, free and lapsed and refuses, and the coverage test fails for any new Pro function without a denial test.
+- Roadmap pages mark Pro modules (the Pro tag, a lock on each lesson, a link to Pro); tutorials inside them stay open. `learn.roadmap` gained `locked` per lesson and its denial test. Checked in the browser on Programming basics, signed out.
+- The live webhook checked end to end in test mode: a subscription made through Stripe's API for a throwaway player sent a real, signed `customer.subscription.created` to Convex dev, which wrote Pro until 11 Nov (period end plus 2 days); cancelling sent `customer.subscription.deleted`, which ended Pro. The player, its Stripe customer and the throwaway function were removed.
+- The 1v1 rating chart checked with sample data on a throwaway page (removed): the line, the tier grid and the hover readout.
+- Messages for `ALREADY_PRO`, `NO_BILLING`, `PRICE_NOT_FOUND` and `UNAUTHENTICATED`. 1 new test (524 in all, all passing). Production build passes. Deployed to Convex dev.
+- Left for whenever you're signed in (tests cover them): a purchase through `/pro` with the test card (Checkout, the welcome, Manage billing), the profile editor (saving, the Pro prompt, pinning), and a Pro lesson opening for a Pro player. Still open from earlier phases: phase 6's check by hand, and the signed-out header overflow (its own task).
 
 ### 9 Oct 2026 · Phase 8: the Pro page
 - `/pro` ([decisions §18](notes/decisions.md#the-pro-page-as-built-9-oct-2026)): what Pro adds and what stays free, monthly or yearly with Stripe's prices (yearly also shown per month, with how much less it is), and a button for each state: sign in, Get Pro (Checkout), or Pro's renewal date and Manage billing (the portal). Coming back from Checkout shows a confirmation that turns into a welcome once the webhook has written Pro. Linked from Settings (Plan).

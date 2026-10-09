@@ -59,6 +59,10 @@ const MESSAGES: Record<string, string> = {
   NOT_PINNABLE: "Only your own accepted Submits can be pinned.",
   PIN_HELD: "That problem is in today's daily or a weekly set that isn't over. Pin it once it's done.",
   PINS_FULL: "You can pin 3 solutions. Unpin one first.",
+  ALREADY_PRO: "You're already on Pro. Use Manage billing to change your plan.",
+  NO_BILLING: "There's no billing to manage yet.",
+  PRICE_NOT_FOUND: "Pro isn't on sale right now. Try again later.",
+  UNAUTHENTICATED: "Sign in first.",
 };
 
 export function errorCode(error: unknown) {

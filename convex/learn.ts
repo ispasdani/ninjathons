@@ -165,7 +165,8 @@ export const overview = publicQuery({
 
 /**
  * One roadmap as a path: its modules in order, each with its lessons and,
- * signed in, how far you've got. The outline is public (decisions §17).
+ * signed in, how far you've got. The outline is public (decisions §17);
+ * `locked` marks the lessons whose text only Pro players get (§18).
  */
 export const roadmap = publicQuery({
   args: { slug: v.string() },
@@ -177,6 +178,7 @@ export const roadmap = publicQuery({
     if (!roadmap || roadmap.status !== "published") return null;
     const user = await getCurrentUserOrNull(ctx);
     const userId = user?._id ?? null;
+    const pro = await hasPro(ctx, user);
 
     const modules = [];
     for (const mod of roadmap.modules) {
@@ -189,6 +191,8 @@ export const roadmap = publicQuery({
           tutorial: lesson.tutorial,
           exercises: lesson.exerciseIds.length,
           state: await lessonState(ctx, userId, lesson._id),
+          // As lessonLocked: tutorials and the free module are open to everyone.
+          locked: !lesson.tutorial && !mod.free && !pro,
         });
       }
       modules.push({

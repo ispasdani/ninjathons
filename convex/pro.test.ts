@@ -140,6 +140,22 @@ async function savedProProfiles(t: T, ids: Record<string, Id<"users">>) {
 }
 
 Object.assign(PRO_FUNCTIONS, {
+  "learn:roadmap": async () => {
+    const t = setup();
+    await seedRoadmap(t);
+    const who = await players(t);
+    const lockedOf = async (caller: Caller) => {
+      const roadmap = await caller.query(api.learn.roadmap, { slug: "dsa" });
+      return Object.fromEntries(roadmap!.modules.flatMap((m) => m.lessons.map((l) => [l.slug, l.locked])));
+    };
+
+    // The free module and the tutorial are open to everyone; the Pro lesson only to Pro.
+    for (const caller of [who.signedOut, who.free, who.lapsed]) {
+      expect(await lockedOf(caller)).toEqual({ intro: false, paid: true, tut: false });
+    }
+    expect(await lockedOf(who.pro)).toEqual({ intro: false, paid: false, tut: false });
+  },
+
   "profiles:get": async () => {
     const t = setup();
     const who = await players(t);
