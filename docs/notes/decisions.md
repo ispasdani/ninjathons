@@ -643,7 +643,7 @@ Agreed 8 Oct 2026, at the start of phase 8. Adds to the roadmap's rules (Profile
 
 ### Payments
 
-- **Stripe Checkout** (hosted, subscription mode), monthly or yearly, prices looked up in Stripe by lookup key. **The billing portal** (Stripe's customer portal) handles cancelling, switching interval, cards and invoices. A Convex action creates both sessions; nothing in the browser touches Stripe keys.
+- **Stripe Checkout** (hosted, subscription mode), monthly or yearly: the Pro product's active monthly and yearly prices, read from Stripe by the product id in `STRIPE_PRO_PRODUCT`, so changing a price in Stripe needs no code change. **The billing portal** (Stripe's customer portal) handles cancelling, switching interval, cards and invoices. A Convex action creates both sessions; nothing in the browser touches Stripe keys.
 - **Test mode until release.** Live keys, regional prices (§10) and the VAT choice (§2: Stripe Tax or a merchant of record) are set at release; phase 8 uses one price per interval. The code is the same either way.
 - **The webhook,** `POST /stripe` on Convex, checks Stripe's signature and records each event id once (`stripeEvents`). On any subscription event it reads the subscription back from Stripe, so events arriving out of order can't undo a newer state, and writes `entitlements`: `pro` until the current period's end plus 2 days while the subscription is active, trialing or past due; ended now when it's cancelled or unpaid. A cancel at period end keeps Pro to that end.
 - **`stripeCustomers`** links a user to their Stripe customer, created at the first Checkout.
