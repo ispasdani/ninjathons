@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements, the Pro lock on roadmap lessons with its denial tests, and public profile pages are built. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the profile editor: bio, links, favourite languages, pinned solutions, then themes and the Pro options.
+**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements, the Pro lock on roadmap lessons, public profiles, the profile editor, themes and the Pro options are built, and every Pro function has a denial test. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the Pro page (`/pro`) with Checkout and the billing portal, and a test purchase that reaches the webhook; then phase 8 is done.
 
 ## Phases
 
@@ -25,6 +25,16 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 9 Oct 2026 · Phase 8: the profile editor, themes and Pro options
+- `/settings/profile` ([decisions §18](notes/decisions.md#the-profile-editor-as-built-9-oct-2026)): bio, links, favourite languages, theme, the Pro options and pins, with the real profile as a live preview of the draft. Linked from Settings and as "Edit profile" on your own profile.
+- New `profiles` table (deleted with the account). Free fields and pins through `userMutation`s with server checks (https links only, 160-character plain-text bio, 3 languages, 3 pins of your own accepted Submits, nothing from today's daily or an unfinished weekly set).
+- 10 themes in `convex/lib/themes.ts` (3 free, 4 earned through badges, 3 Pro), every one passing the contrast check in light and dark. Pro options: accent with a contrast check, 5 banner patterns, 5 heading fonts, section order and visibility. Free players can preview them; saving is refused, and their profile shows the last free theme and none of the Pro values.
+- The Pro short URL `/<username>`; non-Pro names go to `/u/`. Five more route names reserved as usernames, with a test that every top-level route is.
+- The denial tests now cover `profiles.get`, `profiles.saveTheme` and `profiles.saveCustom` (5 Pro functions in all); the coverage test flagged all three before their tests were written.
+- Checked in the browser on a throwaway page (removed) drawing the real profile in Default, Terminal, Editorial, Blueprint (dark, custom accent, sections moved and one hidden) and Royal: theme colours, banners and fonts apply, the stats block keeps the platform's colours, nothing wider than the page. The editor itself hasn't been seen, since the pane isn't signed in; tests cover its functions.
+- 34 new tests (522 in all, all passing). Production build passes. Deployed to Convex dev.
+- Open: try the editor signed in (saving, the Pro prompt, pinning).
 
 ### 9 Oct 2026 · Phase 8: profile pages
 - `/u/<username>` ([decisions §18](notes/decisions.md#profile-pages-as-built-9-oct-2026)): server-rendered from `profiles.get`, then live. Header (avatar, name, username, Pro badge, level and title, country, join month), the fixed stats block (1v1 and Territory ratings or placement games left, global rank, 1v1 record, problems solved, daily streak), the activity grid, the 1v1 rating chart, badges (earned first, locked on request) and the last 10 finished games.

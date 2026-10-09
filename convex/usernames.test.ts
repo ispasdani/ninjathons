@@ -112,3 +112,23 @@ describe("setUsername", () => {
     await expect(bob.as.mutation(api.user.setUsername, { username: "dani" })).rejects.toThrowError("USERNAME_TAKEN");
   });
 });
+
+describe("reserved route names", () => {
+  // Only the keys are read; nothing is imported.
+  const routes = Object.keys(import.meta.glob(["../app/**/page.tsx", "../app/**/route.ts", "../app/**/route.tsx"]));
+
+  it("reserves every top-level route a username could look like", () => {
+    const firstSegments = new Set(
+      routes
+        .map((path) => path.replace("../app/", "").split("/").filter((s) => !s.startsWith("(") && !s.startsWith("[")))
+        .filter((segments) => segments.length > 1)
+        .map((segments) => segments[0]),
+    );
+    expect(firstSegments.size).toBeGreaterThan(10);
+    for (const segment of firstSegments) {
+      // Names the rules refuse anyway ("m" is too short) can't be taken.
+      const problem = checkUsernameRules(segment);
+      expect(problem === null ? `${segment} is not reserved` : "ok").toBe("ok");
+    }
+  });
+});

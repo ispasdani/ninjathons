@@ -319,6 +319,13 @@ export const deleteFromClerk = internalMutation({
       .collect();
     for (const row of activity) await ctx.db.delete(row._id);
 
+    // Their profile: bio, links, pins and theme (decisions §18).
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .unique();
+    if (profile) await ctx.db.delete(profile._id);
+
     // Off the leaderboards now; the ranks close up on the next rebuild.
     const snapshots = await ctx.db
       .query("leaderboardSnapshots")

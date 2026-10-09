@@ -27,12 +27,12 @@ async function profileOf(t: T, username: string) {
   return result;
 }
 
-async function seedProblem(t: T) {
+async function seedProblem(t: T, slug = "two-sum") {
   const file = await t.run((ctx) => ctx.storage.store(new Blob(["[]"])));
   const { problemId } = await t.mutation(internal.problems.seed, {
     problem: {
-      slug: "two-sum",
-      title: "Two Sum",
+      slug,
+      title: slug === "two-sum" ? "Two Sum" : slug,
       statement: "…",
       difficulty: "easy",
       tags: [],
@@ -209,5 +209,138 @@ describe("profiles.get", () => {
 
     const bobs = await profileOf(t, "bob");
     expect(bobs?.recent?.[0]).toMatchObject({ result: "win", opponent: "ada", ghost: true });
+  });
+});
+
+async function accepted(t: T, userId: Id<"users">, problemId: Id<"problems">, source = "print(1)") {
+  return await t.run((ctx) =>
+    ctx.db.insert("submissions", {
+      userId,
+      problemId,
+      problemVersion: 1,
+      language: "python",
+      source,
+      kind: "submit",
+      status: "done",
+      verdict: { status: "accepted", passed: 1, total: 1, timeMs: 5, tests: [] },
+    }),
+  );
+}
+
+describe("the free fields", () => {
+  it("saves a plain-text bio, https links and up to 3 languages", async () => {
+    const t = setup();
+    await player(t, "ada", "ada");
+    const as = t.withIdentity(identity("user_ada"));
+
+    await as.mutation(api.profiles.saveAbout, {
+      bio: "  Hi\u0007 there\n\n\n\nfriend  ",
+      links: ["https://github.com/ada", " https://ada.dev ", "", "https://github.com/ada"],
+      languages: ["python", "rust", "python"],
+    });
+
+    const profile = await profileOf(t, "ada");
+    expect(profile.about).toEqual({
+      bio: "Hi there\n\nfriend",
+      links: ["https://github.com/ada", "https://ada.dev/"],
+      languages: ["python", "rust"],
+    });
+  });
+
+  it("refuses links that aren't https, long bios and too many of anything", async () => {
+    const t = setup();
+    await player(t, "ada", "ada");
+    const as = t.withIdentity(identity("user_ada"));
+    const save = (fields: Partial<{ bio: string; links: string[]; languages: ("python" | "rust" | "java" | "cpp")[] }>) =>
+      as.mutation(api.profiles.saveAbout, { bio: "", links: [], languages: [], ...fields });
+
+    for (const link of ["javascript:alert(1)", "http://ada.dev", "https://localhost", "https://user:pw@ada.dev", "data:text/html,hi", "ada.dev"]) {
+      await expect(save({ links: [link] })).rejects.toThrowError("BAD_LINK");
+    }
+    await expect(save({ bio: "x".repeat(161) })).rejects.toThrowError("BIO_TOO_LONG");
+    await expect(save({ links: ["https://a.dev", "https://b.dev", "https://c.dev", "https://d.dev", "https://e.dev"] })).rejects.toThrowError(
+      "TOO_MANY_LINKS",
+    );
+    await expect(save({ languages: ["python", "rust", "java", "cpp"] })).rejects.toThrowError("TOO_MANY_LANGUAGES");
+    expect(await t.run((ctx) => ctx.db.query("profiles").collect())).toHaveLength(0);
+  });
+});
+
+describe("pinned solutions", () => {
+  it("pins your own accepted Submits, one per problem, up to 3, and shows their code", async () => {
+    const t = setup();
+    const ada = await player(t, "ada", "ada");
+    const as = t.withIdentity(identity("user_ada"));
+    const problems = [];
+    for (const slug of ["a", "b", "c", "d"]) problems.push(await seedProblem(t, slug));
+
+    const first = await accepted(t, ada, problems[0], "v1");
+    const again = await accepted(t, ada, problems[0], "v2");
+    await as.mutation(api.profiles.pin, { submissionId: first });
+    await as.mutation(api.profiles.pin, { submissionId: again });
+    await as.mutation(api.profiles.pin, { submissionId: await accepted(t, ada, problems[1]) });
+    await as.mutation(api.profiles.pin, { submissionId: await accepted(t, ada, problems[2]) });
+    await expect(as.mutation(api.profiles.pin, { submissionId: await accepted(t, ada, problems[3]) })).rejects.toThrowError(
+      "PINS_FULL",
+    );
+
+    const profile = await profileOf(t, "ada");
+    expect(profile.pins.map((p) => p.slug)).toEqual(["a", "b", "c"]);
+    expect(profile.pins[0]).toMatchObject({ language: "python", source: "v2" });
+
+    await as.mutation(api.profiles.unpin, { problemId: problems[1] });
+    expect((await profileOf(t, "ada")).pins.map((p) => p.slug)).toEqual(["a", "c"]);
+  });
+
+  it("refuses someone else's Submit, a Run and a failed Submit", async () => {
+    const t = setup();
+    await player(t, "ada", "ada");
+    const bob = await player(t, "bob", "bob");
+    const problemId = await seedProblem(t);
+    const as = t.withIdentity(identity("user_ada"));
+
+    const bobs = await accepted(t, bob, problemId);
+    const run = await accepted(t, bob, problemId);
+    await t.run((ctx) => ctx.db.patch(run, { kind: "run" }));
+    const failed = await accepted(t, bob, problemId);
+    await t.run((ctx) =>
+      ctx.db.patch(failed, { verdict: { status: "wrong_answer", passed: 0, total: 1, timeMs: 5, tests: [] } }),
+    );
+    const asBob = t.withIdentity(identity("user_bob"));
+    await expect(as.mutation(api.profiles.pin, { submissionId: bobs })).rejects.toThrowError("NOT_PINNABLE");
+    await expect(asBob.mutation(api.profiles.pin, { submissionId: run })).rejects.toThrowError("NOT_PINNABLE");
+    await expect(asBob.mutation(api.profiles.pin, { submissionId: failed })).rejects.toThrowError("NOT_PINNABLE");
+  });
+
+  it("won't pin today's daily, and hides a pin while its problem is held", async () => {
+    const t = setup();
+    const ada = await player(t, "ada", "ada");
+    const as = t.withIdentity(identity("user_ada"));
+    const daily = await seedProblem(t, "daily-one");
+    const later = await seedProblem(t, "later");
+    const today = new Date().toISOString().slice(0, 10);
+    await t.run((ctx) => ctx.db.insert("dailyChallenges", { day: today, problemId: daily }));
+
+    await expect(as.mutation(api.profiles.pin, { submissionId: await accepted(t, ada, daily) })).rejects.toThrowError("PIN_HELD");
+
+    await as.mutation(api.profiles.pin, { submissionId: await accepted(t, ada, later) });
+    expect((await profileOf(t, "ada")).pins).toHaveLength(1);
+    // The problem joins a weekly set that hasn't started: its pin is hidden until the week is over.
+    await t.run((ctx) =>
+      ctx.db.insert("weeklySets", { slug: "w", title: "W", theme: "", order: 1, problemIds: [later] }),
+    );
+    expect((await profileOf(t, "ada")).pins).toHaveLength(0);
+  });
+
+  it("lists what you could pin in the editor, newest per problem", async () => {
+    const t = setup();
+    const ada = await player(t, "ada", "ada");
+    const problemId = await seedProblem(t);
+    await accepted(t, ada, problemId, "old");
+    const newest = await accepted(t, ada, problemId, "new");
+
+    const editor = await t.withIdentity(identity("user_ada")).query(api.profiles.editor, {});
+    expect(editor.candidates).toMatchObject([{ submissionId: newest, title: "Two Sum", held: false }]);
+    expect(editor.unlocked).toEqual(["default", "slate", "ink"]);
   });
 });

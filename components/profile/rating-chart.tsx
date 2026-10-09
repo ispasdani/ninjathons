@@ -54,28 +54,28 @@ export function RatingChart({ points }: { points: { at: number; rating: number }
       >
         {grid.map(([r, tier]) => (
           <g key={r}>
-            <line x1={PAD.left} x2={W - PAD.right} y1={y(r)} y2={y(r)} stroke="var(--border)" strokeWidth={1} />
-            <text x={PAD.left - 6} y={y(r) + 3} textAnchor="end" className="fill-muted-foreground font-mono text-[10px]">
+            <line x1={PAD.left} x2={W - PAD.right} y1={y(r)} y2={y(r)} stroke="var(--p-border)" strokeWidth={1} />
+            <text x={PAD.left - 6} y={y(r) + 3} textAnchor="end" className="fill-[var(--p-muted)] font-mono text-[10px]">
               {r}
             </text>
             <title>{tier}</title>
           </g>
         ))}
-        <line x1={PAD.left} x2={W - PAD.right} y1={H - PAD.bottom} y2={H - PAD.bottom} stroke="var(--border)" strokeWidth={1} />
-        <path d={path} fill="none" stroke="var(--foreground)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <line x1={PAD.left} x2={W - PAD.right} y1={H - PAD.bottom} y2={H - PAD.bottom} stroke="var(--p-border)" strokeWidth={1} />
+        <path d={path} fill="none" stroke="var(--p-text)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         {active && hover !== null && (
           <g>
-            <line x1={x(hover)} x2={x(hover)} y1={PAD.top} y2={H - PAD.bottom} stroke="var(--border-strong)" strokeWidth={1} />
-            <circle cx={x(hover)} cy={y(active.rating)} r={4} fill="var(--foreground)" stroke="var(--background)" strokeWidth={2} />
+            <line x1={x(hover)} x2={x(hover)} y1={PAD.top} y2={H - PAD.bottom} stroke="var(--p-muted)" strokeWidth={1} />
+            <circle cx={x(hover)} cy={y(active.rating)} r={4} fill="var(--p-text)" stroke="var(--p-bg)" strokeWidth={2} />
           </g>
         )}
         {/* Bigger than the line, so the hover catches anywhere in the plot. */}
         <rect x={PAD.left} y={PAD.top} width={W - PAD.left - PAD.right} height={H - PAD.top - PAD.bottom} fill="transparent" />
       </svg>
-      <figcaption className="mt-2 font-mono text-xs text-muted-foreground tabular-nums" aria-live="polite">
+      <figcaption className="mt-2 font-mono text-xs text-[var(--p-muted)] tabular-nums" aria-live="polite">
         {active ? (
           <>
-            <span className="text-foreground">{active.rating}</span> · game {hover! + 1} · {dateLabel(active.at)}
+            <span className="text-[var(--p-text)]">{active.rating}</span> · game {hover! + 1} · {dateLabel(active.at)}
           </>
         ) : (
           `Last ${points.length} rated games`

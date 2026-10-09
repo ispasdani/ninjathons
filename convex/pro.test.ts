@@ -127,6 +127,70 @@ const PRO_FUNCTIONS: Record<string, () => Promise<void>> = {
   },
 };
 
+const custom = { accent: "#e11d48", banner: "dots", headingFont: "fraunces", sections: { order: ["recent", "about"], hidden: ["badges"] } };
+
+/** Gives each player a username and a saved profile using every Pro option. */
+async function savedProProfiles(t: T, ids: Record<string, Id<"users">>) {
+  await t.run(async (ctx) => {
+    for (const [name, userId] of Object.entries(ids)) {
+      await ctx.db.patch(userId, { username: name, usernameKey: name });
+      await ctx.db.insert("profiles", { userId, theme: "terminal", freeTheme: "slate", ...custom });
+    }
+  });
+}
+
+Object.assign(PRO_FUNCTIONS, {
+  "profiles:get": async () => {
+    const t = setup();
+    const who = await players(t);
+    await savedProProfiles(t, who.ids);
+
+    // Whoever looks, a free or lapsed player's Pro values aren't shown: their last free theme is.
+    for (const viewer of [who.signedOut, who.pro]) {
+      for (const owner of ["free", "lapsed"]) {
+        const profile = await viewer.query(api.profiles.get, { username: owner });
+        expect(profile).toMatchObject({
+          look: { theme: "slate", accent: null, banner: "none", headingFont: "geist", sections: { hidden: [] } },
+        });
+      }
+    }
+    expect(await who.signedOut.query(api.profiles.get, { username: "pro" })).toMatchObject({
+      look: { theme: "terminal", accent: "#e11d48", banner: "dots", headingFont: "fraunces", sections: { hidden: ["badges"] } },
+    });
+  },
+
+  "profiles:saveTheme": async () => {
+    const t = setup();
+    const who = await players(t);
+
+    await expect(who.signedOut.mutation(api.profiles.saveTheme, { theme: "terminal" })).rejects.toThrowError("UNAUTHENTICATED");
+    await expect(who.free.mutation(api.profiles.saveTheme, { theme: "terminal" })).rejects.toThrowError("PRO_REQUIRED");
+    await expect(who.lapsed.mutation(api.profiles.saveTheme, { theme: "terminal" })).rejects.toThrowError("PRO_REQUIRED");
+    // Earned themes need their badge.
+    await expect(who.free.mutation(api.profiles.saveTheme, { theme: "royal" })).rejects.toThrowError("THEME_LOCKED");
+    expect(await t.run((ctx) => ctx.db.query("profiles").collect())).toHaveLength(0);
+
+    await who.free.mutation(api.profiles.saveTheme, { theme: "slate" });
+    await who.pro.mutation(api.profiles.saveTheme, { theme: "terminal" });
+    const rows = await t.run((ctx) => ctx.db.query("profiles").collect());
+    expect(rows.map((r) => r.theme).sort()).toEqual(["slate", "terminal"]);
+  },
+
+  "profiles:saveCustom": async () => {
+    const t = setup();
+    const who = await players(t);
+
+    await expect(who.signedOut.mutation(api.profiles.saveCustom, custom)).rejects.toThrowError("UNAUTHENTICATED");
+    await expect(who.free.mutation(api.profiles.saveCustom, custom)).rejects.toThrowError("PRO_REQUIRED");
+    await expect(who.lapsed.mutation(api.profiles.saveCustom, custom)).rejects.toThrowError("PRO_REQUIRED");
+    expect(await t.run((ctx) => ctx.db.query("profiles").collect())).toHaveLength(0);
+
+    await who.pro.mutation(api.profiles.saveCustom, custom);
+    const [row] = await t.run((ctx) => ctx.db.query("profiles").collect());
+    expect(row).toMatchObject({ userId: who.ids.pro, accent: "#e11d48", banner: "dots", headingFont: "fraunces" });
+  },
+} satisfies Record<string, () => Promise<void>>);
+
 describe("every Pro function refuses free players", () => {
   for (const [name, test] of Object.entries(PRO_FUNCTIONS)) it(name, test);
 });

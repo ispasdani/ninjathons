@@ -7,15 +7,15 @@ import { cn } from "@/lib/utils";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEKDAYS = ["Mon", "", "Wed", "", "Fri", "", ""];
 
-// One hue, light to dark (sequential): the empty cell, then --brand-text mixed
-// in at four steps. --brand-text is olive in light mode and neon in dark, so
-// the ramp is picked per mode from the brand's own tokens.
+// One hue, light to dark (sequential): the empty cell, then the profile accent mixed
+// in at four steps. The accent is picked per mode by the theme (lib/themes.ts),
+// and passes 3:1 on the background in both.
 const STEPS = [
-  "var(--bg-tertiary)",
-  "color-mix(in oklab, var(--brand-text) 35%, var(--bg-tertiary))",
-  "color-mix(in oklab, var(--brand-text) 60%, var(--bg-tertiary))",
-  "color-mix(in oklab, var(--brand-text) 80%, var(--bg-tertiary))",
-  "var(--brand-text)",
+  "var(--p-surface)",
+  "color-mix(in oklab, var(--p-accent) 35%, var(--p-surface))",
+  "color-mix(in oklab, var(--p-accent) 60%, var(--p-surface))",
+  "color-mix(in oklab, var(--p-accent) 80%, var(--p-surface))",
+  "var(--p-accent)",
 ];
 
 function step(count: number) {
@@ -59,7 +59,7 @@ export function ActivityGrid({ activity }: { activity: { from: string; today: st
   return (
     <div>
       <div ref={scroller} className="flex gap-1.5 overflow-x-auto pb-1">
-        <div className="sticky left-0 z-10 grid shrink-0 grid-rows-7 gap-[3px] bg-background pr-1 font-mono text-[10px] leading-[11px] text-muted-foreground" aria-hidden>
+        <div className="sticky left-0 z-10 grid shrink-0 grid-rows-7 gap-[3px] bg-[var(--p-bg)] pr-1 font-mono text-[10px] leading-[11px] text-[var(--p-muted)]" aria-hidden>
           {WEEKDAYS.map((d, i) => (
             <span key={i} className="h-[11px]">
               {d}
@@ -81,14 +81,14 @@ export function ActivityGrid({ activity }: { activity: { from: string; today: st
               className={cn(
                 "size-[11px] rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 future && "invisible",
-                shown === day && "ring-1 ring-foreground",
+                shown === day && "ring-1 ring-[var(--p-text)]",
               )}
               style={{ background: STEPS[step(count)] }}
             />
           ))}
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 font-mono text-xs text-muted-foreground tabular-nums">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 font-mono text-xs text-[var(--p-muted)] tabular-nums">
         <span aria-live="polite">
           {shown ? `${dayLabel(shown)} · ${countLabel(activity.days[shown] ?? 0)}` : `${total} in the last 26 weeks`}
         </span>
