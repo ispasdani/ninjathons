@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-#
 # The runner image: every compiler the judge uses, booted by Vercel Sandbox for
 # each job (docs/notes/decisions.md §5) and used locally by problems:check.
 # Built and pushed to Vercel Container Registry by .github/workflows/runner-image.yml.
@@ -7,7 +5,11 @@
 # Versions are pinned; a toolchain upgrade is a change to this file, and the
 # label in convex/judge/languages/<language>.ts must follow it.
 
-FROM ubuntu:26.04
+# Docker's official ubuntu image, pulled through Amazon's public mirror of the
+# official images (same digest): Docker Hub limits anonymous pulls, and shared
+# CI runners hit that limit. For the same reason there is no `# syntax=` line;
+# BuildKit's built-in Dockerfile parser covers everything used here.
+FROM public.ecr.aws/docker/library/ubuntu:26.04
 
 ENV LANG=C.UTF-8
 ARG DEBIAN_FRONTEND=noninteractive
