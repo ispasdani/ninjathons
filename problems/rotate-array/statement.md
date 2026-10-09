@@ -4,7 +4,7 @@ Rotate `nums` to the right by `k` steps: each step moves the last value to the f
 
 ## Constraints
 
-- `1 <= nums.length <= 100000`
+- `1 <= nums.length <= 200000`
 - `-10^9 <= nums[i] <= 10^9`
 - `0 <= k <= 10^9`
 
