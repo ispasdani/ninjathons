@@ -686,3 +686,9 @@ Agreed 8 Oct 2026, at the start of phase 8. Adds to the roadmap's rules (Profile
 - **Pro options:** accent (refused unless 3:1 on the chosen theme's background in both modes; dropped if a later theme change makes it fail), 5 banner patterns drawn in the accent, 5 heading fonts loaded with `next/font` without preloading, and the order and visibility of the 6 sections below the header and stats.
 - **What a profile shows** comes from `lookFor` in `lib/profiles.ts`, which uses `hasPro`: without Pro, the saved theme if it's free or earned, else the last free one, and none of the Pro values. `profiles.get`, `saveTheme` and `saveCustom` are in the denial tests.
 - **The short URL** `/<username>` shows a Pro player's profile (canonical `/u/<username>`) and sends anyone else's to `/u/` with a temporary redirect. Five route names (`badges`, `groups`, `lobby`, `play`, `roadmaps`) were added to the reserved usernames, and a test checks every top-level route is reserved.
+
+### The Pro page as built (9 Oct 2026)
+
+- **`/pro`**, public: what Pro adds and what stays free (the roadmap's table), a monthly or yearly toggle with Stripe's prices, and one button: "Sign in to get Pro" signed out, "Get Pro" (`billing.checkout`, then Stripe's hosted Checkout) for free players, and the renewal or end date with "Manage billing" (`billing.portal`) for Pro players. Linked from Settings (Plan), the locked lesson panel and the profile editor.
+- **Prices** come from a `stripePrices` table that `billing.syncPrices` copies from Stripe every hour (crons.ts) and on demand, so the page never calls Stripe and never shows a stale hard-coded price. In test mode the page shows Stripe's test card.
+- **Coming back from Checkout:** `?checkout=success` says the payment is in and turns into a welcome once the webhook has written the plan (the page watches `billing.plan`); `?checkout=cancelled` says nothing was charged.

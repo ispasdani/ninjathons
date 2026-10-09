@@ -9,7 +9,7 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { internalAction, internalMutation, internalQuery, type QueryCtx } from "./_generated/server";
 import { applySubscription } from "./lib/billing";
-import { getPlan, userAction, userQuery } from "./lib/functions";
+import { getPlan, publicQuery, userAction, userQuery } from "./lib/functions";
 import { stripe, StripeError, subscriptionState, type StripeEvent } from "./lib/stripe";
 
 const SUBSCRIPTION_EVENTS = new Set([
@@ -68,10 +68,17 @@ export const linkCustomer = internalMutation({
   },
 });
 
-type Price = { id: string; created: number; recurring?: { interval?: string } | null };
+type Price = {
+  id: string;
+  created: number;
+  unit_amount: number | null;
+  currency: string;
+  livemode: boolean;
+  recurring?: { interval?: string } | null;
+};
 
-/** The Pro product's newest active price for an interval. */
-async function proPrice(interval: "month" | "year") {
+/** The Pro product's newest active price for each interval. */
+async function proPrices() {
   const product = process.env.STRIPE_PRO_PRODUCT;
   if (!product) throw new Error("STRIPE_PRO_PRODUCT is not set in the Convex environment");
   const { data } = await stripe<{ data: Price[] }>("GET", "/prices", {
@@ -80,11 +87,63 @@ async function proPrice(interval: "month" | "year") {
     type: "recurring",
     limit: 20,
   });
-  const matching = data.filter((p) => p.recurring?.interval === interval);
-  matching.sort((a, b) => b.created - a.created);
-  if (!matching[0]) throw new ConvexError("PRICE_NOT_FOUND");
-  return matching[0].id;
+  const newest = (interval: "month" | "year") =>
+    data.filter((p) => p.recurring?.interval === interval).sort((a, b) => b.created - a.created)[0] ?? null;
+  return { month: newest("month"), year: newest("year") };
 }
+
+async function proPrice(interval: "month" | "year") {
+  const price = (await proPrices())[interval];
+  if (!price) throw new ConvexError("PRICE_NOT_FOUND");
+  return price.id;
+}
+
+/** The prices the Pro page shows, as last copied from Stripe. */
+export const prices = publicQuery({
+  args: {},
+  handler: async (ctx) => {
+    const rows = await ctx.db.query("stripePrices").collect();
+    const of = (interval: "month" | "year") => {
+      const row = rows.find((r) => r.interval === interval);
+      return row ? { amount: row.amount, currency: row.currency } : null;
+    };
+    return { month: of("month"), year: of("year"), testMode: rows.some((r) => !r.livemode) };
+  },
+});
+
+export const storePrices = internalMutation({
+  args: {
+    prices: v.array(
+      v.object({
+        priceId: v.string(),
+        interval: v.union(v.literal("month"), v.literal("year")),
+        amount: v.number(),
+        currency: v.string(),
+        livemode: v.boolean(),
+      }),
+    ),
+  },
+  handler: async (ctx, { prices }) => {
+    for (const row of await ctx.db.query("stripePrices").collect()) await ctx.db.delete(row._id);
+    for (const price of prices) await ctx.db.insert("stripePrices", price);
+  },
+});
+
+/** Copies the Pro prices from Stripe (crons.ts, hourly; or `npx convex run billing:syncPrices`). */
+export const syncPrices = internalAction({
+  args: {},
+  handler: async (ctx) => {
+    const found = await proPrices();
+    const prices = (["month", "year"] as const).flatMap((interval) => {
+      const p = found[interval];
+      return p && p.unit_amount !== null
+        ? [{ priceId: p.id, interval, amount: p.unit_amount, currency: p.currency, livemode: p.livemode }]
+        : [];
+    });
+    await ctx.runMutation(internal.billing.storePrices, { prices });
+    return prices.map((p) => `${p.interval}: ${p.amount} ${p.currency}`);
+  },
+});
 
 /** Starts a Stripe Checkout for Pro and returns the page to send the player to. */
 export const checkout = userAction({

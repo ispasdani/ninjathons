@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements, the Pro lock on roadmap lessons, public profiles, the profile editor, themes and the Pro options are built, and every Pro function has a denial test. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the Pro page (`/pro`) with Checkout and the billing portal, and a test purchase that reaches the webhook; then phase 8 is done.
+**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements, the Pro lock on roadmap lessons, public profiles, the profile editor, themes, the Pro options and the Pro page are built, and every Pro function has a denial test. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a test purchase on `/pro`, signed in with Stripe's test card, that reaches the webhook; then phase 8 is done.
 
 ## Phases
 
@@ -25,6 +25,13 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 9 Oct 2026 · Phase 8: the Pro page
+- `/pro` ([decisions §18](notes/decisions.md#the-pro-page-as-built-9-oct-2026)): what Pro adds and what stays free, monthly or yearly with Stripe's prices (yearly also shown per month, with how much less it is), and a button for each state: sign in, Get Pro (Checkout), or Pro's renewal date and Manage billing (the portal). Coming back from Checkout shows a confirmation that turns into a welcome once the webhook has written Pro. Linked from Settings (Plan).
+- New `stripePrices` table, copied from Stripe hourly by `billing.syncPrices`; run once on dev and read €8.00 monthly and €69.00 yearly from the test account, the first real call to Stripe's API.
+- Checked in the browser signed out, at desktop and phone widths, light and dark: prices, the toggle, the sign-in button, the cancelled and success notes, nothing wider than the page, no new console errors. Fixed on the way: on phones the price card now comes before the feature lists.
+- 1 new test (523 in all, all passing). Production build passes. Deployed to Convex dev.
+- Open: the signed-in states (Checkout, the welcome, Manage billing) and a real webhook delivery wait for a test purchase.
 
 ### 9 Oct 2026 · Phase 8: the profile editor, themes and Pro options
 - `/settings/profile` ([decisions §18](notes/decisions.md#the-profile-editor-as-built-9-oct-2026)): bio, links, favourite languages, theme, the Pro options and pins, with the real profile as a live preview of the draft. Linked from Settings and as "Edit profile" on your own profile.

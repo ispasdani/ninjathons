@@ -18,7 +18,7 @@ type Call = { method: string; url: string; body: string };
 let calls: Call[];
 // Subscriptions as Stripe holds them, by id.
 let subscriptions: Record<string, Record<string, unknown>>;
-let prices: { id: string; created: number; recurring: { interval: string } }[];
+let prices: { id: string; created: number; unit_amount: number; currency: string; livemode: boolean; recurring: { interval: string } }[];
 
 beforeEach(() => {
   vi.stubEnv("STRIPE_WEBHOOK_SECRET", SECRET);
@@ -28,9 +28,9 @@ beforeEach(() => {
   calls = [];
   subscriptions = {};
   prices = [
-    { id: "price_month_old", created: 1, recurring: { interval: "month" } },
-    { id: "price_month", created: 2, recurring: { interval: "month" } },
-    { id: "price_year", created: 2, recurring: { interval: "year" } },
+    { id: "price_month_old", created: 1, unit_amount: 700, currency: "eur", livemode: false, recurring: { interval: "month" } },
+    { id: "price_month", created: 2, unit_amount: 800, currency: "eur", livemode: false, recurring: { interval: "month" } },
+    { id: "price_year", created: 2, unit_amount: 6900, currency: "eur", livemode: false, recurring: { interval: "year" } },
   ];
   vi.stubGlobal(
     "fetch",
@@ -280,6 +280,23 @@ describe("checkout and the billing portal", () => {
     const { as } = await player(t, "ada");
     await expect(as.action(api.billing.portal, {})).rejects.toThrowError("NO_BILLING");
     expect(await as.query(api.billing.plan, {})).toMatchObject({ tier: "free", hasBilling: false });
+  });
+});
+
+describe("the Pro page prices", () => {
+  it("copies the newest active price of each interval from Stripe", async () => {
+    const t = setup();
+    expect(await t.query(api.billing.prices, {})).toEqual({ month: null, year: null, testMode: false });
+
+    await t.action(internal.billing.syncPrices, {});
+    await t.action(internal.billing.syncPrices, {});
+
+    expect(await t.query(api.billing.prices, {})).toEqual({
+      month: { amount: 800, currency: "eur" },
+      year: { amount: 6900, currency: "eur" },
+      testMode: true,
+    });
+    expect(await t.run((ctx) => ctx.db.query("stripePrices").collect())).toHaveLength(2);
   });
 });
 

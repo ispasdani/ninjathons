@@ -27,7 +27,7 @@ import {
   territoryQueue,
   territoryRegions,
 } from "./schemas/territory";
-import { stripeCustomers, stripeEvents } from "./schemas/billing";
+import { stripeCustomers, stripeEvents, stripePrices } from "./schemas/billing";
 import { activityDays, profiles } from "./schemas/profiles";
 import { entitlements, usernameReservations, users } from "./schemas/users";
 
@@ -38,6 +38,7 @@ export default defineSchema({
   entitlements,
   stripeCustomers,
   stripeEvents,
+  stripePrices,
   activityDays,
   profiles,
   problems,
