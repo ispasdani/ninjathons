@@ -10,6 +10,7 @@
 
 import type * as badges from "../badges.js";
 import type * as benchmark from "../benchmark.js";
+import type * as billing from "../billing.js";
 import type * as challenges from "../challenges.js";
 import type * as crons from "../crons.js";
 import type * as daily from "../daily.js";
@@ -38,6 +39,7 @@ import type * as judging from "../judging.js";
 import type * as leaderboards from "../leaderboards.js";
 import type * as learn from "../learn.js";
 import type * as lib_badges from "../lib/badges.js";
+import type * as lib_billing from "../lib/billing.js";
 import type * as lib_codes from "../lib/codes.js";
 import type * as lib_countries from "../lib/countries.js";
 import type * as lib_daily from "../lib/daily.js";
@@ -54,6 +56,7 @@ import type * as lib_matchmaking from "../lib/matchmaking.js";
 import type * as lib_openskill from "../lib/openskill.js";
 import type * as lib_problems from "../lib/problems.js";
 import type * as lib_ratings from "../lib/ratings.js";
+import type * as lib_stripe from "../lib/stripe.js";
 import type * as lib_territory from "../lib/territory.js";
 import type * as lib_territoryMap from "../lib/territoryMap.js";
 import type * as lib_usernames from "../lib/usernames.js";
@@ -63,6 +66,7 @@ import type * as matches from "../matches.js";
 import type * as problems from "../problems.js";
 import type * as queue from "../queue.js";
 import type * as ratings from "../ratings.js";
+import type * as schemas_billing from "../schemas/billing.js";
 import type * as schemas_challenges from "../schemas/challenges.js";
 import type * as schemas_docs from "../schemas/docs.js";
 import type * as schemas_groups from "../schemas/groups.js";
@@ -95,6 +99,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   badges: typeof badges;
   benchmark: typeof benchmark;
+  billing: typeof billing;
   challenges: typeof challenges;
   crons: typeof crons;
   daily: typeof daily;
@@ -123,6 +128,7 @@ declare const fullApi: ApiFromModules<{
   leaderboards: typeof leaderboards;
   learn: typeof learn;
   "lib/badges": typeof lib_badges;
+  "lib/billing": typeof lib_billing;
   "lib/codes": typeof lib_codes;
   "lib/countries": typeof lib_countries;
   "lib/daily": typeof lib_daily;
@@ -139,6 +145,7 @@ declare const fullApi: ApiFromModules<{
   "lib/openskill": typeof lib_openskill;
   "lib/problems": typeof lib_problems;
   "lib/ratings": typeof lib_ratings;
+  "lib/stripe": typeof lib_stripe;
   "lib/territory": typeof lib_territory;
   "lib/territoryMap": typeof lib_territoryMap;
   "lib/usernames": typeof lib_usernames;
@@ -148,6 +155,7 @@ declare const fullApi: ApiFromModules<{
   problems: typeof problems;
   queue: typeof queue;
   ratings: typeof ratings;
+  "schemas/billing": typeof schemas_billing;
   "schemas/challenges": typeof schemas_challenges;
   "schemas/docs": typeof schemas_docs;
   "schemas/groups": typeof schemas_groups;

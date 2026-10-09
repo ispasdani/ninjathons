@@ -1,7 +1,7 @@
 "use client";
 
 import { type Preloaded, useConvexAuth, useMutation, usePreloadedQuery } from "convex/react";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -18,7 +18,8 @@ type Opened = { xp: number; modules: { title: string }[] };
 /**
  * A lesson or tutorial (decisions §17): the text, then its exercises. Opening
  * it signed in counts as reading it; it's finished once every exercise is
- * solved, earlier solves included.
+ * solved, earlier solves included. A Pro lesson comes without its text for
+ * everyone else (decisions §18) and isn't recorded as opened.
  */
 export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.learn.lesson> }) {
   const lesson = usePreloadedQuery(preloaded);
@@ -28,13 +29,14 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
   const sent = useRef<string | null>(null);
 
   const slug = lesson?.slug;
+  const locked = lesson?.locked ?? false;
   useEffect(() => {
-    if (!isAuthenticated || !slug || sent.current === slug) return;
+    if (!isAuthenticated || !slug || locked || sent.current === slug) return;
     sent.current = slug;
     open({ slug }).then(setOpened, () => {
       sent.current = null;
     });
-  }, [isAuthenticated, slug, open]);
+  }, [isAuthenticated, slug, locked, open]);
 
   if (!lesson) return null;
   const { place, exercises, me } = lesson;
@@ -69,7 +71,27 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
       </header>
 
       <div className="mt-8">
-        <LessonText>{lesson.body}</LessonText>
+        {lesson.body === null ? (
+          <section className="rounded-md border p-6" aria-labelledby="pro-lesson">
+            <p className={cn(eyebrow, "flex items-center gap-2")}>
+              <Lock className="size-3.5" aria-hidden />
+              Pro
+            </p>
+            <h2 id="pro-lesson" className="mt-3 text-xl">
+              This lesson is part of Pro
+            </h2>
+            <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+              The first module of every roadmap and all the tutorials are free. With Pro you get every lesson, and
+              finishing them counts toward your modules and roadmap badge. The exercises below stay free to solve
+              in the library.
+            </p>
+            <Button className="mt-4" size="sm" asChild>
+              <Link href="/pro">See Pro</Link>
+            </Button>
+          </section>
+        ) : (
+          <LessonText>{lesson.body}</LessonText>
+        )}
       </div>
 
       <section
@@ -111,6 +133,8 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
               </Link>{" "}
               to solve these and keep your progress. Finishing a lesson gives {lesson.xp} XP.
             </>
+          ) : locked ? (
+            "Solving these counts toward the lesson once you're on Pro."
           ) : finished ? (
             <>
               <span className="font-medium text-foreground">Lesson finished.</span>

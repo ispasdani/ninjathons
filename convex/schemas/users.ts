@@ -33,12 +33,17 @@ export const users = defineTable({
   .index("by_xp", ["xp", "xpTieBreak"]);
 
 // One row per user (organizations come in V2). Written only by the payment
-// webhook; read by the pro* wrappers in lib/functions.ts. No row means the
-// free plan.
+// webhook, through lib/billing.ts; read by the pro* wrappers in
+// lib/functions.ts. No row means the free plan.
 export const entitlements = defineTable({
   userId: v.id("users"),
   tier: v.union(v.literal("free"), v.literal("pro"), v.literal("organization")),
   expiresAt: v.number(),
+  // The Stripe subscription behind it, as last read from Stripe.
+  subscriptionId: v.optional(v.string()),
+  status: v.optional(v.string()),
+  interval: v.optional(v.union(v.literal("month"), v.literal("year"))),
+  cancelAtPeriodEnd: v.optional(v.boolean()),
 }).index("by_user", ["userId"]);
 
 // Usernames given up by a change or a deleted account, held for 90 days so

@@ -1,7 +1,9 @@
 import { ConvexError, v } from "convex/values";
 
+import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
-import { internalMutation, type QueryCtx } from "./_generated/server";
+import { internalMutation, internalQuery, type QueryCtx } from "./_generated/server";
+import { removeBilling } from "./lib/billing";
 import {
   getCurrentUserOrNull,
   getPlan,
@@ -200,11 +202,11 @@ export const deleteFromClerk = internalMutation({
       .unique();
     if (!user) return;
 
-    const plans = await ctx.db
-      .query("entitlements")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .collect();
-    for (const plan of plans) await ctx.db.delete(plan._id);
+    // Deleting the Stripe customer cancels its subscription at once; Stripe
+    // keeps the invoices (decisions §18).
+    for (const customerId of await removeBilling(ctx, user._id)) {
+      await ctx.scheduler.runAfter(0, internal.billing.deleteCustomer, { customerId });
+    }
 
     const xp = await ctx.db
       .query("xpLedger")
@@ -338,4 +340,15 @@ export const deleteFromClerk = internalMutation({
 
     await ctx.db.delete(user._id);
   },
+});
+
+// For userAction in lib/functions.ts: actions can't read the database, so the
+// wrapper looks the signed-in user up through this.
+export const byClerkId = internalQuery({
+  args: { clerkId: v.string() },
+  handler: async (ctx, { clerkId }) =>
+    await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+      .unique(),
 });

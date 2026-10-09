@@ -658,3 +658,12 @@ Agreed 8 Oct 2026, at the start of phase 8. Adds to the roadmap's rules (Profile
 - **The denial tests:** one test file calls every Pro function as a signed-out user and as a free user and expects refusal, and a second test lists every function built from `proQuery` or `proMutation`, or calling `requirePro`, and fails if one is missing from the first. A new Pro function without a denial test fails CI.
 
 - **Order of work:** the Stripe webhook, entitlements and the Pro lock with its tests first (the phase check); then profile pages and redirects; then themes and the editor; then Checkout and the billing portal in the app.
+
+### Payments and the Pro lock as built (9 Oct 2026)
+
+- **Stripe test account** (sandbox "EcoTech Core sandbox"): the Pro product with €8 monthly and €69 yearly prices, the customer portal (cancel at period end, switch between the two prices, cards, invoices), and the webhook destination `ninjathons-convex-dev` (snapshot payloads, the 4 events below) at `https://<deployment>.convex.site/stripe`. Convex dev has `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and `STRIPE_PRO_PRODUCT`; `SITE_URL` (for Checkout's return pages) defaults to `http://localhost:3000`.
+- **No Stripe SDK:** `convex/lib/stripe.ts` checks the signature with Web Crypto (5-minute tolerance, any `v1` may match while a secret is rolled) and calls the REST API with `fetch`.
+- **The webhook** handles `checkout.session.completed` (subscription mode) and `customer.subscription.created`, `.updated` and `.deleted`, reads the subscription back (the event's own copy only when Stripe answers 404) and finds the player by the subscription's `metadata.userId`, else by `stripeCustomers`. Any other answer than 2xx makes Stripe retry.
+- **`lib/billing.ts` is the only writer of `entitlements`;** a test fails if any other file names the table, or if `lib/functions.ts` writes.
+- **`userAction`** in `lib/functions.ts`: signed in, for actions that call Stripe (`billing.checkout`, `billing.portal`). `billing.checkout` refuses a player who is already Pro (`ALREADY_PRO`); `billing.plan` gives the caller's tier, interval, renewal and whether the portal has anything to show.
+- **`hasPro`** in `lib/functions.ts` for public functions that send Pro players more, like `learn.lesson`. `convex/pro.test.ts` calls each Pro function signed out, free, lapsed and Pro, and finds every exported function that uses `proQuery`, `proMutation`, `hasPro`, `requirePro` or a helper calling one; a function found with no denial test fails.

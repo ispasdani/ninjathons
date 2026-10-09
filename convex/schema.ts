@@ -27,6 +27,7 @@ import {
   territoryQueue,
   territoryRegions,
 } from "./schemas/territory";
+import { stripeCustomers, stripeEvents } from "./schemas/billing";
 import { entitlements, usernameReservations, users } from "./schemas/users";
 
 // Table definitions live in convex/schemas, grouped by area.
@@ -34,6 +35,8 @@ export default defineSchema({
   users,
   usernameReservations,
   entitlements,
+  stripeCustomers,
+  stripeEvents,
   problems,
   problemTests,
   testDrives,

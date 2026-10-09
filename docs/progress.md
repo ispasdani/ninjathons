@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 8, Profiles and Pro, has started: its rules are agreed ([decisions §18](notes/decisions.md#18-profiles-and-pro)). Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the Stripe webhook, entitlements and the Pro lock with its denial tests, once the Stripe test keys are in the Convex dev environment.
+**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements and the Pro lock on roadmap lessons are built, with the denial tests. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** profile pages at `/u/<username>` and redirects from old usernames.
 
 ## Phases
 
@@ -25,6 +25,15 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 9 Oct 2026 · Phase 8: Stripe, entitlements and the Pro lock
+- Stripe set up in test mode ([decisions §18](notes/decisions.md#payments-and-the-pro-lock-as-built-9-oct-2026)): the Pro product with €8 monthly and €69 yearly prices, the customer portal, and a webhook destination pointing at Convex dev. The keys are in the Convex dev environment.
+- `POST /stripe` checks the signature (`convex/lib/stripe.ts`, no SDK), records each event once (`stripeEvents`), reads the subscription back from Stripe and writes `entitlements` through `lib/billing.ts`, the only writer: Pro to the period end plus 2 days while active, trialing or past due; ended at once when cancelled or unpaid; an ended subscription can't take Pro from one still running. `stripeCustomers` links players to customers.
+- `billing.checkout` (monthly or yearly, the product's newest active price) and `billing.portal` through a new `userAction` wrapper; `billing.plan` for the app. No Pro page yet: Checkout returns to `/pro`, which comes with the app screens.
+- The Pro lock: `learn.lesson` sends roadmap lesson text outside the free module only to Pro players (`locked: true` otherwise, outline and exercises kept), and `learn.open` refuses them, so the lesson can't finish. Tutorials stay free inside Pro modules. The lesson page shows a Pro panel instead of the text; checked signed out in the browser (`/learn/pb-loops`), with the text absent from the served HTML and a free-module lesson unchanged.
+- Account deletion removes the plan and the customer link and deletes the Stripe customer, which cancels the subscription.
+- The phase check's tests: `convex/pro.test.ts` calls every Pro function signed out, free, lapsed and Pro, and fails when a function that checks Pro has no denial test (checked by adding one without a test). 29 new tests (480 in all); the two that judge real Python timed out in the full run and pass alone, as before. Deployed to Convex dev; an unsigned POST to `/stripe` gets 400.
+- Open: no real Stripe delivery has reached the webhook yet (a test Checkout will do it once the Pro page exists); Convex warns the account is over the Free plan limits.
 
 ### 8 Oct 2026 · Phase 8: Profiles and Pro rules
 - Agreed and written up in [decisions §18](notes/decisions.md#18-profiles-and-pro): free profiles at `/u/<username>` with a fixed stats block, pinned solutions (never from a running daily or weekly) and redirects from old usernames; 10 themes (3 free, 4 earned by level and 1v1 tier, 3 Pro); Pro customisation (accent with a contrast check, pattern banners, no uploads in V1, heading font, section order, a short `/<username>` URL), previewable by everyone but saved only by Pro.
