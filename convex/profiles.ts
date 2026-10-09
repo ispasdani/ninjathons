@@ -1,0 +1,488 @@
+/**
+ * Public profiles (decisions §18): everything here is public by design, so
+ * only what the profile shows leaves the server. Never email, code, groups,
+ * doc views or unfinished games.
+ */
+import { ConvexError, v } from "convex/values";
+
+import type { Doc, Id } from "./_generated/dataModel";
+import { internalMutation, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { BADGES } from "./lib/badges";
+import { addDays, dayKey, isoWeekday } from "./lib/days";
+import { getPlan, hasPro, proMutation, publicQuery, userMutation, userQuery } from "./lib/functions";
+import { levelProgress } from "./lib/levels";
+import { isListed } from "./lib/problems";
+import {
+  cleanBio,
+  cleanLink,
+  heldProblems,
+  LANGUAGES_MAX,
+  LINKS_MAX,
+  lookFor,
+  normalizeSections,
+  PINS_MAX,
+  profileRow,
+  unlockedThemes,
+} from "./lib/profiles";
+import { accentFits, BANNERS, FONTS, SECTIONS, THEMES, themeById } from "./lib/themes";
+import { language } from "./schemas/problems";
+import { PROVISIONAL_GAMES, tierFor, type RatingArea } from "./lib/ratings";
+import { usernameKey } from "./lib/usernames";
+
+// The activity grid: 26 weeks, Monday to Sunday (decisions §18).
+export const ACTIVITY_WEEKS = 26;
+const RECENT_GAMES = 10;
+const HISTORY_POINTS = 60;
+
+/** The user behind a username, or the new username when it's an old one still held for its owner. */
+async function findUser(ctx: QueryCtx, username: string) {
+  const key = usernameKey(username);
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_usernameKey", (q) => q.eq("usernameKey", key))
+    .unique();
+  if (user) return { user };
+  // An old username redirects for its 90 days (§1); a deleted account's has no owner.
+  const reservations = await ctx.db
+    .query("usernameReservations")
+    .withIndex("by_usernameKey", (q) => q.eq("usernameKey", key))
+    .collect();
+  const now = Date.now();
+  for (const held of reservations) {
+    if (held.expiresAt <= now || !held.userId) continue;
+    const owner = await ctx.db.get(held.userId);
+    if (owner?.username) return { redirect: owner.username };
+  }
+  return null;
+}
+
+async function rating(ctx: QueryCtx, userId: Id<"users">, area: RatingArea) {
+  const row = await ctx.db
+    .query("ratings")
+    .withIndex("by_user_area", (q) => q.eq("userId", userId).eq("area", area))
+    .unique();
+  if (!row) return null;
+  // Hidden while provisional (plan, trust rules); the games left are shown instead.
+  const trusted = row.games >= PROVISIONAL_GAMES;
+  const value = Math.round(row.rating);
+  return {
+    rating: trusted ? value : null,
+    tier: trusted ? tierFor(value) : null,
+    games: row.games,
+    placementLeft: trusted ? 0 : PROVISIONAL_GAMES - row.games,
+    record: { wins: row.wins, losses: row.losses, draws: row.draws },
+  };
+}
+
+async function levelRank(ctx: QueryCtx, userId: Id<"users">) {
+  const versions = await ctx.db
+    .query("leaderboardVersions")
+    .withIndex("by_board", (q) => q.eq("board", "level"))
+    .unique();
+  if (versions?.live === undefined) return null;
+  const row = await ctx.db
+    .query("leaderboardSnapshots")
+    .withIndex("by_board_user", (q) => q.eq("board", "level").eq("version", versions.live!).eq("userId", userId))
+    .unique();
+  return row?.rank ?? null;
+}
+
+/** Problems solved, in any language: the distinct slugs of the solve entries in the ledger. */
+async function solvedCount(ctx: QueryCtx, userId: Id<"users">) {
+  const entries = await ctx.db
+    .query("xpLedger")
+    .withIndex("by_user_key", (q) => q.eq("userId", userId).gte("key", "solve:").lt("key", "solve;"))
+    .collect();
+  return new Set(entries.map((e) => e.key.split(":")[1])).size;
+}
+
+async function badges(ctx: QueryCtx, userId: Id<"users">) {
+  const earned = new Map(
+    (
+      await ctx.db
+        .query("userBadges")
+        .withIndex("by_user_badge", (q) => q.eq("userId", userId))
+        .collect()
+    ).map((b) => [b.badgeId, b._creationTime]),
+  );
+  const all = BADGES.map((b) => ({ id: b.id, group: b.group, name: b.name, description: b.description, earnedAt: earned.get(b.id) ?? null }));
+  // Earned first, newest first; then locked, in the list's order.
+  return [
+    ...all.filter((b) => b.earnedAt !== null).sort((a, b) => b.earnedAt! - a.earnedAt!),
+    ...all.filter((b) => b.earnedAt === null),
+  ];
+}
+
+/** The first day of the grid: the Monday ACTIVITY_WEEKS - 1 weeks before this week's. */
+export function activityStart(now: number) {
+  const today = dayKey(now);
+  return addDays(today, -(isoWeekday(today) - 1) - 7 * (ACTIVITY_WEEKS - 1));
+}
+
+async function activity(ctx: QueryCtx, userId: Id<"users">, now: number) {
+  const from = activityStart(now);
+  const rows = await ctx.db
+    .query("activityDays")
+    .withIndex("by_user_day", (q) => q.eq("userId", userId).gte("day", from))
+    .collect();
+  return { from, today: dayKey(now), days: Object.fromEntries(rows.map((r) => [r.day, r.count])) };
+}
+
+async function ratingHistory(ctx: QueryCtx, userId: Id<"users">, trusted: boolean) {
+  if (!trusted) return [];
+  const rows = await ctx.db
+    .query("ratingHistory")
+    .withIndex("by_user_area", (q) => q.eq("userId", userId).eq("area", "1v1"))
+    .order("desc")
+    .take(HISTORY_POINTS);
+  return rows.reverse().map((r) => ({ at: r._creationTime, rating: Math.round(r.rating) }));
+}
+
+type Recent =
+  | {
+      kind: "1v1";
+      id: Id<"matches">;
+      finishedAt: number;
+      ranked: boolean;
+      result: "win" | "loss" | "draw";
+      opponent: string | null;
+      ghost: boolean;
+      problem: string | null;
+      ratingChange: number | null;
+    }
+  | {
+      kind: "territory";
+      id: Id<"territoryGames">;
+      finishedAt: number;
+      ranked: boolean;
+      place: number;
+      players: number;
+      ratingChange: number | null;
+    };
+
+/** The last finished 1v1 and Territory games, newest first. Ghost runs of this player in others' matches don't count. */
+async function recentGames(ctx: QueryCtx, user: Doc<"users">, trusted: { duel: boolean; territory: boolean }) {
+  const games: Recent[] = [];
+  const duels = await ctx.db
+    .query("matchPlayers")
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
+    .order("desc")
+    .take(RECENT_GAMES * 2);
+  for (const row of duels) {
+    if (row.ghost || !row.result) continue;
+    const match = await ctx.db.get(row.matchId);
+    if (!match || match.status !== "finished" || match.finishedAt === undefined) continue;
+    const other = (
+      await ctx.db
+        .query("matchPlayers")
+        .withIndex("by_match", (q) => q.eq("matchId", match._id))
+        .collect()
+    ).find((p) => p._id !== row._id);
+    const opponent = other ? await ctx.db.get(other.userId) : null;
+    const problem = await ctx.db.get(match.problemId);
+    games.push({
+      kind: "1v1",
+      id: match._id,
+      finishedAt: match.finishedAt,
+      ranked: match.ranked,
+      result: row.result,
+      opponent: opponent?.username ?? null,
+      ghost: other?.ghost ?? false,
+      problem: problem?.title ?? null,
+      ratingChange: trusted.duel && row.counted && row.ratingChange !== undefined ? Math.round(row.ratingChange) : null,
+    });
+  }
+  const territory = await ctx.db
+    .query("territoryPlayers")
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
+    .order("desc")
+    .take(RECENT_GAMES * 2);
+  for (const row of territory) {
+    if (row.place === undefined) continue;
+    const game = await ctx.db.get(row.gameId);
+    if (!game || game.status !== "finished" || game.finishedAt === undefined) continue;
+    games.push({
+      kind: "territory",
+      id: game._id,
+      finishedAt: game.finishedAt,
+      ranked: game.ranked,
+      place: row.place,
+      players: game.players,
+      ratingChange: trusted.territory && row.counted && row.ratingChange !== undefined ? Math.round(row.ratingChange) : null,
+    });
+  }
+  return games.sort((a, b) => b.finishedAt - a.finishedAt).slice(0, RECENT_GAMES);
+}
+
+/** Pinned solutions, leaving out any whose problem is today's daily or in a weekly set not over yet. */
+async function pinnedSolutions(ctx: QueryCtx, row: Doc<"profiles"> | null, now: number) {
+  if (!row?.pins?.length) return [];
+  const held = await heldProblems(ctx, now);
+  const pins = [];
+  for (const pin of row.pins) {
+    if (held.has(pin.problemId)) continue;
+    const [submission, problem] = await Promise.all([ctx.db.get(pin.submissionId), ctx.db.get(pin.problemId)]);
+    if (!submission || !problem || !isListed(problem)) continue;
+    pins.push({
+      slug: problem.slug,
+      title: problem.title,
+      difficulty: problem.difficulty,
+      language: submission.language,
+      source: submission.source,
+    });
+  }
+  return pins;
+}
+
+/**
+ * A profile by username. `redirect` when it's an old username still held for
+ * its owner; null when nobody has it.
+ */
+export const get = publicQuery({
+  args: { username: v.string() },
+  handler: async (ctx, { username }) => {
+    const found = await findUser(ctx, username);
+    if (!found) return null;
+    if ("redirect" in found) return { redirect: found.redirect } as const;
+    const { user } = found;
+    if (!user.username) return null;
+
+    const now = Date.now();
+    const [duel, territory, streak] = await Promise.all([
+      rating(ctx, user._id, "1v1"),
+      rating(ctx, user._id, "territory"),
+      ctx.db
+        .query("streaks")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .unique(),
+    ]);
+    const { tier } = await getPlan(ctx, user);
+    const row = await profileRow(ctx, user._id);
+
+    return {
+      redirect: null,
+      username: user.username,
+      name: user.name,
+      imageUrl: user.imageUrl,
+      country: user.country ?? null,
+      joinedAt: user._creationTime,
+      pro: tier !== "free",
+      level: levelProgress(user.xp ?? 0),
+      about: { bio: row?.bio ?? "", links: row?.links ?? [], languages: row?.languages ?? [] },
+      // Pro themes and options only while Pro (lib/profiles.ts lookFor).
+      look: await lookFor(ctx, user, row),
+      pins: await pinnedSolutions(ctx, row, now),
+      stats: {
+        duel,
+        territory,
+        levelRank: await levelRank(ctx, user._id),
+        solved: await solvedCount(ctx, user._id),
+        streak: { current: streak?.current ?? 0, best: streak?.best ?? 0 },
+      },
+      badges: await badges(ctx, user._id),
+      activity: await activity(ctx, user._id, now),
+      ratingHistory: await ratingHistory(ctx, user._id, duel?.rating != null),
+      recent: await recentGames(ctx, user, { duel: duel?.rating != null, territory: territory?.rating != null }),
+    };
+  },
+});
+
+/**
+ * Rebuilds one player's activity days from their accepted Submits and
+ * finished lessons, for activity from before the counter existed (9 Oct
+ * 2026). Run by hand: `npx convex run profiles:backfillActivity '{"username":"…"}'`.
+ */
+export const backfillActivity = internalMutation({
+  args: { username: v.string() },
+  handler: async (ctx, { username }) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_usernameKey", (q) => q.eq("usernameKey", usernameKey(username)))
+      .unique();
+    if (!user) throw new Error(`no user ${username}`);
+    const counts = new Map<string, number>();
+    const add = (time: number) => counts.set(dayKey(time), (counts.get(dayKey(time)) ?? 0) + 1);
+
+    const submissions = await ctx.db
+      .query("submissions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const s of submissions) {
+      if (s.kind === "submit" && s.verdict?.status === "accepted") add(s.finishedAt ?? s._creationTime);
+    }
+    const web = await ctx.db
+      .query("webSubmissions")
+      .withIndex("by_user_problem", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const s of web) if (s.accepted) add(s._creationTime);
+    const lessons = await ctx.db
+      .query("lessonProgress")
+      .withIndex("by_user_lesson", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const l of lessons) if (l.finishedAt !== undefined) add(l.finishedAt);
+
+    const old = await ctx.db
+      .query("activityDays")
+      .withIndex("by_user_day", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of old) await ctx.db.delete(row._id);
+    for (const [day, count] of counts) await ctx.db.insert("activityDays", { userId: user._id, day, count });
+    return { days: counts.size, total: [...counts.values()].reduce((a, b) => a + b, 0) };
+  },
+});
+
+// --- The editor (decisions §18) ---
+
+async function saveFields(ctx: MutationCtx, userId: Id<"users">, fields: Partial<Doc<"profiles">>) {
+  const row = await profileRow(ctx, userId);
+  if (row) await ctx.db.patch(row._id, fields);
+  else await ctx.db.insert("profiles", { userId, ...fields });
+}
+
+/** Bio, links and favourite languages: free for everyone. */
+export const saveAbout = userMutation({
+  args: { bio: v.string(), links: v.array(v.string()), languages: v.array(language) },
+  handler: async (ctx, { bio, links, languages }) => {
+    const cleanLinks = links.map((l) => l.trim()).filter(Boolean);
+    if (cleanLinks.length > LINKS_MAX) throw new ConvexError("TOO_MANY_LINKS");
+    const langs = [...new Set(languages)];
+    if (langs.length > LANGUAGES_MAX) throw new ConvexError("TOO_MANY_LANGUAGES");
+    await saveFields(ctx, ctx.user._id, {
+      bio: cleanBio(bio),
+      links: [...new Set(cleanLinks.map(cleanLink))],
+      languages: langs,
+    });
+  },
+});
+
+/**
+ * Picks a theme. Free themes for everyone, earned ones once their badge is
+ * held, Pro themes only with Pro. A free or earned theme is also kept as the
+ * one to fall back to when Pro ends.
+ */
+export const saveTheme = userMutation({
+  args: { theme: v.string() },
+  handler: async (ctx, { theme }) => {
+    const chosen = THEMES.find((t) => t.id === theme);
+    if (!chosen) throw new ConvexError("THEME_NOT_FOUND");
+    const pro = await hasPro(ctx, ctx.user);
+    if (chosen.kind === "pro" && !pro) throw new ConvexError("PRO_REQUIRED");
+    if (!(await unlockedThemes(ctx, ctx.user._id, pro)).includes(theme)) throw new ConvexError("THEME_LOCKED");
+    await saveFields(ctx, ctx.user._id, chosen.kind === "pro" ? { theme } : { theme, freeTheme: theme });
+  },
+});
+
+/** The Pro options: accent, banner pattern, heading font, section order and visibility. */
+export const saveCustom = proMutation({
+  args: {
+    accent: v.union(v.string(), v.null()),
+    banner: v.string(),
+    headingFont: v.string(),
+    sections: v.object({ order: v.array(v.string()), hidden: v.array(v.string()) }),
+  },
+  handler: async (ctx, { accent, banner, headingFont, sections }) => {
+    const row = await profileRow(ctx, ctx.user._id);
+    if (accent !== null && !accentFits(themeById(row?.theme), accent)) throw new ConvexError("ACCENT_CONTRAST");
+    if (!(BANNERS as readonly string[]).includes(banner)) throw new ConvexError("BAD_BANNER");
+    if (!FONTS.some((f) => f.id === headingFont)) throw new ConvexError("BAD_FONT");
+    const known = new Set<string>(SECTIONS);
+    if ([...sections.order, ...sections.hidden].some((s) => !known.has(s))) throw new ConvexError("BAD_SECTION");
+    await saveFields(ctx, ctx.user._id, {
+      accent: accent ?? undefined,
+      banner,
+      headingFont,
+      sections: normalizeSections(sections),
+    });
+  },
+});
+
+/** Pins one of your accepted Submits, replacing an earlier pin of the same problem. Makes its code public. */
+export const pin = userMutation({
+  args: { submissionId: v.id("submissions") },
+  handler: async (ctx, { submissionId }) => {
+    const submission = await ctx.db.get(submissionId);
+    if (
+      !submission ||
+      submission.userId !== ctx.user._id ||
+      submission.kind !== "submit" ||
+      submission.verdict?.status !== "accepted"
+    ) {
+      throw new ConvexError("NOT_PINNABLE");
+    }
+    const problem = await ctx.db.get(submission.problemId);
+    if (!problem || !isListed(problem)) throw new ConvexError("NOT_PINNABLE");
+    if ((await heldProblems(ctx, Date.now())).has(problem._id)) throw new ConvexError("PIN_HELD");
+
+    const pins = (await profileRow(ctx, ctx.user._id))?.pins ?? [];
+    const pinned = { problemId: problem._id, submissionId };
+    // A newer solve of a pinned problem takes its place.
+    if (pins.some((p) => p.problemId === problem._id)) {
+      await saveFields(ctx, ctx.user._id, { pins: pins.map((p) => (p.problemId === problem._id ? pinned : p)) });
+      return;
+    }
+    if (pins.length >= PINS_MAX) throw new ConvexError("PINS_FULL");
+    await saveFields(ctx, ctx.user._id, { pins: [...pins, pinned] });
+  },
+});
+
+export const unpin = userMutation({
+  args: { problemId: v.id("problems") },
+  handler: async (ctx, { problemId }) => {
+    const row = await profileRow(ctx, ctx.user._id);
+    if (!row?.pins) return;
+    await ctx.db.patch(row._id, { pins: row.pins.filter((p) => p.problemId !== problemId) });
+  },
+});
+
+// Accepted Submits read for the pin list, newest first.
+const CANDIDATE_SCAN = 300;
+
+/** Everything the editor needs: your saved values, the themes you can use, and what you could pin. */
+export const editor = userQuery({
+  args: {},
+  handler: async (ctx) => {
+    const user = ctx.user;
+    const row = await profileRow(ctx, user._id);
+    const { tier } = await getPlan(ctx, user);
+    const pro = tier !== "free";
+    const held = await heldProblems(ctx, Date.now());
+
+    const done = await ctx.db
+      .query("submissions")
+      .withIndex("by_user_status", (q) => q.eq("userId", user._id).eq("status", "done"))
+      .order("desc")
+      .take(CANDIDATE_SCAN);
+    const seen = new Set<Id<"problems">>();
+    const candidates = [];
+    for (const s of done) {
+      if (s.kind !== "submit" || s.verdict?.status !== "accepted" || seen.has(s.problemId)) continue;
+      seen.add(s.problemId);
+      const problem = await ctx.db.get(s.problemId);
+      if (!problem || !isListed(problem)) continue;
+      candidates.push({
+        submissionId: s._id,
+        problemId: problem._id,
+        title: problem.title,
+        language: s.language,
+        at: s.finishedAt ?? s._creationTime,
+        held: held.has(problem._id),
+      });
+    }
+
+    return {
+      username: user.username ?? null,
+      pro,
+      unlocked: await unlockedThemes(ctx, user._id, pro),
+      about: { bio: row?.bio ?? "", links: row?.links ?? [], languages: row?.languages ?? [] },
+      theme: row?.theme ?? "default",
+      custom: {
+        accent: row?.accent ?? null,
+        banner: row?.banner ?? "none",
+        headingFont: row?.headingFont ?? "geist",
+        sections: normalizeSections(row?.sections),
+      },
+      pins: (row?.pins ?? []).map((p) => ({ problemId: p.problemId, submissionId: p.submissionId })),
+      candidates,
+    };
+  },
+});

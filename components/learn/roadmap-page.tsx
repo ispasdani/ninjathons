@@ -1,7 +1,7 @@
 "use client";
 
 import { type Preloaded, useConvexAuth, usePreloadedQuery } from "convex/react";
-import { Check } from "lucide-react";
+import { Check, Lock } from "lucide-react";
 import Link from "next/link";
 
 import { LessonState } from "@/components/learn/lesson-state";
@@ -89,14 +89,27 @@ export function RoadmapPage({ preloaded }: { preloaded: Preloaded<typeof api.lea
               <section className="min-w-0 flex-1 rounded-md border p-5">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <h2 className="text-xl">{module.title}</h2>
-                  {module.free && (
+                  {module.free ? (
                     <span className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
                       Free preview
+                    </span>
+                  ) : (
+                    <span className="rounded-xs border border-pro-border bg-pro px-1.5 font-mono text-[10px] font-medium tracking-[0.08em] text-pro-foreground uppercase">
+                      Pro
                     </span>
                   )}
                   <span className="ml-auto font-mono text-xs text-muted-foreground">+{roadmap.xp.module} XP</span>
                 </div>
                 <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{module.summary}</p>
+                {module.lessons.some((l) => l.locked) && (
+                  <p className="mt-2 text-[13px] text-muted-foreground">
+                    Its lessons are part of{" "}
+                    <Link href="/pro" className="text-brand-text hover:underline">
+                      Pro
+                    </Link>
+                    ; tutorials and every exercise stay free.
+                  </p>
+                )}
                 <ul className="mt-4 divide-y border-t">
                   {module.lessons.map((lesson) => (
                     <li key={lesson.slug}>
@@ -104,7 +117,11 @@ export function RoadmapPage({ preloaded }: { preloaded: Preloaded<typeof api.lea
                         href={`/learn/${lesson.slug}?roadmap=${roadmap.slug}`}
                         className="group flex items-center gap-3 py-3 text-[13px] transition-colors hover:text-foreground"
                       >
-                        <LessonState state={lesson.state} />
+                        {lesson.locked ? (
+                          <Lock className="size-4 shrink-0 text-muted-foreground" aria-label="Pro lesson" />
+                        ) : (
+                          <LessonState state={lesson.state} />
+                        )}
                         <span className="min-w-0 flex-1">
                           <span className="font-medium">{lesson.title}</span>
                           {lesson.tutorial && <span className="ml-2 text-xs text-muted-foreground">Tutorial</span>}

@@ -7,6 +7,7 @@ import { problemLanguages } from "./judge/languages";
 import { userMutation, userQuery } from "./lib/functions";
 import { checkSolveBadges } from "./lib/badges";
 import { openDaily, recordDailySolve } from "./lib/daily";
+import { noteActivity } from "./lib/activity";
 import { recordLessonSolve } from "./lib/learn";
 import { isListed } from "./lib/problems";
 import { openWeekly, recordWeeklySolve } from "./lib/weekly";
@@ -208,6 +209,7 @@ export const finish = internalMutation({
     if (submission.matchId) await recordJudgedSubmit(ctx, submission);
     if (submission.territoryGameId) await recordTerritorySubmit(ctx, submission);
     if (verdict?.status !== "accepted") return;
+    await noteActivity(ctx, submission.userId, Date.now());
     const problem = await ctx.db.get(submission.problemId);
     if (!problem) return;
     const amount = SOLVE_XP[problem.difficulty];

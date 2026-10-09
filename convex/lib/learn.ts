@@ -7,6 +7,7 @@
  */
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
+import { noteActivity } from "./activity";
 import { grantBadge } from "./badges";
 import { isListed } from "./problems";
 import { awardXp, monthKey } from "./xp";
@@ -115,6 +116,7 @@ async function tryFinish(
   if (exercises.length === 0 || exercises.some((e) => !e.solved)) return;
 
   await ctx.db.patch(progress._id, { finishedAt: now });
+  await noteActivity(ctx, userId, now);
   outcome.lessons.push({ slug: lesson.slug, title: lesson.title });
   const xp = await awardLearning(ctx, userId, { key: lessonKey(lesson.slug), source: "lesson", amount: LESSON_XP }, now);
   if (xp.awarded) {

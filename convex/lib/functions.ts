@@ -7,8 +7,10 @@
  * Internal functions (internalQuery, internalMutation, internalAction) and
  * httpAction are not callable from the browser and stay allowed everywhere.
  */
+import { makeFunctionReference } from "convex/server";
 import { ConvexError } from "convex/values";
 import {
+  customAction,
   customCtx,
   customMutation,
   customQuery,
@@ -16,6 +18,7 @@ import {
 
 import type { Doc } from "../_generated/dataModel";
 import {
+  action,
   mutation,
   query,
   type MutationCtx,
@@ -47,6 +50,17 @@ export async function getPlan(ctx: Ctx, user: Doc<"users">) {
     .unique();
   const active = plan !== null && plan.tier !== "free" && plan.expiresAt > Date.now();
   return { tier: active ? plan.tier : "free", plan };
+}
+
+/**
+ * Whether the user has an active Pro or Organization plan. For public
+ * functions that send more to Pro players; a function that is Pro-only uses
+ * proQuery or proMutation. Every function calling this needs a denial test
+ * (convex/pro.test.ts).
+ */
+export async function hasPro(ctx: Ctx, user: Doc<"users"> | null) {
+  if (!user) return false;
+  return (await getPlan(ctx, user)).tier !== "free";
 }
 
 async function requirePro(ctx: Ctx) {
@@ -89,3 +103,24 @@ export const userMutation = customMutation(
 /** Active Pro or Organization plan only. Adds `ctx.user` and `ctx.plan`. */
 export const proQuery = customQuery(query, customCtx(requirePro));
 export const proMutation = customMutation(mutation, customCtx(requirePro));
+
+// By name rather than through _generated/api, which imports this file.
+const userByClerkId = makeFunctionReference<"query", { clerkId: string }, Doc<"users"> | null>(
+  "user:byClerkId",
+);
+
+/**
+ * Signed-in users only, for actions that call outside services (Stripe).
+ * Adds `ctx.user`, read through an internal query since actions have no
+ * database access.
+ */
+export const userAction = customAction(
+  action,
+  customCtx(async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError("UNAUTHENTICATED");
+    const user = await ctx.runQuery(userByClerkId, { clerkId: identity.subject });
+    if (!user) throw new ConvexError("UNAUTHENTICATED");
+    return { user };
+  }),
+);

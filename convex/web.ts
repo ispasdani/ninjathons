@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { checkSolveBadges } from "./lib/badges";
 import { userMutation } from "./lib/functions";
+import { noteActivity } from "./lib/activity";
 import { recordLessonSolve } from "./lib/learn";
 import { isListed } from "./lib/problems";
 import { awardXp, SOLVE_XP, solveKey } from "./lib/xp";
@@ -53,6 +54,7 @@ export const submit = userMutation({
       accepted,
     });
     if (!accepted) return { accepted, xp: null, badges: [], levelReached: null, learn: null };
+    await noteActivity(ctx, ctx.user._id, Date.now());
 
     const amount = SOLVE_XP[problem.difficulty];
     const xp = await awardXp(ctx, { userId: ctx.user._id, key: solveKey(slug, "web"), source: "solve", amount });

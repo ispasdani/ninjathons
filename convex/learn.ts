@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, type QueryCtx } from "./_generated/server";
-import { getCurrentUserOrNull, publicQuery, userMutation } from "./lib/functions";
+import { getCurrentUserOrNull, hasPro, publicQuery, userMutation } from "./lib/functions";
 import { exercisesOf, LESSON_XP, MODULE_XP, openLesson, progressOf } from "./lib/learn";
 
 // --- Seeding (npm run problems:seed, through `npx convex run`) ---
@@ -104,6 +104,19 @@ async function moduleLessons(ctx: QueryCtx, mod: Doc<"roadmaps">["modules"][numb
 }
 
 /**
+ * A roadmap lesson outside its roadmap's free module is Pro (decisions §17,
+ * §18): its text goes only to Pro players, and nobody else can open it.
+ * Tutorials are free wherever they appear; a lesson in no roadmap is free.
+ */
+async function lessonLocked(ctx: QueryCtx, user: Doc<"users"> | null, lesson: Doc<"lessons">) {
+  if (lesson.tutorial) return false;
+  const inPaidModule = (await publishedRoadmaps(ctx)).some((roadmap) =>
+    roadmap.modules.some((mod) => !mod.free && mod.lessonIds.includes(lesson._id)),
+  );
+  return inPaidModule && !(await hasPro(ctx, user));
+}
+
+/**
  * The Learn page: the roadmaps with how far you've got, and every tutorial.
  * Public; signed in, the progress is yours.
  */
@@ -152,7 +165,8 @@ export const overview = publicQuery({
 
 /**
  * One roadmap as a path: its modules in order, each with its lessons and,
- * signed in, how far you've got. The outline is public (decisions §17).
+ * signed in, how far you've got. The outline is public (decisions §17);
+ * `locked` marks the lessons whose text only Pro players get (§18).
  */
 export const roadmap = publicQuery({
   args: { slug: v.string() },
@@ -164,6 +178,7 @@ export const roadmap = publicQuery({
     if (!roadmap || roadmap.status !== "published") return null;
     const user = await getCurrentUserOrNull(ctx);
     const userId = user?._id ?? null;
+    const pro = await hasPro(ctx, user);
 
     const modules = [];
     for (const mod of roadmap.modules) {
@@ -176,6 +191,8 @@ export const roadmap = publicQuery({
           tutorial: lesson.tutorial,
           exercises: lesson.exerciseIds.length,
           state: await lessonState(ctx, userId, lesson._id),
+          // As lessonLocked: tutorials and the free module are open to everyone.
+          locked: !lesson.tutorial && !mod.free && !pro,
         });
       }
       modules.push({
@@ -200,8 +217,8 @@ export const roadmap = publicQuery({
 
 /**
  * A lesson or tutorial: its text, exercises (solved or not, signed in), your
- * progress, and where it sits in a roadmap. Every lesson is open in phase 7;
- * phase 8 locks the text of roadmap lessons outside the free module.
+ * progress, and where it sits in a roadmap. A locked lesson (lessonLocked)
+ * comes without its text and with `locked: true`.
  */
 export const lesson = publicQuery({
   // The roadmap it was opened from, when it's a tutorial in several.
@@ -241,11 +258,13 @@ export const lesson = publicQuery({
 
     const exercises = await exercisesOf(ctx, lesson, userId);
     const progress = userId ? await progressOf(ctx, userId, lesson._id) : null;
+    const locked = await lessonLocked(ctx, user, lesson);
     return {
       slug: lesson.slug,
       title: lesson.title,
       summary: lesson.summary,
-      body: lesson.body,
+      body: locked ? null : lesson.body,
+      locked,
       tutorial: lesson.tutorial,
       exercises,
       place,
@@ -269,6 +288,8 @@ export const open = userMutation({
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
     if (!lesson || lesson.status !== "published") throw new ConvexError("LESSON_NOT_FOUND");
+    // A locked lesson isn't recorded, so it can't finish until the player is Pro.
+    if (await lessonLocked(ctx, ctx.user, lesson)) throw new ConvexError("PRO_REQUIRED");
     const outcome = await openLesson(ctx, ctx.user._id, lesson);
     return { xp: outcome.xp, badges: outcome.badges, modules: outcome.modules, levelUp: outcome.levelUp ?? null };
   },

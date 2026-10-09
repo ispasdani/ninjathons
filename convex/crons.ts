@@ -19,4 +19,7 @@ crons.daily("settle streaks", { hourUTC: 0, minuteUTC: 5 }, internal.daily.settl
 // settled; hourly, so a missed run is caught up the same day.
 crons.hourly("start weekly challenge", { minuteUTC: 0 }, internal.weekly.start, {});
 
+// The Pro prices shown on /pro, copied from Stripe (decisions §18).
+crons.hourly("sync Pro prices", { minuteUTC: 30 }, internal.billing.syncPrices, {});
+
 export default crons;

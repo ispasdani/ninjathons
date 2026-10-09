@@ -45,7 +45,29 @@ const MESSAGES: Record<string, string> = {
   ALREADY_YOURS: "That region is already yours.",
   NOT_NEXT_TO_YOURS: "You can only take regions next to one you hold.",
   SHIELDED: "That region was just taken and is shielded for a minute.",
+  PRO_REQUIRED: "That's a Pro feature.",
+  BIO_TOO_LONG: "Keep your bio to 160 characters.",
+  BAD_LINK: "Links must start with https:// and go to a real site.",
+  TOO_MANY_LINKS: "Up to 4 links.",
+  TOO_MANY_LANGUAGES: "Pick up to 3 languages.",
+  THEME_NOT_FOUND: "Pick a theme from the list.",
+  THEME_LOCKED: "You haven't unlocked that theme yet.",
+  ACCENT_CONTRAST: "That accent is hard to read on this theme in light or dark mode. Try a stronger colour.",
+  BAD_BANNER: "Pick a banner from the list.",
+  BAD_FONT: "Pick a font from the list.",
+  BAD_SECTION: "Something's off with the sections. Reload and try again.",
+  NOT_PINNABLE: "Only your own accepted Submits can be pinned.",
+  PIN_HELD: "That problem is in today's daily or a weekly set that isn't over. Pin it once it's done.",
+  PINS_FULL: "You can pin 3 solutions. Unpin one first.",
+  ALREADY_PRO: "You're already on Pro. Use Manage billing to change your plan.",
+  NO_BILLING: "There's no billing to manage yet.",
+  PRICE_NOT_FOUND: "Pro isn't on sale right now. Try again later.",
+  UNAUTHENTICATED: "Sign in first.",
 };
+
+export function errorCode(error: unknown) {
+  return error instanceof ConvexError && typeof error.data === "string" ? error.data : "";
+}
 
 export function errorMessage(error: unknown) {
   const code = error instanceof ConvexError && typeof error.data === "string" ? error.data : "";

@@ -24,6 +24,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 7 Oct 2026 | Level and 1v1 boards with Global, Country and Group scopes; free private groups | [13](#leaderboards-and-groups) |
 | 8 Oct 2026 | Territory: ring values, one problem deck per difficulty, captures by send time, OpenSkill on the 1v1 scale | [16](#16-territory) |
 | 8 Oct 2026 | Learn: tutorials and 3 roadmaps (no separate courses), lessons finish when their exercises are solved, HTML and CSS checked in the browser, curated MDN and Python docs | [17](#17-learn) |
+| 8 Oct 2026 | Profiles and Pro: free profiles at `/u/`, 10 themes (3 free, 4 earned, 3 Pro), pattern banners only, Stripe Checkout in test mode, VAT decided at release | [18](#18-profiles-and-pro) |
 
 ---
 
@@ -36,7 +37,7 @@ Every user picks a unique username. It lives in Convex, not Clerk. Clerk only ha
 - **Rules.** 3 to 20 characters, `a-z`, `0-9`, `_` and `-`, starting with a letter.
 - **Reserved names.** Route and system words (`admin`, `api`, `dashboard`, `settings`, `u`, `support`, `help`, `login`, `signup`…) and the brand name are blocked.
 - **When it's chosen.** In an onboarding step right after sign-up, before the first match. Until then the user can't be challenged by name.
-- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for 90 days (and redirects to the new one, once profile pages exist in phase 8; the cooldown and reservations are built), so nobody can grab a well-known player's old name right after they change it. The same 90 days apply to the username of a deleted account.
+- **Changing it.** Allowed with a 30-day cooldown (`usernameChangedAt`). An old username stays reserved for 90 days (and `/u/<old>` redirects permanently to the new one, built in phase 8, [§18](#18-profiles-and-pro)), so nobody can grab a well-known player's old name right after they change it. The same 90 days apply to the username of a deleted account.
 
 ## 2. Payments: Stripe
 
@@ -48,7 +49,7 @@ We use Stripe directly. Clerk Billing is easier to set up, but the plan needs th
 - **EU VAT** on consumer sales, through Stripe Tax.
 - **Our guardrail.** Only the Stripe webhook writes `entitlements`, and every Pro check reads that table in Convex. With Clerk Billing the plan would live in Clerk and have to be synced.
 
-Still open, decide in the payments phase: **Stripe Tax** (we file VAT ourselves) or a **merchant of record** (Paddle, Lemon Squeezy or Stripe's managed offering handles VAT for a higher fee).
+Decided at release (8 Oct 2026, [§18](#18-profiles-and-pro)); phase 8 builds on Stripe Checkout in test mode, which works for either: **Stripe Tax** (we file VAT ourselves) or a **merchant of record** (Paddle, Lemon Squeezy or Stripe's managed offering handles VAT for a higher fee).
 
 ## 3. Judging model: hybrid
 
@@ -359,7 +360,7 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | 5 | Daily and weekly challenges ✅ | Daily pick runs unattended; 6 weekly sets written |
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
 | 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
-| 8 | Profiles and Pro | Every Pro function has a test that calls it as a free user and is refused |
+| 8 | Profiles and Pro ✅ | Every Pro function has a test that calls it as a free user and is refused |
 | 9 | Ninjathons | One event runs from creation to results (first to cut) |
 | 10 | Closed beta and launch | Hosting, then the private alpha (10 to 20 friends), then 2 or 3 office teams plus 20 to 50 players; issues fixed |
 
@@ -610,3 +611,90 @@ Agreed 8 Oct 2026, at the start of phase 7. Adds to the roadmap's rules (Learn, 
 - **`web.submit`** records each Submit in `webSubmissions` with the HTML and CSS (for V1.1's re-check), refuses a total no real run gives and Submits less than 3 s apart, and on an accepted one gives solve XP and counts for lessons. Solves of web challenges count toward the solve milestones but not the language or Polyglot badges. The code runner, daily, 1v1 and Territory never use them, and weekly sets can't list them.
 
 - **Order of work:** the content model, pages, progress, XP and board first; then HTML and CSS challenges; then the content (about 20 tutorials, 3 roadmaps, and the easy problems Programming basics needs); the docs library last.
+
+## 18. Profiles and Pro
+
+Agreed 8 Oct 2026, at the start of phase 8. Adds to the roadmap's rules (Profiles, Free vs Pro), §1 (old usernames), §2 (payments), §10 (price), §17 (the roadmap lock) and design.md (Profiles).
+
+### What's in phase 8
+
+- **Public profiles** at `/u/<username>`, the profile editor with themes, redirects from old usernames (§1), **Stripe Checkout** and the billing portal, the **entitlements webhook**, and the **Pro lock** on every paid function, each with a test that calls it as a free user and is refused.
+- **Not in phase 8:** following and friends online, notifications, and share cards for level-ups, badges and finished roadmaps (the 1v1 ones exist). They're V1 scope and get placed after this phase.
+
+### The profile (free)
+
+- **`/u/<username>`**, rendered on the server from public data only (for search and the Open Graph image), then live. An unknown username is a 404; an old one, within its 90 days, redirects permanently to the new one; a deleted account's is a 404.
+- **Sections:** the header (Clerk avatar, display name, username, level and title, country flag, Pro badge while Pro), bio (plain text, up to 160 characters), links (up to 4, `https` only, shown by domain, `rel="nofollow ugc noopener"`), favourite languages (up to 3 of the 9), the stats block, badges (earned first, then locked), the activity grid (26 weeks of UTC days: accepted Submits and lessons finished), 1v1 rating history, pinned solutions and recent games (the last 10 1v1 and Territory games).
+- **The stats block is fixed** (design.md): 1v1 rating and tier, Territory rating, global level rank, 1v1 record, problems solved and the daily streak. Platform tokens only; no theme or setting restyles, moves or hides it.
+- **Pinned solutions:** up to 3 of your own accepted Submits, one per problem. Pinning makes that code public; unpinning hides it again. A problem in today's daily, or in a weekly set that's running or hasn't started, can't be pinned, and a pin on one is hidden until its window ends.
+- **Never on the profile:** email, unpinned code, group names, doc views, anything from an unfinished game.
+
+### Themes
+
+- **A theme is a template id plus checked values,** never user CSS. Every theme has light and dark values and passes the contrast check (text 4.5:1, large text and the accent 3:1, both modes) in a test.
+- **3 free** (Default, Slate, Ink), **4 earned** (level 20, level 40, reaching Expert and reaching Master in 1v1; kept once earned) and **3 Pro** (Terminal, Editorial, Blueprint). Pro players can use all 10. Names are placeholders.
+
+### The custom profile (Pro)
+
+- **Accent colour** (any hex, refused by the server if it fails 3:1 against the theme's background in either mode), **banner pattern** (built-in patterns tinted with the accent; no uploads in V1), **heading font** (from an approved list), **section order and visibility** (the header and stats block are fixed and can't be hidden).
+- **Short URL:** a Pro profile is also at `/<username>`, redirecting to `/u/<username>` while the player isn't Pro. Usernames already exclude route words (§1), so there's one namespace and nothing new to claim.
+- **Try before buying:** the editor previews Pro options for everyone; saving them is a `proMutation`, so a free player gets `PRO_REQUIRED` and an upgrade prompt. Free fields save through their own `userMutation`.
+- **When Pro ends** the custom values are kept but not shown: the profile falls back to the player's last free or earned theme (or Default) until they're Pro again.
+
+### Payments
+
+- **Stripe Checkout** (hosted, subscription mode), monthly or yearly: the Pro product's active monthly and yearly prices, read from Stripe by the product id in `STRIPE_PRO_PRODUCT`, so changing a price in Stripe needs no code change. **The billing portal** (Stripe's customer portal) handles cancelling, switching interval, cards and invoices. A Convex action creates both sessions; nothing in the browser touches Stripe keys.
+- **Test mode until release.** Live keys, regional prices (§10) and the VAT choice (§2: Stripe Tax or a merchant of record) are set at release; phase 8 uses one price per interval. The code is the same either way.
+- **The webhook,** `POST /stripe` on Convex, checks Stripe's signature and records each event id once (`stripeEvents`). On any subscription event it reads the subscription back from Stripe, so events arriving out of order can't undo a newer state, and writes `entitlements`: `pro` until the current period's end plus 2 days while the subscription is active, trialing or past due; ended now when it's cancelled or unpaid. A cancel at period end keeps Pro to that end.
+- **`stripeCustomers`** links a user to their Stripe customer, created at the first Checkout.
+- **Only the webhook writes `entitlements`** (§2), checked by a test over the source, as the raw builders are checked by ESLint.
+- **Early-bird pricing** comes free: a Stripe subscription keeps its price, and a rise is a new price for new subscribers.
+- **Account deletion** cancels the subscription at once (no refund for the rest of the period) and deletes `stripeCustomers` and `entitlements`; Stripe keeps its invoices, as tax law requires.
+
+### What Pro locks in phase 8
+
+- **Roadmap lessons outside the free module** (§17): `learn.lesson` sends their text only to Pro players; everyone else gets the title, summary, exercises and place in the roadmap, with `locked: true`. A locked lesson isn't recorded as opened, so it can't finish; going Pro and opening it finishes it if the exercises are solved, since earlier solves count. Tutorials, free modules, roadmap outlines and every problem stay free.
+- **Saving custom profile values** and the short URL.
+- **The denial tests:** one test file calls every Pro function as a signed-out user and as a free user and expects refusal, and a second test lists every function built from `proQuery` or `proMutation`, or calling `requirePro`, and fails if one is missing from the first. A new Pro function without a denial test fails CI.
+
+- **Order of work:** the Stripe webhook, entitlements and the Pro lock with its tests first (the phase check); then profile pages and redirects; then themes and the editor; then Checkout and the billing portal in the app.
+
+### Payments and the Pro lock as built (9 Oct 2026)
+
+- **Stripe test account** (sandbox "EcoTech Core sandbox"): the Pro product with €8 monthly and €69 yearly prices, the customer portal (cancel at period end, switch between the two prices, cards, invoices), and the webhook destination `ninjathons-convex-dev` (snapshot payloads, the 4 events below) at `https://<deployment>.convex.site/stripe`. Convex dev has `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and `STRIPE_PRO_PRODUCT`; `SITE_URL` (for Checkout's return pages) defaults to `http://localhost:3000`.
+- **No Stripe SDK:** `convex/lib/stripe.ts` checks the signature with Web Crypto (5-minute tolerance, any `v1` may match while a secret is rolled) and calls the REST API with `fetch`.
+- **The webhook** handles `checkout.session.completed` (subscription mode) and `customer.subscription.created`, `.updated` and `.deleted`, reads the subscription back (the event's own copy only when Stripe answers 404) and finds the player by the subscription's `metadata.userId`, else by `stripeCustomers`. Any other answer than 2xx makes Stripe retry.
+- **`lib/billing.ts` is the only writer of `entitlements`;** a test fails if any other file names the table, or if `lib/functions.ts` writes.
+- **`userAction`** in `lib/functions.ts`: signed in, for actions that call Stripe (`billing.checkout`, `billing.portal`). `billing.checkout` refuses a player who is already Pro (`ALREADY_PRO`); `billing.plan` gives the caller's tier, interval, renewal and whether the portal has anything to show.
+- **`hasPro`** in `lib/functions.ts` for public functions that send Pro players more, like `learn.lesson`. `convex/pro.test.ts` calls each Pro function signed out, free, lapsed and Pro, and finds every exported function that uses `proQuery`, `proMutation`, `hasPro`, `requirePro` or a helper calling one; a function found with no denial test fails.
+
+### Profile pages as built (9 Oct 2026)
+
+- **`profiles.get`** (public): the profile by username, case-insensitive; `{ redirect }` for an old username still held for its owner (§1), null for an unknown one, a deleted account's or one held with no owner. `/u/<username>` answers 404, 308 to the new name, or the page, rendered on the server and then live. The route has no `loading.tsx`, so the redirect is a real 308.
+- **What it sends:** name, username, avatar, country, join month, Pro badge, level and title; the stats block (1v1 and Territory ratings, hidden with the placement games left while provisional; global rank from the live Level board; 1v1 record; problems solved, counted from the ledger's solve entries; current and best daily streak); every badge, earned first; the activity grid; the 1v1 rating after each of the last 60 rated games (once not provisional); the last 10 finished 1v1 and Territory games, without the player's ghost runs in others' matches. Never email, Clerk ids, code, groups or unfinished games, checked by a test.
+- **Activity grid:** a new `activityDays` table (player, UTC day, count), kept by `lib/activity.ts` on every accepted Submit (code and HTML and CSS) and finished lesson, so the profile never reads submissions. `profiles:backfillActivity` rebuilds one player's days from their history (run on dev for the two accounts). Shown as 26 week columns from Monday, one hue from the empty grey to `--brand-text` in four steps, with a hover and focus readout and labels for screen readers; on phones it scrolls, starting at this week.
+- **Rating chart:** one 2px line in `--foreground`, the tier cut-offs as the grid, a crosshair and readout on hover.
+- **Bio, links, favourite languages and pinned solutions** come with the editor, the next piece; nothing can set them before then.
+
+### The profile editor as built (9 Oct 2026)
+
+- **`/settings/profile`**, linked from Settings and from your own profile ("Edit profile"): the free fields, themes and pins on the left, and on the right the real profile drawn with the draft values, Pro options included, so anyone can try them. One Save sends `profiles.saveAbout`, then `saveTheme` and `saveCustom` when they changed; a free player whose draft uses Pro options keeps the free parts and is told the rest needs Pro. Pins save straight away.
+- **A `profiles` row** per player (no row means the defaults): bio, links, languages, pins, `theme`, `freeTheme` (the last free or earned theme, shown when Pro ends) and the Pro values. Deleted with the account.
+- **Free fields:** a plain-text bio of up to 160 characters (control characters dropped, blank-line runs shortened); up to 4 links, each `https` with a dotted host and no credentials, stored as the URL parser writes it and shown by domain with `rel="nofollow ugc noopener noreferrer"`; up to 3 of the 7 code languages.
+- **Pins:** your own accepted code Submits (not Runs, not HTML and CSS), one per problem, a newer solve replacing the pin in place, up to 3. Refused for today's daily or a weekly set not over yet (`PIN_HELD`); a pin whose problem later joins one is hidden until the week ends.
+- **Themes** in `convex/lib/themes.ts` with light and dark values (background, surface, text, muted, accent, border), checked by a test: text and muted 4.5:1 on background and surface, the accent 3:1. Earned themes unlock with the badge of their milestone (`title-engineer`, `title-sensei`, `tier-expert`, `tier-master`), so they're kept once earned. The page writes a theme's values as `--p-*` variables on the profile element; the stats block keeps the platform tokens.
+- **Pro options:** accent (refused unless 3:1 on the chosen theme's background in both modes; dropped if a later theme change makes it fail), 5 banner patterns drawn in the accent, 5 heading fonts loaded with `next/font` without preloading, and the order and visibility of the 6 sections below the header and stats.
+- **What a profile shows** comes from `lookFor` in `lib/profiles.ts`, which uses `hasPro`: without Pro, the saved theme if it's free or earned, else the last free one, and none of the Pro values. `profiles.get`, `saveTheme` and `saveCustom` are in the denial tests.
+- **The short URL** `/<username>` shows a Pro player's profile (canonical `/u/<username>`) and sends anyone else's to `/u/` with a temporary redirect. Five route names (`badges`, `groups`, `lobby`, `play`, `roadmaps`) were added to the reserved usernames, and a test checks every top-level route is reserved.
+
+### The Pro page as built (9 Oct 2026)
+
+- **`/pro`**, public: what Pro adds and what stays free (the roadmap's table), a monthly or yearly toggle with Stripe's prices, and one button: "Sign in to get Pro" signed out, "Get Pro" (`billing.checkout`, then Stripe's hosted Checkout) for free players, and the renewal or end date with "Manage billing" (`billing.portal`) for Pro players. Linked from Settings (Plan), the locked lesson panel and the profile editor.
+- **Prices** come from a `stripePrices` table that `billing.syncPrices` copies from Stripe every hour (crons.ts) and on demand, so the page never calls Stripe and never shows a stale hard-coded price. In test mode the page shows Stripe's test card.
+- **Coming back from Checkout:** `?checkout=success` says the payment is in and turns into a welcome once the webhook has written the plan (the page watches `billing.plan`); `?checkout=cancelled` says nothing was charged.
+
+### Phase 8 done (9 Oct 2026)
+
+- **The check passes:** 6 Pro functions (`learn.lesson`, `learn.open`, `learn.roadmap`, `profiles.get`, `profiles.saveTheme`, `profiles.saveCustom`) are each called signed out, free and with a lapsed plan in `convex/pro.test.ts` and refuse, and the coverage test fails for any function that checks Pro without a denial test.
+- **Roadmap pages** mark Pro modules with the Pro tag and their lessons with a lock, through `locked` on each lesson of `learn.roadmap`; tutorials inside Pro modules stay open.
+- **The live webhook was checked end to end in test mode:** a throwaway function (removed) created a subscription through Stripe's API for a throwaway player; Stripe's real, signed `customer.subscription.created` reached `/stripe` and wrote Pro to the period's end plus 2 days, and cancelling it sent `customer.subscription.deleted`, which ended Pro at once. The player, its Stripe customer and the function were deleted afterwards.

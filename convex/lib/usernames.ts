@@ -19,12 +19,12 @@ export const USERNAME_RESERVED_MS = USERNAME_RESERVED_DAYS * DAY_MS;
 // Route and system words, and the brand: a username becomes /u/<name>, and
 // nobody should look like staff. Compared on the lowercased key.
 const RESERVED = new Set([
-  "about", "account", "admin", "administrator", "api", "app", "auth", "billing", "blog",
+  "about", "account", "admin", "administrator", "api", "app", "auth", "badges", "billing", "blog",
   "challenge", "challenges", "contact", "contest", "contests", "courses", "daily", "dashboard",
-  "docs", "duel", "duels", "events", "explore", "faq", "help", "home", "learn", "leaderboard",
-  "leaderboards", "legal", "login", "logout", "me", "mod", "moderator", "new", "ninja",
-  "ninjathon", "ninjathons", "null", "official", "onboarding", "pricing", "privacy", "pro",
-  "problems", "profile", "root", "security", "settings", "sign-in", "sign-up", "signin",
+  "docs", "duel", "duels", "events", "explore", "faq", "groups", "help", "home", "learn", "leaderboard",
+  "leaderboards", "legal", "lobby", "login", "logout", "me", "mod", "moderator", "new", "ninja",
+  "ninjathon", "ninjathons", "null", "official", "onboarding", "play", "pricing", "privacy", "pro",
+  "problems", "profile", "roadmaps", "root", "security", "settings", "sign-in", "sign-up", "signin",
   "signout", "signup", "solve", "staff", "status", "support", "system", "team", "terms",
   "territory", "u", "undefined", "user", "users", "weekly", "www",
 ]);
