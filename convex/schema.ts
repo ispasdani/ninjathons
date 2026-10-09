@@ -28,6 +28,7 @@ import {
   territoryRegions,
 } from "./schemas/territory";
 import { stripeCustomers, stripeEvents } from "./schemas/billing";
+import { activityDays } from "./schemas/profiles";
 import { entitlements, usernameReservations, users } from "./schemas/users";
 
 // Table definitions live in convex/schemas, grouped by area.
@@ -37,6 +38,7 @@ export default defineSchema({
   entitlements,
   stripeCustomers,
   stripeEvents,
+  activityDays,
   problems,
   problemTests,
   testDrives,

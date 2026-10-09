@@ -312,6 +312,13 @@ export const deleteFromClerk = internalMutation({
     ];
     for (const row of learnRows) await ctx.db.delete(row._id);
 
+    // The profile's activity grid (decisions §18).
+    const activity = await ctx.db
+      .query("activityDays")
+      .withIndex("by_user_day", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const row of activity) await ctx.db.delete(row._id);
+
     // Off the leaderboards now; the ranks close up on the next rebuild.
     const snapshots = await ctx.db
       .query("leaderboardSnapshots")

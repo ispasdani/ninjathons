@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements and the Pro lock on roadmap lessons are built, with the denial tests. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** profile pages at `/u/<username>` and redirects from old usernames.
+**Now:** Phase 8, Profiles and Pro, is in progress: Stripe (test mode), the webhook, entitlements, the Pro lock on roadmap lessons with its denial tests, and public profile pages are built. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the profile editor: bio, links, favourite languages, pinned solutions, then themes and the Pro options.
 
 ## Phases
 
@@ -25,6 +25,15 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 9 Oct 2026 · Phase 8: profile pages
+- `/u/<username>` ([decisions §18](notes/decisions.md#profile-pages-as-built-9-oct-2026)): server-rendered from `profiles.get`, then live. Header (avatar, name, username, Pro badge, level and title, country, join month), the fixed stats block (1v1 and Territory ratings or placement games left, global rank, 1v1 record, problems solved, daily streak), the activity grid, the 1v1 rating chart, badges (earned first, locked on request) and the last 10 finished games.
+- Old usernames redirect permanently to the new one while held (checked on dev: a held name answered 308 to `/u/dnis`, then 404 once removed); unknown names are 404.
+- New `activityDays` table, kept on every accepted Submit and finished lesson and removed with the account; `profiles:backfillActivity` filled it for the two dev accounts.
+- Checked in the browser at desktop and phone widths, light and dark: no console errors, no page scroll sideways from the profile. Fixed on the way: the grid opened at its oldest weeks on phones (now at this week, labels pinned), and recent games were cut off on phones (now wrap).
+- Found and flagged as a separate task: the signed-out site header overflows sideways at about 800 to 850 pixels on every page.
+- 8 new tests (488 in all, all passing). Production build passes. Deployed to Convex dev.
+- Open: bio, links, favourite languages and pinned solutions wait for the editor; the rating chart hasn't been seen with real data (no dev account has 10 rated games).
 
 ### 9 Oct 2026 · Phase 8: Stripe, entitlements and the Pro lock
 - Stripe set up in test mode ([decisions §18](notes/decisions.md#payments-and-the-pro-lock-as-built-9-oct-2026)): the Pro product with €8 monthly and €69 yearly prices, the customer portal, and a webhook destination pointing at Convex dev. The keys are in the Convex dev environment.
