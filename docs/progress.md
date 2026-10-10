@@ -26,6 +26,14 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 9 Oct 2026 · CI: the runner image no longer pulls from Docker Hub
+- CI's "Build the runner image" failed with `429 Too Many Requests` from Docker Hub, which limits anonymous pulls and is often at that limit on GitHub's shared runners; nothing in the code was wrong.
+- `runner/Dockerfile` now starts `FROM public.ecr.aws/docker/library/ubuntu:26.04`, Amazon's public mirror of Docker's official images (checked: the same digest as Docker Hub's `ubuntu:26.04`), and drops the `# syntax=docker/dockerfile:1` line, which also pulled from Docker Hub; BuildKit's built-in parser handles the file (`docker build --check` clean). The image is unchanged: a local build came entirely from cache.
+
+### 9 Oct 2026 · Content: Rotate Array's slow solution timed out too narrowly
+- CI failed `problems:check` on the phase 8 pull request: `slow-one-step-at-a-time.js` (O(n × k)) finished the largest test in 972 ms against the 1000 ms limit, since V8's `unshift` is quick. Locally it took 2.4 s, so the margin depended on the machine.
+- Rotate Array is now version 2: up to 200,000 numbers (was 100,000) and a new hidden test rotating 200,000 by 199,999, about 4× the old worst case for the slow solution (10.2 s locally) and still instant for the references (3 to 4 ms). The earlier tests are unchanged. `problems:check rotate-array` passes; seeded to dev.
+
 ### 9 Oct 2026 · Phase 8 done
 - The check passes ([decisions §18](notes/decisions.md#phase-8-done-9-oct-2026)): every Pro function (6 now) is called signed out, free and lapsed and refuses, and the coverage test fails for any new Pro function without a denial test.
 - Roadmap pages mark Pro modules (the Pro tag, a lock on each lesson, a link to Pro); tutorials inside them stay open. `learn.roadmap` gained `locked` per lesson and its denial test. Checked in the browser on Programming basics, signed out.
