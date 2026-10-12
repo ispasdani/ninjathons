@@ -28,6 +28,15 @@ import {
   territoryRegions,
 } from "./schemas/territory";
 import { stripeCustomers, stripeEvents, stripePrices } from "./schemas/billing";
+import {
+  ninjathonMembers,
+  ninjathonResults,
+  ninjathons,
+  ninjathonScores,
+  ninjathonStandings,
+  ninjathonSubmissions,
+  ninjathonTeams,
+} from "./schemas/ninjathons";
 import { activityDays, profiles } from "./schemas/profiles";
 import { entitlements, usernameReservations, users } from "./schemas/users";
 
@@ -76,6 +85,13 @@ export default defineSchema({
   territoryLobbyPlayers,
   territoryQueue,
   territoryMatchmaking,
+  ninjathons,
+  ninjathonTeams,
+  ninjathonMembers,
+  ninjathonSubmissions,
+  ninjathonScores,
+  ninjathonResults,
+  ninjathonStandings,
   lessons,
   roadmaps,
   lessonProgress,

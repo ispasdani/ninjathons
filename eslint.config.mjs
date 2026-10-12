@@ -20,7 +20,7 @@ const eslintConfig = defineConfig([
               name: "convex/server",
               importNames: ["queryGeneric", "mutationGeneric", "actionGeneric"],
               message:
-                "Use publicQuery, userQuery, userMutation, proQuery or proMutation from convex/lib/functions.ts. For actions, call an internal query that runs the same check first.",
+                "Use publicQuery, userQuery, userMutation, proQuery, proMutation, adminQuery or adminMutation from convex/lib/functions.ts. For actions, call an internal query that runs the same check first.",
             },
           ],
           patterns: [
@@ -28,7 +28,7 @@ const eslintConfig = defineConfig([
               group: ["**/_generated/server"],
               importNames: ["query", "mutation", "action"],
               message:
-                "Use publicQuery, userQuery, userMutation, proQuery or proMutation from convex/lib/functions.ts. For actions, call an internal query that runs the same check first.",
+                "Use publicQuery, userQuery, userMutation, proQuery, proMutation, adminQuery or adminMutation from convex/lib/functions.ts. For actions, call an internal query that runs the same check first.",
             },
           ],
         },

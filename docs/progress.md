@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 9, Ninjathons, has started: its rules are agreed in [decisions §19](notes/decisions.md#19-ninjathons). Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the admin role and its denial tests, then events and the admin editor.
+**Now:** Phase 9, Ninjathons, has started: its rules are agreed in [decisions §19](notes/decisions.md#19-ninjathons). Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the phase check, run signed in on dev: give your account the admin role, create and publish a short event, two players form a team and one plays solo, both hand in, then judge and publish.
 
 ## Phases
 
@@ -25,6 +25,14 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 12 Oct 2026 · Phase 9: admin role, events, teams, submissions, judging and results
+- Built to [decisions §19](notes/decisions.md#as-built-12-oct-2026). The admin role is `users.role`, set only by `admin:setRole` from the CLI. `adminQuery` and `adminMutation` have denial tests for all 10 admin functions, and a coverage test fails for any admin function without one.
+- 7 new tables, each with its row in [§4](notes/decisions.md#what-happens-to-each-kind-of-data). Events go from draft to published to results, or cancelled. Teams by invite code, solo allowed, locked at the start. One link-only submission per team, refused after the end by the server's clock. Admins score 0 to 10 per criterion and can disqualify. Publishing places the teams, gives 200 XP plus 1,000, 750 or 500, and the 2 new badges, and fills the new Ninjathons board (the Hall of fame).
+- Pages: `/ninjathons` (a tab on Play), `/ninjathons/<slug>` (overview, the brief from the start, your team, your project, results) and `/admin/ninjathons` (list, editor, judging). `/admin` answers 404 to anyone who isn't an admin, signed out included.
+- Checked in the browser with throwaway data on dev (removed afterwards): the list, an upcoming event (no brief in the served HTML), a running one (the brief), results (scores averaged across judges, criteria, links), and the Hall of fame board. Desktop and phone widths, light and dark, nothing wider than the page, no console errors. Fixed on the way: the stage tag stretched across the card.
+- 29 new tests (553 in all, all passing). Production build passes. Deployed to Convex dev.
+- Open: the signed-in screens haven't been seen yet (registering, the team card, handing in, and the admin editor and judging screen); tests cover their functions. They get seen in the phase check.
 
 ### 12 Oct 2026 · Phase 9: Ninjathons rules
 - Agreed and written up in [decisions §19](notes/decisions.md#19-ninjathons). Admins are `users.role: "admin"`, set only from the Convex CLI, behind `adminQuery` and `adminMutation` with denial tests like the Pro lock. Events last 1 hour to 7 days; the brief reaches players only from the start.

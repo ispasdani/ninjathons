@@ -6,13 +6,14 @@ import { usePathname } from "next/navigation";
 const MODES = [
   { href: "/play", label: "1v1 race" },
   { href: "/play/territory", label: "Territory" },
+  { href: "/ninjathons", label: "Ninjathons" },
 ] as const;
 
-/** The match modes on Play, as links so each has its own address. */
+/** The play modes, as links so each has its own address. */
 export function PlayTabs() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Match modes" className="flex w-fit rounded-md border p-0.5">
+    <nav aria-label="Play modes" className="flex w-fit rounded-md border p-0.5">
       {MODES.map((mode) => (
         <Link
           key={mode.href}

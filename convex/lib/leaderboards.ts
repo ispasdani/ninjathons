@@ -1,8 +1,8 @@
 /**
  * Leaderboards (roadmap, Progression; decisions §13). Each board ranks players
  * by one value, read in rank order from an index so a rebuild can go page by
- * page. Built now: Level and Learning (all time and monthly), 1v1, Territory, Daily and
- * Weekly; Ninjathons comes with its phase.
+ * page: Level and Learning (all time and monthly), 1v1, Territory, Daily, Weekly and
+ * Ninjathons.
  */
 import { v, type Infer } from "convex/values";
 
@@ -22,6 +22,7 @@ export const boardKind = v.union(
   v.literal("weekly"),
   v.literal("learning"),
   v.literal("learning-month"),
+  v.literal("ninjathons"),
 );
 export type BoardKind = Infer<typeof boardKind>;
 
@@ -34,7 +35,7 @@ const WEEK = /^\d{4}-W\d{2}$/;
 
 /**
  * The stored key of a board: "level", "level-month:2026-10", "1v1", "territory", "daily",
- * "weekly:2026-W41", "learning" or "learning-month:2026-10". `period` is the month or week,
+ * "weekly:2026-W41", "learning", "learning-month:2026-10" or "ninjathons". `period` is the month or week,
  * defaulting to now's.
  */
 export function boardKey(kind: BoardKind, period?: string) {
@@ -66,6 +67,7 @@ export function liveBoards(now: number) {
     `weekly:${previousWeek(week)}`,
     "learning",
     `learning-month:${month}`,
+    "ninjathons",
   ];
 }
 
@@ -158,7 +160,17 @@ export async function sourcePage(
       .paginate(paginationOpts);
     return { ...page, page: page.page.map((r): Entry => ({ userId: r.userId, value: r.xp })) };
   }
+  if (board === "ninjathons") {
+    // 1st places, then 2nd, then 3rd, then events submitted (decisions §19).
+    const page = await ctx.db.query("ninjathonStandings").withIndex("by_board").order("desc").paginate(paginationOpts);
+    return { ...page, page: page.page.map((r): Entry => ({ userId: r.userId, value: r.firsts })) };
+  }
   throw new Error(`Unknown board: ${board}`);
+}
+
+/** The Ninjathons board's order as one number, for sorting a group's members. */
+function placings(row: Doc<"ninjathonStandings">) {
+  return ((row.seconds * 1000 + row.thirds) * 1000) + row.events;
 }
 
 /**
@@ -167,7 +179,7 @@ export async function sourcePage(
  */
 export async function groupEntries(ctx: QueryCtx, board: string, userIds: Id<"users">[]) {
   const now = Date.now();
-  // Sorted by value, then `then` (Daily: total solved), then tieBreak.
+  // Sorted by value, then `then` (Daily: total solved; Ninjathons: the other placings), then tieBreak.
   const scored: (Entry & { then?: number; tieBreak: number })[] = [];
   for (const userId of userIds) {
     if (board === "level") {
@@ -203,6 +215,12 @@ export async function groupEntries(ctx: QueryCtx, board: string, userIds: Id<"us
         .withIndex("by_user_period", (q) => q.eq("userId", userId).eq("period", learningPeriod(board)))
         .unique();
       scored.push({ userId, value: row?.xp ?? 0, tieBreak: row?.tieBreak ?? -Infinity });
+    } else if (board === "ninjathons") {
+      const row = await ctx.db
+        .query("ninjathonStandings")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .unique();
+      if (row) scored.push({ userId, value: row.firsts, then: placings(row), tieBreak: row.tieBreak });
     } else {
       throw new Error(`Unknown board: ${board}`);
     }
@@ -246,6 +264,14 @@ export async function presentRow(
       .withIndex("by_user_week", (q) => q.eq("userId", row.userId).eq("week", board.slice("weekly:".length)))
       .unique();
     return { ...base, timeMs: result?.timeMs ?? 0, solved: result?.solved ?? 0 };
+  }
+  if (board === "ninjathons") {
+    // The Hall of fame's other columns: 2nd and 3rd places and events submitted.
+    const standing = await ctx.db
+      .query("ninjathonStandings")
+      .withIndex("by_user", (q) => q.eq("userId", row.userId))
+      .unique();
+    return { ...base, seconds: standing?.seconds ?? 0, thirds: standing?.thirds ?? 0, events: standing?.events ?? 0 };
   }
   return base;
 }

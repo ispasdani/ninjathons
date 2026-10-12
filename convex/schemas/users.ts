@@ -26,6 +26,9 @@ export const users = defineTable({
   // ranks higher, and a descending index on ["xp", "xpTieBreak"] reads them in
   // exactly that order.
   xpTieBreak: v.optional(v.number()),
+  // "admin" may create and judge ninjathons (decisions §19). Set only by
+  // admin.setRole, run from the Convex CLI; absent for everyone else.
+  role: v.optional(v.literal("admin")),
 })
   .index("by_clerkId", ["clerkId"])
   .index("by_email", ["email"])

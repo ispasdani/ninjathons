@@ -119,7 +119,7 @@ Most of these tables don't exist yet. **Every new table gets a row here when it 
 | Anti-cheat cases | `similarityFlags` | **Anonymize**: the opponent's case stays, the code is gone |
 | Social | `follows` (both directions), `groupMembers` | Delete |
 | Groups they own | `groups` | Transfer to the oldest member; delete if empty |
-| Ninjathons | `registrations`, `teamMembers`, `ninjathonSubmissions`, `results` | Delete the registration before the event starts; afterwards remove them from the team, keep the team's project if it has other members, and anonymize placements and Hall of fame |
+| Ninjathons | `ninjathonMembers`, `ninjathonTeams`, `ninjathonSubmissions`, `ninjathonResults`, `ninjathonStandings`; `ninjathonScores` and `ninjathons` for admins | Taken off their team (the captain passes on; an empty team goes, with its project and score sheets); a placing whose team went shows "Deleted player"; their Hall of fame row is deleted. An admin's score sheets and events stay, without the author (§19) |
 | Plan | `entitlements` | Delete |
 | Stripe | subscription, invoices | Cancel the subscription. **Keep** invoices and the Stripe customer, unlinked from the account: tax law requires keeping invoices for years |
 | Aggregates | solve counts and acceptance rates on `problems`, badge rarity | **Keep**: plain counts, nothing personal |
@@ -769,3 +769,14 @@ Agreed 12 Oct 2026, at the start of phase 9. Adds to the roadmap's rules (Challe
 - **One event runs from creation to its results page on dev:** an admin creates and publishes it, two players form a team (and one plays solo), both teams submit, the deadline locks the submissions, the admin judges and publishes, and the results page, XP, badges and the Ninjathons board are right. To avoid waiting for the clock, an internal function moves the event's times during the run and is removed afterwards.
 
 - **Order of work:** the admin role with its denial tests first; then events and the admin editor; teams; submissions; judging, results and rewards; the public pages and the Ninjathons board; then the check.
+
+### As built (12 Oct 2026)
+
+- **The admin role:** `users.role`, set by `admin:setRole` (internal, by username): `npx convex run admin:setRole '{"username": "<name>", "admin": true}'`. `adminQuery` and `adminMutation` in `lib/functions.ts` throw `FORBIDDEN`. `convex/admin.test.ts` calls all 10 admin functions signed out and as a player; it fails for any function built from the wrappers without a denial test, and for any role check outside `lib/functions.ts`.
+- **`/admin/...`** answers 404 unless the signed-in user is an admin: `app/(app)/admin/layout.tsx` reads the user through Convex with the Clerk token on the server. It isn't in `proxy.ts`, so signed-out visitors get the 404 too rather than a sign-in redirect.
+- **Tables** (`convex/schemas/ninjathons.ts`): `ninjathons`, `ninjathonTeams`, `ninjathonMembers`, `ninjathonSubmissions`, `ninjathonScores`, `ninjathonResults`, `ninjathonStandings`. The rules are in `lib/ninjathons.ts`; player functions in `ninjathons.ts`, admin ones in `ninjathonsAdmin.ts`.
+- **The stage** (`stageOf`) comes from the status and the clock. `ninjathons.get` takes an optional `at` that the page changes as its clock passes the start and the end, so the query runs again and the brief arrives on time; the server checks the time itself.
+- **Team names and invite codes:** names 3 to 32 characters, unique in the event ignoring case; codes from `lib/codes.ts`, shown only to members and only before the start. Creating or joining needs a username.
+- **Judging:** each admin sees only their own sheet (and how many sheets a project has), so judges score independently. Scores are whole numbers. Publishing writes `ninjathonResults` for every submission not disqualified; members get one `ninjathon:<eventId>` XP entry, the badges (`ninjathon-participant`, `ninjathon-winner`) and their `ninjathonStandings` row.
+- **The Ninjathons board** reads `ninjathonStandings` (index on 1st, 2nd and 3rd places, events, then the tie-break) and is rebuilt with the others every 5 minutes. Its value is 1st places; the other column shows 2nd · 3rd · events.
+- **Pages:** `/ninjathons` (also a tab next to 1v1 race and Territory on Play), `/ninjathons/<slug>` (rendered on the server without the brief before the start), `/admin/ninjathons` with the editor (a Markdown preview of the brief, times in the admin's time zone) and the judging screen (0 to 10 buttons per criterion, a private note, disqualifying with a reason, Publish results once every project has a sheet).

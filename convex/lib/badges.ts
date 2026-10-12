@@ -1,8 +1,7 @@
 /**
  * Badge definitions and the rules that grant them (roadmap, Progression;
  * decisions §13). Badges give no XP and, once earned, are never taken away.
- * Badges from solves, levels and 1v1 exist so far; the rest are added with
- * their phase.
+ * Each badge is granted by the code of its area.
  */
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
@@ -11,7 +10,7 @@ import type { Language } from "../judge/types";
 import { TITLES, levelForXp } from "./levels";
 import { PROVISIONAL_GAMES, TIERS, tierFor } from "./ratings";
 
-export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1" | "territory" | "challenges" | "learn";
+export type BadgeGroup = "milestones" | "difficulty" | "languages" | "levels" | "1v1" | "territory" | "challenges" | "learn" | "ninjathons";
 
 export type Badge = {
   // Stored in userBadges; never changes once released.
@@ -107,6 +106,14 @@ export const BADGES: Badge[] = [
     name: roadmap.name,
     description: `Finish every module of the ${roadmap.title} roadmap.`,
   })),
+  // Granted when results are published, in lib/ninjathons.ts (decisions §19).
+  {
+    id: "ninjathon-participant",
+    group: "ninjathons",
+    name: "Ninjathoner",
+    description: "Hand in a project at a ninjathon.",
+  },
+  { id: "ninjathon-winner", group: "ninjathons", name: "Ninjathon winner", description: "Win a ninjathon." },
 ];
 
 /** Grants a badge once; returns whether it was new. */

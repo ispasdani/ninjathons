@@ -70,6 +70,12 @@ async function requirePro(ctx: Ctx) {
   return { user, plan };
 }
 
+async function requireAdmin(ctx: Ctx) {
+  const user = await requireUser(ctx);
+  if (user.role !== "admin") throw new ConvexError("FORBIDDEN");
+  return { user };
+}
+
 /**
  * For data that is genuinely public (problem pages, public profiles,
  * leaderboards). The handler must not return anything private.
@@ -103,6 +109,14 @@ export const userMutation = customMutation(
 /** Active Pro or Organization plan only. Adds `ctx.user` and `ctx.plan`. */
 export const proQuery = customQuery(query, customCtx(requirePro));
 export const proMutation = customMutation(mutation, customCtx(requirePro));
+
+/**
+ * Admins only (decisions §19): creating and judging ninjathons. Adds
+ * `ctx.user`. Every function built from these needs a denial test
+ * (convex/admin.test.ts).
+ */
+export const adminQuery = customQuery(query, customCtx(requireAdmin));
+export const adminMutation = customMutation(mutation, customCtx(requireAdmin));
 
 // By name rather than through _generated/api, which imports this file.
 const userByClerkId = makeFunctionReference<"query", { clerkId: string }, Doc<"users"> | null>(

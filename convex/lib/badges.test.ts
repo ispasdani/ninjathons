@@ -33,9 +33,10 @@ const check = (t: T, userId: Id<"users">, difficulty: "easy" | "medium" | "hard"
   t.run((ctx) => checkSolveBadges(ctx, userId, { difficulty }));
 
 describe("badge definitions", () => {
-  it("has the 21 phase 3 badges, 7 for 1v1, 1 for Territory, 4 for challenges and 4 for Learn, with unique ids", () => {
-    expect(BADGES).toHaveLength(37);
-    expect(new Set(BADGES.map((b) => b.id)).size).toBe(37);
+  it("has the 21 phase 3 badges, 7 for 1v1, 1 for Territory, 4 for challenges, 4 for Learn and 2 for Ninjathons, with unique ids", () => {
+    expect(BADGES).toHaveLength(39);
+    expect(new Set(BADGES.map((b) => b.id)).size).toBe(39);
+    expect(BADGES.map((b) => b.id)).toContain("ninjathon-winner");
     expect(BADGES.map((b) => b.id)).toContain("streak-100");
     expect(BADGES.map((b) => b.id)).toContain("weekly-top-10");
     expect(BADGES.map((b) => b.id)).toContain("language-python");
