@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 9, Ninjathons, has started: its rules are agreed in [decisions §19](notes/decisions.md#19-ninjathons). Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the phase check, run signed in on dev: give your account the admin role, create and publish a short event, two players form a team and one plays solo, both hand in, then judge and publish.
+**Now:** Phase 9, Ninjathons, is done: one event ran from creation to its results page on dev. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass over the ninjathon screens (registering, the team card, handing in, the admin editor and judging; `dnis` is an admin on dev), the pull request for phase 9, then phase 10, Closed beta and launch.
 
 ## Phases
 
@@ -17,7 +17,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 6 | Territory | In progress | 8 Oct 2026 | |
 | 7 | Learn | Done | 8 Oct 2026 | 8 Oct 2026 |
 | 8 | Profiles and Pro | Done | 8 Oct 2026 | 9 Oct 2026 |
-| 9 | Ninjathons | In progress | 12 Oct 2026 | |
+| 9 | Ninjathons | Done | 12 Oct 2026 | 12 Oct 2026 |
 | 10 | Closed beta and launch | Not started | | |
 
 Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tutorials, 3 of 3 roadmaps, 6 of 6 weekly sets.
@@ -25,6 +25,12 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 12 Oct 2026 · Phase 9 done
+- The check passes ([decisions §19](notes/decisions.md#phase-9-done-12-oct-2026)). One event ran on Convex dev from creation to results through the real public functions, as throwaway players and a throwaway admin: create and publish, a team of two and a solo entry, the start (brief out, teams locked), two projects handed in, the deadline, judging and publishing. Refusals were checked at each step.
+- Results were right: scores of 86 and 72, the private note hidden, XP of 1,200, 1,200 and 950, 5 badges, standings and the Hall of fame board. The public pages were checked in the browser signed out.
+- `dnis` has the admin role on dev. The throwaway players, admin, event and clock function were removed.
+- Still open: the signed-in screens haven't been seen in the browser (registering, the team card, handing in, the admin editor and judging), since the pane can't sign in. Tests and the CLI run cover their functions. Also still open: phase 6's check by hand, and the signed-out header overflow.
 
 ### 12 Oct 2026 · Phase 9: admin role, events, teams, submissions, judging and results
 - Built to [decisions §19](notes/decisions.md#as-built-12-oct-2026). The admin role is `users.role`, set only by `admin:setRole` from the CLI. `adminQuery` and `adminMutation` have denial tests for all 10 admin functions, and a coverage test fails for any admin function without one.

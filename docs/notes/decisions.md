@@ -362,7 +362,7 @@ The roadmap's build order is now 11 phases (0 to 10), each with a check that mus
 | 6 | Territory | Group lobbies of 3 to 6 players finish full games |
 | 7 | Learn | 3 roadmaps and about 20 tutorials live; HTML and CSS challenges work |
 | 8 | Profiles and Pro ✅ | Every Pro function has a test that calls it as a free user and is refused |
-| 9 | Ninjathons | One event runs from creation to results (first to cut) |
+| 9 | Ninjathons ✅ | One event runs from creation to results (first to cut) |
 | 10 | Closed beta and launch | Hosting, then the private alpha (10 to 20 friends), then 2 or 3 office teams plus 20 to 50 players; issues fixed |
 
 **Content track:** runs alongside the build from phase 2. Problems grow from about 30 to 150–200 by launch, tutorials and roadmaps are written before phase 7, and weekly sets before phase 5.
@@ -780,3 +780,9 @@ Agreed 12 Oct 2026, at the start of phase 9. Adds to the roadmap's rules (Challe
 - **Judging:** each admin sees only their own sheet (and how many sheets a project has), so judges score independently. Scores are whole numbers. Publishing writes `ninjathonResults` for every submission not disqualified; members get one `ninjathon:<eventId>` XP entry, the badges (`ninjathon-participant`, `ninjathon-winner`) and their `ninjathonStandings` row.
 - **The Ninjathons board** reads `ninjathonStandings` (index on 1st, 2nd and 3rd places, events, then the tie-break) and is rebuilt with the others every 5 minutes. Its value is 1st places; the other column shows 2nd · 3rd · events.
 - **Pages:** `/ninjathons` (also a tab next to 1v1 race and Territory on Play), `/ninjathons/<slug>` (rendered on the server without the brief before the start), `/admin/ninjathons` with the editor (a Markdown preview of the brief, times in the admin's time zone) and the judging screen (0 to 10 buttons per criterion, a private note, disqualifying with a reason, Publish results once every project has a sheet).
+
+### Phase 9 done (12 Oct 2026)
+
+- **The check passes:** one event ran on Convex dev from creation to its results page, through the same public functions the pages call, as throwaway players and a throwaway admin (`npx convex run --identity`). The admin created and published it (a player trying to create one got `FORBIDDEN`). Two players formed a team by its code and a third entered solo (a full team, a taken name and an early save were refused). At the start the brief went out and teams locked. Both teams handed in (a second member's save replaced the first's, a non-https link was refused, neither team could see the other's project). After the end saves were refused, results couldn't publish unscored, and the admin scored and published.
+- **Results were right:** 86 and 72 from the weighted rubric, with the private note hidden; 1,200 XP for each winner and 950 for the solo player; 3 participant and 2 winner badges; standings, and the Hall of fame board after a rebuild. Checked in the browser signed out: the running page with the brief, the results page and the board.
+- **Removed afterwards:** the players, the admin, the event and the throwaway function that moved its clock. `dnis` keeps the admin role on dev.
