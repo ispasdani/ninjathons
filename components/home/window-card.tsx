@@ -20,7 +20,8 @@ export type WinColor = keyof typeof WIN;
 /**
  * A square window: a coloured title bar with a file name and window controls,
  * a solid offset shadow in the same colour, and the content below. Pass `href`
- * to make the whole window a link.
+ * to make the whole window a link. `role` and `aria-label` go on the content,
+ * so a window can be a tab panel.
  */
 export function WindowCard({
   file,
@@ -28,6 +29,8 @@ export function WindowCard({
   href,
   className,
   bodyClassName,
+  role,
+  "aria-label": label,
   children,
 }: {
   file: string;
@@ -35,6 +38,8 @@ export function WindowCard({
   href?: string;
   className?: string;
   bodyClassName?: string;
+  role?: string;
+  "aria-label"?: string;
   children: ReactNode;
 }) {
   const { bar, text } = WIN[color];
@@ -57,7 +62,9 @@ export function WindowCard({
           <i className="size-3.5 border border-t-white border-r-[#404040] border-b-[#404040] border-l-white bg-[#c0c0c0]" />
         </span>
       </div>
-      <div className={cn("flex grow flex-col", bodyClassName)}>{children}</div>
+      <div role={role} aria-label={label} className={cn("flex grow flex-col", bodyClassName)}>
+        {children}
+      </div>
     </>
   );
   const style = { boxShadow: `6px 6px 0 ${bar}` };
