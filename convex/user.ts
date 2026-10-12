@@ -15,6 +15,7 @@ import {
 import { isCountryCode } from "./lib/countries";
 import { leaveGroup } from "./lib/groups";
 import { levelProgress } from "./lib/levels";
+import { removeFromNinjathons } from "./lib/ninjathons";
 import { leaveTerritoryWaiting } from "./lib/territory";
 import {
   checkUsernameRules,
@@ -343,6 +344,9 @@ export const deleteFromClerk = internalMutation({
       if (group) await leaveGroup(ctx, group, user._id);
       else await ctx.db.delete(m._id);
     }
+
+    // Off their ninjathon teams; placings stay, anonymized (decisions §19).
+    await removeFromNinjathons(ctx, user._id);
 
     // The name stays reserved for 90 days after the account is gone.
     if (user.usernameKey) {

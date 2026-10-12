@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
 import type * as badges from "../badges.js";
 import type * as benchmark from "../benchmark.js";
 import type * as billing from "../billing.js";
@@ -54,6 +55,7 @@ import type * as lib_learn from "../lib/learn.js";
 import type * as lib_levels from "../lib/levels.js";
 import type * as lib_matches from "../lib/matches.js";
 import type * as lib_matchmaking from "../lib/matchmaking.js";
+import type * as lib_ninjathons from "../lib/ninjathons.js";
 import type * as lib_openskill from "../lib/openskill.js";
 import type * as lib_problems from "../lib/problems.js";
 import type * as lib_profiles from "../lib/profiles.js";
@@ -66,6 +68,8 @@ import type * as lib_usernames from "../lib/usernames.js";
 import type * as lib_weekly from "../lib/weekly.js";
 import type * as lib_xp from "../lib/xp.js";
 import type * as matches from "../matches.js";
+import type * as ninjathons from "../ninjathons.js";
+import type * as ninjathonsAdmin from "../ninjathonsAdmin.js";
 import type * as problems from "../problems.js";
 import type * as profiles from "../profiles.js";
 import type * as queue from "../queue.js";
@@ -77,6 +81,7 @@ import type * as schemas_groups from "../schemas/groups.js";
 import type * as schemas_leaderboards from "../schemas/leaderboards.js";
 import type * as schemas_learn from "../schemas/learn.js";
 import type * as schemas_matches from "../schemas/matches.js";
+import type * as schemas_ninjathons from "../schemas/ninjathons.js";
 import type * as schemas_problems from "../schemas/problems.js";
 import type * as schemas_profiles from "../schemas/profiles.js";
 import type * as schemas_progression from "../schemas/progression.js";
@@ -102,6 +107,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
   badges: typeof badges;
   benchmark: typeof benchmark;
   billing: typeof billing;
@@ -148,6 +154,7 @@ declare const fullApi: ApiFromModules<{
   "lib/levels": typeof lib_levels;
   "lib/matches": typeof lib_matches;
   "lib/matchmaking": typeof lib_matchmaking;
+  "lib/ninjathons": typeof lib_ninjathons;
   "lib/openskill": typeof lib_openskill;
   "lib/problems": typeof lib_problems;
   "lib/profiles": typeof lib_profiles;
@@ -160,6 +167,8 @@ declare const fullApi: ApiFromModules<{
   "lib/weekly": typeof lib_weekly;
   "lib/xp": typeof lib_xp;
   matches: typeof matches;
+  ninjathons: typeof ninjathons;
+  ninjathonsAdmin: typeof ninjathonsAdmin;
   problems: typeof problems;
   profiles: typeof profiles;
   queue: typeof queue;
@@ -171,6 +180,7 @@ declare const fullApi: ApiFromModules<{
   "schemas/leaderboards": typeof schemas_leaderboards;
   "schemas/learn": typeof schemas_learn;
   "schemas/matches": typeof schemas_matches;
+  "schemas/ninjathons": typeof schemas_ninjathons;
   "schemas/problems": typeof schemas_problems;
   "schemas/profiles": typeof schemas_profiles;
   "schemas/progression": typeof schemas_progression;

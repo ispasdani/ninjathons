@@ -15,6 +15,7 @@ const GROUPS = [
   ["territory", "Territory"],
   ["challenges", "Challenges"],
   ["learn", "Learn"],
+  ["ninjathons", "Ninjathons"],
 ] as const;
 
 function rarityText(rarity: number) {

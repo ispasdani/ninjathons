@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 8, Profiles and Pro, is done: Stripe in test mode with the webhook checked end to end, entitlements, the Pro lock with a denial test for every Pro function, public profiles with the editor, themes and Pro options, and the Pro page. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass over the Pro and profile screens (a test purchase, the editor), the pull request for phase 8, then phase 9, Ninjathons.
+**Now:** Phase 9, Ninjathons, is done: one event ran from creation to its results page on dev. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass over the ninjathon screens (registering, the team card, handing in, the admin editor and judging; `dnis` is an admin on dev), the pull request for phase 9, then phase 10, Closed beta and launch.
 
 ## Phases
 
@@ -17,7 +17,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 6 | Territory | In progress | 8 Oct 2026 | |
 | 7 | Learn | Done | 8 Oct 2026 | 8 Oct 2026 |
 | 8 | Profiles and Pro | Done | 8 Oct 2026 | 9 Oct 2026 |
-| 9 | Ninjathons | Not started | | |
+| 9 | Ninjathons | Done | 12 Oct 2026 | 12 Oct 2026 |
 | 10 | Closed beta and launch | Not started | | |
 
 Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tutorials, 3 of 3 roadmaps, 6 of 6 weekly sets.
@@ -25,6 +25,26 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 12 Oct 2026 · Phase 9 done
+- The check passes ([decisions §19](notes/decisions.md#phase-9-done-12-oct-2026)). One event ran on Convex dev from creation to results through the real public functions, as throwaway players and a throwaway admin: create and publish, a team of two and a solo entry, the start (brief out, teams locked), two projects handed in, the deadline, judging and publishing. Refusals were checked at each step.
+- Results were right: scores of 86 and 72, the private note hidden, XP of 1,200, 1,200 and 950, 5 badges, standings and the Hall of fame board. The public pages were checked in the browser signed out.
+- `dnis` has the admin role on dev. The throwaway players, admin, event and clock function were removed.
+- Still open: the signed-in screens haven't been seen in the browser (registering, the team card, handing in, the admin editor and judging), since the pane can't sign in. Tests and the CLI run cover their functions. Also still open: phase 6's check by hand, and the signed-out header overflow.
+
+### 12 Oct 2026 · Phase 9: admin role, events, teams, submissions, judging and results
+- Built to [decisions §19](notes/decisions.md#as-built-12-oct-2026). The admin role is `users.role`, set only by `admin:setRole` from the CLI. `adminQuery` and `adminMutation` have denial tests for all 10 admin functions, and a coverage test fails for any admin function without one.
+- 7 new tables, each with its row in [§4](notes/decisions.md#what-happens-to-each-kind-of-data). Events go from draft to published to results, or cancelled. Teams by invite code, solo allowed, locked at the start. One link-only submission per team, refused after the end by the server's clock. Admins score 0 to 10 per criterion and can disqualify. Publishing places the teams, gives 200 XP plus 1,000, 750 or 500, and the 2 new badges, and fills the new Ninjathons board (the Hall of fame).
+- Pages: `/ninjathons` (a tab on Play), `/ninjathons/<slug>` (overview, the brief from the start, your team, your project, results) and `/admin/ninjathons` (list, editor, judging). `/admin` answers 404 to anyone who isn't an admin, signed out included.
+- Checked in the browser with throwaway data on dev (removed afterwards): the list, an upcoming event (no brief in the served HTML), a running one (the brief), results (scores averaged across judges, criteria, links), and the Hall of fame board. Desktop and phone widths, light and dark, nothing wider than the page, no console errors. Fixed on the way: the stage tag stretched across the card.
+- 29 new tests (553 in all, all passing). Production build passes. Deployed to Convex dev.
+- Open: the signed-in screens haven't been seen yet (registering, the team card, handing in, and the admin editor and judging screen); tests cover their functions. They get seen in the phase check.
+
+### 12 Oct 2026 · Phase 9: Ninjathons rules
+- Agreed and written up in [decisions §19](notes/decisions.md#19-ninjathons). Admins are `users.role: "admin"`, set only from the Convex CLI, behind `adminQuery` and `adminMutation` with denial tests like the Pro lock. Events last 1 hour to 7 days; the brief reaches players only from the start.
+- Teams: an invite code each, one team per player per event, teams of 1 allowed when the event allows it, and changes lock at the start. Submissions are links only (repository and demo video) plus a description, editable until the server-side deadline.
+- Judging: admins score every criterion from 0 to 10 against the event's weighted rubric, and can disqualify. Publishing gives 200 XP for submitting plus 1,000, 750 or 500 for the top 3, the participant and winner badges, and places on the Ninjathons board.
+- Not in phase 9: Pro-created private events, paid entry, uploads, judges who aren't admins.
 
 ### 9 Oct 2026 · CI: the runner image no longer pulls from Docker Hub
 - CI's "Build the runner image" failed with `429 Too Many Requests` from Docker Hub, which limits anonymous pulls and is often at that limit on GitHub's shared runners; nothing in the code was wrong.

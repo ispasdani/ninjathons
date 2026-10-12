@@ -15,7 +15,7 @@ import { duration } from "@/lib/duration";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
 
-export type BoardTab = "level" | "month" | "1v1" | "territory" | "daily" | "weekly" | "learning" | "learning-month";
+export type BoardTab = "level" | "month" | "1v1" | "territory" | "daily" | "weekly" | "learning" | "learning-month" | "ninjathons";
 export type Scope = "global" | "country" | "group";
 
 const PAGE = 50;
@@ -29,6 +29,7 @@ const BOARDS: [BoardTab, string][] = [
   ["weekly", "Weekly"],
   ["learning", "Learning"],
   ["learning-month", "Learning this month"],
+  ["ninjathons", "Ninjathons"],
 ];
 
 const ABOUT: Record<BoardTab, string> = {
@@ -40,6 +41,7 @@ const ABOUT: Record<BoardTab, string> = {
   weekly: "Points from this week's challenge set, then less total time. Starts again every Monday (UTC).",
   learning: "XP from finished lessons, tutorials and roadmap modules.",
   "learning-month": "Learning XP earned this calendar month (UTC). Starts again on the 1st.",
+  ninjathons: "The Hall of fame: ninjathon wins, then 2nd and 3rd places, then projects handed in. All time.",
 };
 
 // What follows your value in the "You" row.
@@ -48,6 +50,7 @@ const UNIT_SUFFIX: Record<string, (value: number) => string> = {
   Rating: () => "",
   Streak: (value) => (value === 1 ? "day" : "days"),
   Points: () => "points",
+  Wins: (value) => (value === 1 ? "win" : "wins"),
 };
 
 function updatedAgo(builtAt: number | null, now: number) {
@@ -98,7 +101,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
     router.replace(params.size ? `${pathname}?${params}` : pathname, { scroll: false });
   }
 
-  const unit = board === "1v1" || board === "territory" ? "Rating" : board === "daily" ? "Streak" : board === "weekly" ? "Points" : "XP";
+  const unit = board === "1v1" || board === "territory" ? "Rating" : board === "daily" ? "Streak" : board === "weekly" ? "Points" : board === "ninjathons" ? "Wins" : "XP";
   const me = data?.me ?? null;
 
   return (
@@ -173,7 +176,7 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                 <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
                   <th className="w-16 py-3 pl-4 text-right font-medium">Rank</th>
                   <th className="py-3 pl-6 font-medium">Player</th>
-                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" || board === "territory" ? "Tier" : board === "daily" ? "Solved" : board === "weekly" ? "Time" : "Level"}</th>
+                  <th className="hidden py-3 pr-4 font-medium sm:table-cell">{board === "1v1" || board === "territory" ? "Tier" : board === "daily" ? "Solved" : board === "weekly" ? "Time" : board === "ninjathons" ? "2nd · 3rd · Events" : "Level"}</th>
                   <th className="py-3 pr-4 text-right font-medium">{unit}</th>
                 </tr>
               </thead>
@@ -195,7 +198,9 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                             ? "No points yet this week. Solve a problem from this week's set."
                             : board === "daily"
                               ? "No streaks yet. Solve today's daily to start one."
-                              : board === "learning" || board === "learning-month"
+                              : board === "ninjathons"
+                                ? "No ninjathon has finished yet."
+                                : board === "learning" || board === "learning-month"
                                 ? "No one is here yet. Finish a lesson to be the first."
                                 : "No one is here yet. Solve a problem to be the first."}
                     </td>
@@ -232,7 +237,11 @@ export function Leaderboard({ board, scope, groupId }: { board: BoardTab; scope:
                           </span>
                         </td>
                         <td className="hidden pr-4 sm:table-cell">
-                          {"timeMs" in row ? (
+                          {"events" in row ? (
+                            <span className="font-mono tabular-nums">
+                              {row.seconds} · {row.thirds} · {row.events}
+                            </span>
+                          ) : "timeMs" in row ? (
                             <span className="font-mono tabular-nums">{duration(row.timeMs)}</span>
                           ) : "totalSolved" in row ? (
                             <span className="font-mono tabular-nums">{row.totalSolved.toLocaleString("en")}</span>

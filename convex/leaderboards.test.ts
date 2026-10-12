@@ -158,6 +158,7 @@ describe("monthly Level board", () => {
       "level",
       "level-month:2026-11",
       "level-month:2026-12",
+      "ninjathons",
       "territory",
       // Weekly boards older than last week go too.
       "weekly:2026-W50",
