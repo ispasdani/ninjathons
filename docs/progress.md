@@ -26,6 +26,11 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 12 Oct 2026 · Home page window cards (redesign trial)
+- On the `redesign/window-cards` branch, the home page cards (modes, how it works, roadmap, research and coach, challenges, levels, titles and badges, the group card, the ninjathon example, pricing, and the level and leaderboard demos) are now square "windows" like the ones in "the web lost its colors": a coloured title bar with a file name and window controls, and a solid offset shadow in the same colour. They share one component, `components/home/window-card.tsx`, and the retro section's palette.
+- Checked in the browser at 1440 px and 375 px, light and dark: nothing wider than the page, no console errors. Typecheck and lint pass.
+- Open: whether to keep it. It brings colour to the whole page, where the design system is otherwise monochrome, and the Pro plan is now marked by its pink bar instead of a darker border.
+
 ### 12 Oct 2026 · The marketing home page, from the mockups
 - `/` is now the "Marketing homepage" artboard from the mockups canvas (https://claude.ai/artifact/At7q9yu1TddfeuR9oKqBZP), section for section: the hero with a live 1v1 and Territory example, languages, modes, how it works, the learning section, roadmaps, the research panel and AI coach, daily and weekly challenges, "the web lost its colors", levels and badges, leaderboards and groups, profiles, ninjathons, pricing and a closing call to action. The marketing pages also have a footer now.
 - The mockup was drawn on 27 Sept, before most decisions, so its copy was brought in line with what's built: the name, 9 languages (§8), match lengths (§14), the 37-region Territory map with 33 of 65 points to win (§16, drawn by the real `HexMap` and `buildMap`), the real level curve and titles (§13), the real badge names, the DSA roadmap's 5 modules (§17), weekly points (100, 200, 400) from a real set, the board list and scopes, 8-character group codes, 1v1-only share cards (§18) and ninjathon XP (§19). The Pro price comes from Stripe, as on `/pro`. Promises the mockup made that aren't built were dropped: "weekly group recap", Friends scope, hand-written hints, "Get notified", and footer links to pages that don't exist.

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { levelProgress, TITLES } from "@/convex/lib/levels";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
+import { WindowCard } from "./window-card";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 
@@ -51,7 +52,7 @@ export function LevelDemo() {
   }
 
   return (
-    <div className="flex flex-col gap-4.5 rounded-md border bg-card p-6 sm:p-7">
+    <WindowCard file="level_up.exe" color="orange" bodyClassName="gap-4.5 p-6 sm:p-7">
       <div className="flex items-center gap-4">
         <span className="flex size-16 shrink-0 flex-col items-center justify-center rounded-lg bg-foreground text-background">
           <span className="font-mono text-[9px] tracking-widest opacity-70">LEVEL</span>
@@ -92,7 +93,7 @@ export function LevelDemo() {
       <Button variant="secondary" className="self-start" onClick={earn}>
         Try it: solve a medium problem (+20 XP)
       </Button>
-    </div>
+    </WindowCard>
   );
 }
 
@@ -164,7 +165,7 @@ export function LeaderboardDemo() {
   } else rows.push(you);
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-md border bg-card">
+    <WindowCard file="leaderboard.exe" color="yellow">
       <div role="tablist" aria-label="Board" className="flex gap-5 overflow-x-auto border-b px-5">
         {BOARDS.map((b) => (
           <button
@@ -218,7 +219,7 @@ export function LeaderboardDemo() {
           <span className="text-right font-mono tabular-nums">{r.value}</span>
         </div>
       ))}
-    </div>
+    </WindowCard>
   );
 }
 

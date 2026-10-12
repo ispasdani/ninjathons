@@ -6,13 +6,16 @@ import { HexMap, type MapPlayer, type PlayerColor } from "@/components/territory
 import { Button } from "@/components/ui/button";
 import { buildMap, neighbours, totalPoints, winningPoints } from "@/convex/lib/territoryMap";
 import { cn } from "@/lib/utils";
+import { WIN, WindowCard } from "./window-card";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
-const panel = "flex min-h-[468px] flex-col rounded-lg border bg-card p-5 shadow-overlay sm:p-6 dark:shadow-none";
+// The panel sits inside a window (window-card.tsx), which draws the frame.
+const panel = "flex min-h-[468px] min-w-0 flex-col p-4 sm:p-6";
 
+// Same file names and colours as the 1v1 and Territory windows under Modes.
 const TABS = [
-  { id: "duel", label: "1v1 race" },
-  { id: "territory", label: "Territory" },
+  { id: "duel", label: "1v1 race", file: "race_1v1.exe", color: "pink" },
+  { id: "territory", label: "Territory", file: "territory.exe", color: "green" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -64,11 +67,12 @@ export function HeroDemo() {
   }, [pausedUntil]);
 
   const pause = () => setPausedUntil(Date.now() + PAUSE_MS);
+  const shown = TABS.find((t) => t.id === tab)!;
 
   return (
     <div className="flex min-w-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <div role="tablist" aria-label="Live examples" className="flex gap-1 rounded-md bg-bg-secondary p-1">
+        <div role="tablist" aria-label="Live examples" className="flex gap-1.5">
           {TABS.map((t) => {
             const on = tab === t.id;
             return (
@@ -81,14 +85,15 @@ export function HeroDemo() {
                   pause();
                 }}
                 className={cn(
-                  "relative h-9 overflow-hidden rounded-[9px] px-4 text-[13px] font-medium text-text-secondary",
-                  on && "bg-background text-foreground shadow-ring",
+                  "relative h-9 overflow-hidden border-2 border-foreground bg-card px-4 text-[13px] font-medium text-text-secondary",
+                  on && "text-foreground",
                 )}
+                style={on ? { background: WIN[t.color].bar, color: WIN[t.color].text, boxShadow: "3px 3px 0 var(--foreground)" } : undefined}
               >
                 {t.label}
                 <span aria-hidden className="absolute inset-x-3 bottom-1 h-0.5 rounded-full">
                   <span
-                    className="block h-0.5 rounded-full bg-foreground transition-[width] duration-250 ease-linear"
+                    className="block h-0.5 rounded-full bg-current transition-[width] duration-250 ease-linear"
                     style={{ width: on && !paused ? `${(elapsed / TAB_MS) * 100}%` : 0 }}
                   />
                 </span>
@@ -104,18 +109,24 @@ export function HeroDemo() {
       {/* Both examples share one grid cell, so the panel keeps the taller one's
           height and switching tabs never resizes it. The hidden one is inert and
           remounts (fresh state) each time it becomes the shown one. */}
-      <div role="tabpanel" aria-label={tab === "duel" ? "1v1 race example" : "Territory example"} className="grid">
-        <div className={cn("col-start-1 row-start-1 grid", tab !== "duel" && "invisible")} inert={tab !== "duel"}>
+      <WindowCard
+        file={shown.file}
+        color={shown.color}
+        bodyClassName="grid grid-cols-[minmax(0,1fr)]"
+        role="tabpanel"
+        aria-label={tab === "duel" ? "1v1 race example" : "Territory example"}
+      >
+        <div className={cn("col-start-1 row-start-1 grid min-w-0 grid-cols-[minmax(0,1fr)]", tab !== "duel" && "invisible")} inert={tab !== "duel"}>
           <DuelExample key={tab === "duel" ? "on" : "off"} onTouch={pause} />
         </div>
-        <div className={cn("col-start-1 row-start-1 grid", tab !== "territory" && "invisible")} inert={tab !== "territory"}>
+        <div className={cn("col-start-1 row-start-1 grid min-w-0 grid-cols-[minmax(0,1fr)]", tab !== "territory" && "invisible")} inert={tab !== "territory"}>
           <TerritoryExample
             key={tab === "territory" ? "on" : "off"}
             onTouch={pause}
             running={!reduce && tab === "territory"}
           />
         </div>
-      </div>
+      </WindowCard>
     </div>
   );
 }
