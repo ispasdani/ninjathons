@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { HeaderAuth } from "./header-auth";
+import { Logo } from "./logo";
 import { MobileNav } from "./mobile-nav";
 import { NAV_LINKS } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -14,8 +15,8 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 h-16 border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-full max-w-[84rem] items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
         <MobileNav />
-        <Link href="/" className="text-[15px] font-medium tracking-tight">
-          {site.name}
+        <Link href="/" aria-label={`${site.name} home`}>
+          <Logo markOnPhones />
         </Link>
         <nav aria-label="Main" className="hidden items-center gap-1 sm:flex">
           {NAV_LINKS.map((link) => (

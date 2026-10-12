@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 
 // Marketing pages: statically generated, little JavaScript (docs/03, route groups).
@@ -6,6 +7,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
     <>
       <SiteHeader />
       <main className="flex-1">{children}</main>
+      <SiteFooter />
     </>
   );
 }
