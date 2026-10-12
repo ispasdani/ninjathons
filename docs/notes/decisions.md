@@ -25,6 +25,7 @@ Decisions taken after the 27 Sept 2026 snapshots of the roadmap, plan and archit
 | 8 Oct 2026 | Territory: ring values, one problem deck per difficulty, captures by send time, OpenSkill on the 1v1 scale | [16](#16-territory) |
 | 8 Oct 2026 | Learn: tutorials and 3 roadmaps (no separate courses), lessons finish when their exercises are solved, HTML and CSS checked in the browser, curated MDN and Python docs | [17](#17-learn) |
 | 8 Oct 2026 | Profiles and Pro: free profiles at `/u/`, 10 themes (3 free, 4 earned, 3 Pro), pattern banners only, Stripe Checkout in test mode, VAT decided at release | [18](#18-profiles-and-pro) |
+| 12 Oct 2026 | Ninjathons: an admin role set from the CLI, teams by invite code (solo allowed), link-only submissions, the brief hidden until the start, judging by admins against a weighted rubric | [19](#19-ninjathons) |
 
 ---
 
@@ -698,3 +699,73 @@ Agreed 8 Oct 2026, at the start of phase 8. Adds to the roadmap's rules (Profile
 - **The check passes:** 6 Pro functions (`learn.lesson`, `learn.open`, `learn.roadmap`, `profiles.get`, `profiles.saveTheme`, `profiles.saveCustom`) are each called signed out, free and with a lapsed plan in `convex/pro.test.ts` and refuse, and the coverage test fails for any function that checks Pro without a denial test.
 - **Roadmap pages** mark Pro modules with the Pro tag and their lessons with a lock, through `locked` on each lesson of `learn.roadmap`; tutorials inside Pro modules stay open.
 - **The live webhook was checked end to end in test mode:** a throwaway function (removed) created a subscription through Stripe's API for a throwaway player; Stripe's real, signed `customer.subscription.created` reached `/stripe` and wrote Pro to the period's end plus 2 days, and cancelling it sent `customer.subscription.deleted`, which ended Pro at once. The player, its Stripe customer and the function were deleted afterwards.
+
+## 19. Ninjathons
+
+Agreed 12 Oct 2026, at the start of phase 9. Adds to the roadmap's rules (Challenges and ninjathons, XP sources, Badges, Leaderboards), the plan's Ninjathons update, §4 (deleting data) and §13 (badges and boards).
+
+### What's in phase 9
+
+- **The admin role** and the admin pages: create, edit, publish and cancel events, then judge them.
+- **Public event pages:** the list, each event's page (overview, registration, your team, the brief, your submission), and its results.
+- **Teams** by invite code, **submissions** by link, **judging** against the event's rubric, **results** with XP, 2 badges and the **Ninjathons board** (the Hall of fame).
+- **Not in phase 9:** private events created by Pro players (V1.2), Organization events, paid entry and Stripe Connect, judges who aren't admins, uploads of any kind, chat or messaging between teams, email or notifications. Creating events isn't a Pro feature in V1, since only we create them; joining is free, as always.
+
+### Admins
+
+- **`users.role: "admin"`**, optional, set and cleared only by an internal mutation run from the Convex CLI (`npx convex run`). No page grants it.
+- **`adminQuery` and `adminMutation`** in `lib/functions.ts` refuse anyone else with `FORBIDDEN`. As with Pro: one test file calls every admin function signed out and as a normal player and expects refusal, and a second finds every function built from those wrappers and fails if one is missing from the first.
+- **`/admin/...` pages answer 404 to everyone else,** checked on the server. A hidden link is never the guard.
+
+### The event
+
+- **Fields:** a slug (fixed once published), title, a one-line teaser, the brief (Markdown, through the same renderer as lessons), start and end, the team size (a minimum from 1 and a maximum up to 6), the rubric (2 to 6 criteria, each with a name, a short description and a weight, the weights adding up to 100) and prizes (plain text per place, optional).
+- **Length:** from 1 hour to 7 days. The roadmap's 24 to 72 hours stays the norm for real events; shorter ones are allowed for testing and small events.
+- **Status:** `draft` (only admins see it), `published`, `results` and `cancelled` (the soft delete, §4). While published, the stage comes from the clock: **upcoming** before the start, **running** until the end, then **judging**. Times are kept in UTC and shown in the viewer's local time.
+- **Editing:** everything can be edited until the start. After that the event is fixed, apart from cancelling it.
+- **The brief is sent only from the start time,** by the server. Before then the page shows the title, teaser, dates, team size, rubric and prizes, so nobody gets a head start.
+
+### Teams
+
+- **Signing in is needed to register.** A player creates a team (its name 3 to 32 characters, unique within the event) and gets an 8-character invite code (`lib/codes.ts`, as groups use). Others join with the code while the team has room.
+- **One team per player per event.** A team of 1 counts when the event's minimum is 1.
+- **The captain** is whoever created the team. They rename it, make a new code (the old one stops working) and remove members. When the captain leaves, the member who joined first becomes captain, and an empty team is deleted.
+- **Registration and every team change close at the start.** A team still under the minimum then can't submit; the team page warns them before the start.
+
+### Submissions
+
+- **One per team,** which any member can edit until the end. The server checks the time on every save, so the deadline holds whatever the browser shows.
+- **Fields:** project name, repository link and demo video link (both `https`, any host, stored and shown like profile links: by domain, `rel="nofollow ugc noopener noreferrer"`), and a plain-text description of up to 1,000 characters. Only the latest version is kept, with the time and the member who last saved it.
+- **Hidden from other players until results are out.** Admins see every submission once the event ends.
+
+### Judging
+
+- **Judges are the admins.** After the end, each admin scores each submission from 0 to 10 on every criterion and can add a private note.
+- **A project's score** is the average over its judges of Σ(weight × score) ÷ 10, giving 0 to 100. Ties go to the higher average on the heaviest criterion, then to the earlier final save.
+- **Disqualifying:** an admin can disqualify a submission, giving a reason only admins see. A disqualified team gets no place, XP or badges.
+- **Publishing results** needs at least one complete score sheet for every submission that isn't disqualified. It sets `results`, writes the placements and gives the rewards in the same step. It can't be undone.
+
+### Results and rewards
+
+- **The results page** (the event's own page once results are out) lists every team that submitted, in order: place, team name, members, project links, score and the average for each criterion. Notes and disqualification reasons stay private.
+- **XP**, once per event under the key `ninjathon:<eventId>`: 200 for each member of a team that submitted (not disqualified), plus 1,000 for 1st, 750 for 2nd or 500 for 3rd, in one ledger entry. Members are whoever was on the team at the end.
+- **Badges:** Ninjathon participant (on a team that submitted) and Ninjathon winner (1st place). Rarity is worked out as for every badge (§13).
+- **The Ninjathons board** (the Hall of fame), all time: 1st places, then 2nd, then 3rd, then events submitted, then whoever reached it first. Global, Country and Group scopes, like the other boards.
+
+### Pages
+
+- **`/ninjathons`:** running, upcoming and past events. Linked from Play modes.
+- **`/ninjathons/<slug>`:** the overview and registration before the start; the brief, your team and your submission while it runs; a judging notice after the end; the results once they're out.
+- **`/admin/ninjathons`:** the event list, the editor (with a preview of the public page), publishing and cancelling, and the judging screen (the submissions, a score sheet each, disqualifying, publishing results).
+
+### Account deletion (§4)
+
+- **Before the start:** the player's membership is deleted, and the captain passes on as above.
+- **After the start:** the player is removed from the team. The team and its submission stay if anyone else is on it. Their name in placements and on the Ninjathons board becomes "Deleted player".
+- **Admins:** the role goes with the user. Events and score sheets they made are kept, with the author anonymized.
+
+### The phase check
+
+- **One event runs from creation to its results page on dev:** an admin creates and publishes it, two players form a team (and one plays solo), both teams submit, the deadline locks the submissions, the admin judges and publishes, and the results page, XP, badges and the Ninjathons board are right. To avoid waiting for the clock, an internal function moves the event's times during the run and is removed afterwards.
+
+- **Order of work:** the admin role with its denial tests first; then events and the admin editor; teams; submissions; judging, results and rewards; the public pages and the Ninjathons board; then the check.

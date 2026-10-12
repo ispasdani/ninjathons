@@ -2,7 +2,7 @@
 
 Where the build stands against the phases in the roadmap (Build order) and [decisions §12](notes/decisions.md#12-build-plan-phases). Update this file in the same commit as the work: change the phase table when a phase starts or finishes, and add a log entry, newest first.
 
-**Now:** Phase 8, Profiles and Pro, is done: Stripe in test mode with the webhook checked end to end, entitlements, the Pro lock with a denial test for every Pro function, public profiles with the editor, themes and Pro options, and the Pro page. Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** a signed-in pass over the Pro and profile screens (a test purchase, the editor), the pull request for phase 8, then phase 9, Ninjathons.
+**Now:** Phase 9, Ninjathons, has started: its rules are agreed in [decisions §19](notes/decisions.md#19-ninjathons). Phase 6's check (3 to 6 real players finishing a game by hand) is left for the end. **Next step:** the admin role and its denial tests, then events and the admin editor.
 
 ## Phases
 
@@ -17,7 +17,7 @@ Where the build stands against the phases in the roadmap (Build order) and [deci
 | 6 | Territory | In progress | 8 Oct 2026 | |
 | 7 | Learn | Done | 8 Oct 2026 | 8 Oct 2026 |
 | 8 | Profiles and Pro | Done | 8 Oct 2026 | 9 Oct 2026 |
-| 9 | Ninjathons | Not started | | |
+| 9 | Ninjathons | In progress | 12 Oct 2026 | |
 | 10 | Closed beta and launch | Not started | | |
 
 Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tutorials, 3 of 3 roadmaps, 6 of 6 weekly sets.
@@ -25,6 +25,12 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 ## Log
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
+
+### 12 Oct 2026 · Phase 9: Ninjathons rules
+- Agreed and written up in [decisions §19](notes/decisions.md#19-ninjathons). Admins are `users.role: "admin"`, set only from the Convex CLI, behind `adminQuery` and `adminMutation` with denial tests like the Pro lock. Events last 1 hour to 7 days; the brief reaches players only from the start.
+- Teams: an invite code each, one team per player per event, teams of 1 allowed when the event allows it, and changes lock at the start. Submissions are links only (repository and demo video) plus a description, editable until the server-side deadline.
+- Judging: admins score every criterion from 0 to 10 against the event's weighted rubric, and can disqualify. Publishing gives 200 XP for submitting plus 1,000, 750 or 500 for the top 3, the participant and winner badges, and places on the Ninjathons board.
+- Not in phase 9: Pro-created private events, paid entry, uploads, judges who aren't admins.
 
 ### 9 Oct 2026 · CI: the runner image no longer pulls from Docker Hub
 - CI's "Build the runner image" failed with `429 Too Many Requests` from Docker Hub, which limits anonymous pulls and is often at that limit on GitHub's shared runners; nothing in the code was wrong.
