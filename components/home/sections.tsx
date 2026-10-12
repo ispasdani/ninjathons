@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CopyCode, DailyCountdown, LevelDemo, LeaderboardDemo, TitleBands } from "./demos";
 import { HeroDemo } from "./hero-demo";
+import { WindowCard, type WinColor } from "./window-card";
 
 // Section layout from the mockups canvas (Marketing homepage), on the design
 // tokens so it works in both themes and at phone width.
@@ -125,13 +126,13 @@ export function Languages() {
   );
 }
 
-const MODES: { name: string; href: string; icon: LucideIcon; access: string; ranked?: boolean; desc: string }[] = [
-  { name: "Practice", href: "/problems", icon: BookOpen, access: "Free", desc: "Every problem in the library, in any language, with the docs panel open. Earns XP, never costs rating." },
-  { name: "1v1 race", href: "/play", icon: Swords, access: "Free", ranked: true, desc: "Find a ranked match, challenge a friend by username or link, or race a ghost when nobody's online." },
-  { name: "Territory", href: "/play", icon: Hexagon, access: "Free", ranked: true, desc: "3 to 6 players on one hex map. Solve problems to claim regions and take them from rivals." },
-  { name: "Daily and weekly challenges", href: "/daily", icon: CalendarDays, access: "Free", desc: "One problem a day and a themed set every week, with streaks and their own leaderboards." },
-  { name: "Roadmaps and tutorials", href: "/learn", icon: GraduationCap, access: "Pro", desc: "Guided paths from your first loop to interview-ready. Tutorials and the first module of every roadmap are free." },
-  { name: "Ninjathons", href: "/ninjathons", icon: Users, access: "Free to join", desc: "Team events we run, with a brief, a deadline, judges and prizes." },
+const MODES: { name: string; file: string; color: WinColor; href: string; icon: LucideIcon; access: string; ranked?: boolean; desc: string }[] = [
+  { name: "Practice", file: "practice.exe", color: "orange", href: "/problems", icon: BookOpen, access: "Free", desc: "Every problem in the library, in any language, with the docs panel open. Earns XP, never costs rating." },
+  { name: "1v1 race", file: "race_1v1.exe", color: "pink", href: "/play", icon: Swords, access: "Free", ranked: true, desc: "Find a ranked match, challenge a friend by username or link, or race a ghost when nobody's online." },
+  { name: "Territory", file: "territory.exe", color: "green", href: "/play", icon: Hexagon, access: "Free", ranked: true, desc: "3 to 6 players on one hex map. Solve problems to claim regions and take them from rivals." },
+  { name: "Daily and weekly challenges", file: "daily.exe", color: "yellow", href: "/daily", icon: CalendarDays, access: "Free", desc: "One problem a day and a themed set every week, with streaks and their own leaderboards." },
+  { name: "Roadmaps and tutorials", file: "roadmaps.exe", color: "purple", href: "/learn", icon: GraduationCap, access: "Pro", desc: "Guided paths from your first loop to interview-ready. Tutorials and the first module of every roadmap are free." },
+  { name: "Ninjathons", file: "ninjathons.exe", color: "blue", href: "/ninjathons", icon: Users, access: "Free to join", desc: "Team events we run, with a brief, a deadline, judges and prizes." },
 ];
 
 export function Modes() {
@@ -139,13 +140,9 @@ export function Modes() {
     <section id="modes" className={cn("scroll-mt-16 border-t", pad)}>
       <div className={cn(container, "flex flex-col gap-10")}>
         <SectionHead label="Modes" title="Play, learn and compete" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {MODES.map((m) => (
-            <Link
-              key={m.name}
-              href={m.href}
-              className={cn(card, "flex flex-col gap-3 p-6 transition-colors duration-150 ease-out-quad hover:border-border-strong")}
-            >
+            <WindowCard key={m.name} file={m.file} color={m.color} href={m.href} bodyClassName="gap-3 p-6">
               <div className="flex items-center justify-between">
                 <span className="flex size-9 items-center justify-center rounded-[10px] bg-bg-secondary">
                   <m.icon className="size-[18px]" strokeWidth={1.8} aria-hidden />
@@ -157,7 +154,7 @@ export function Modes() {
               </div>
               <span className="text-[17px] font-medium">{m.name}</span>
               <span className="text-sm leading-[21px] text-text-secondary">{m.desc}</span>
-            </Link>
+            </WindowCard>
           ))}
         </div>
       </div>
@@ -165,6 +162,7 @@ export function Modes() {
   );
 }
 
+const STEP_COLORS: WinColor[] = ["orange", "yellow", "green", "pink"];
 const STEPS = [
   ["Pick a mode", "Practice alone, find a 1v1 or Territory match, or take today's challenge."],
   ["Solve in the browser", "A real editor, sample tests on Run, and the docs library a tab away."],
@@ -177,12 +175,14 @@ export function HowItWorks() {
     <section className={cn(muted, pad)}>
       <div className={cn(container, "flex flex-col gap-10")}>
         <SectionHead label="How it works" title="From problem to ranking in four steps" />
-        <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(([title, text], i) => (
-            <li key={title} className={cn(card, "flex flex-col gap-2.5 p-6")}>
-              <span className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
-              <span className="text-base font-medium">{title}</span>
-              <span className="text-sm leading-[21px] text-text-secondary">{text}</span>
+            <li key={title} className="flex">
+              <WindowCard file={`step_0${i + 1}.exe`} color={STEP_COLORS[i]} className="grow" bodyClassName="gap-2.5 p-6">
+                <span className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+                <span className="text-base font-medium">{title}</span>
+                <span className="text-sm leading-[21px] text-text-secondary">{text}</span>
+              </WindowCard>
             </li>
           ))}
         </ol>
@@ -333,7 +333,7 @@ export function Roadmaps() {
         </div>
       </div>
 
-      <div className={cn(card, "flex min-w-0 flex-col gap-4.5 bg-bg-secondary/50 p-5 sm:p-6")}>
+      <WindowCard file="roadmap.exe" color="purple" bodyClassName="gap-4.5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-col gap-0.5">
             <Eyebrow>Roadmap</Eyebrow>
@@ -378,15 +378,15 @@ export function Roadmaps() {
           <span className="rounded-sm bg-bg-secondary px-2.5 py-1 text-xs">Programming basics</span>
           <span className="rounded-sm bg-bg-secondary px-2.5 py-1 text-xs">Interview prep</span>
         </div>
-      </div>
+      </WindowCard>
     </section>
   );
 }
 
 export function ResearchAndCoach() {
   return (
-    <section className={cn(container, "grid gap-6 pb-16 sm:pb-24 lg:grid-cols-2")}>
-      <div className={cn(card, "flex min-w-0 flex-col gap-5 bg-bg-secondary/50 p-6 sm:p-8")}>
+    <section className={cn(container, "grid gap-8 pb-16 sm:pb-24 lg:grid-cols-2")}>
+      <WindowCard file="research.exe" color="blue" bodyClassName="gap-5 p-6 sm:p-8">
         <Eyebrow>Research panel</Eyebrow>
         <h3 className="text-[28px] leading-8">Look things up without leaving the problem</h3>
         <p className="text-[15px] leading-[23px] text-text-secondary">
@@ -416,9 +416,9 @@ export function ResearchAndCoach() {
             <span>2 pages opened</span>
           </div>
         </div>
-      </div>
+      </WindowCard>
 
-      <div className={cn(card, "flex min-w-0 flex-col gap-5 bg-bg-secondary/50 p-6 sm:p-8")}>
+      <WindowCard file="coach.exe" color="green" bodyClassName="gap-5 p-6 sm:p-8">
         <div className="flex items-center gap-2">
           <Eyebrow>AI coach</Eyebrow>
           <Tag>COMING SOON</Tag>
@@ -443,7 +443,7 @@ export function ResearchAndCoach() {
             A FEW HINTS A DAY FREE · UNLIMITED WITH PRO
           </div>
         </div>
-      </div>
+      </WindowCard>
     </section>
   );
 }
@@ -466,8 +466,8 @@ export function Challenges() {
           title="A reason to come back every day"
           aside="Free for everyone, with their own points and leaderboards. They never change your match ratings."
         />
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className={cn(card, "flex flex-col gap-4.5 p-6 sm:p-7")}>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <WindowCard file="daily_challenge.exe" color="orange" bodyClassName="gap-4.5 p-6 sm:p-7">
             <div className="flex items-center justify-between gap-3">
               <Eyebrow>Daily challenge</Eyebrow>
               <DailyCountdown />
@@ -498,9 +498,9 @@ export function Challenges() {
               </Button>
               <span className="font-mono text-xs text-brand-text">+80 XP WITH YOUR STREAK</span>
             </div>
-          </div>
+          </WindowCard>
 
-          <div className={cn(card, "flex flex-col gap-4 p-6 sm:p-7")}>
+          <WindowCard file="weekly_challenge.exe" color="yellow" bodyClassName="gap-4 p-6 sm:p-7">
             <div className="flex items-center justify-between gap-3">
               <Eyebrow>Weekly challenge · Beyond the Grid</Eyebrow>
               <span className="font-mono text-xs">ENDS SUNDAY</span>
@@ -531,7 +531,7 @@ export function Challenges() {
             <Button size="lg" variant="secondary" className="self-start" asChild>
               <Link href="/weekly">See this week&apos;s set</Link>
             </Button>
-          </div>
+          </WindowCard>
         </div>
       </div>
     </section>
@@ -556,14 +556,14 @@ export function Progression() {
           title="Everything you do earns XP"
           aside="XP measures effort and only goes up. Ratings measure skill. The two never mix, so no amount of grinding buys a better rating."
         />
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           <LevelDemo />
-          <div className="flex min-w-0 flex-col gap-4">
-            <div className={cn(card, "flex flex-col gap-3 p-6")}>
+          <div className="flex min-w-0 flex-col gap-6">
+            <WindowCard file="titles.exe" color="purple" bodyClassName="gap-3 p-6">
               <Eyebrow>Titles</Eyebrow>
               <TitleBands />
-            </div>
-            <div className={cn(card, "flex flex-col gap-3 p-6")}>
+            </WindowCard>
+            <WindowCard file="badges.exe" color="pink" bodyClassName="gap-3 p-6">
               <div className="flex flex-wrap justify-between gap-2">
                 <Eyebrow>Badges</Eyebrow>
                 <span className="font-mono text-[11px] text-muted-foreground">% = PLAYERS WHO HOLD IT</span>
@@ -581,7 +581,7 @@ export function Progression() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </WindowCard>
           </div>
         </div>
       </div>
@@ -601,9 +601,9 @@ export function Leaderboards() {
             something. Every board works globally, by country and inside your group.
           </p>
         </div>
-        <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
           <LeaderboardDemo />
-          <div className={cn(card, "flex flex-col gap-4 p-6 sm:p-7")}>
+          <WindowCard file="my_group.exe" color="green" bodyClassName="gap-4 p-6 sm:p-7">
             <Eyebrow>For teams and offices</Eyebrow>
             <span className="text-[22px] leading-7 font-medium tracking-tight">Bring your team. Settle it on the map.</span>
             <p className="text-sm leading-[21px] text-text-secondary">
@@ -630,7 +630,7 @@ export function Leaderboards() {
             <Button size="lg" className="mt-auto self-start" asChild>
               <Link href="/groups">Create a group</Link>
             </Button>
-          </div>
+          </WindowCard>
         </div>
       </div>
     </section>
@@ -760,7 +760,7 @@ export function Ninjathons() {
             </Button>
           </div>
         </div>
-        <div className={cn(card, "flex flex-col gap-4 p-6")}>
+        <WindowCard file="ninjathon.exe" color="blue" bodyClassName="gap-4 p-6">
           <div className="flex items-center justify-between gap-3">
             <Eyebrow>Example ninjathon</Eyebrow>
             <span className="rounded-xs border border-verdict-ac/30 bg-verdict-ac/10 px-[7px] py-0.5 font-mono text-[11px] text-verdict-ac">
@@ -786,7 +786,7 @@ export function Ninjathons() {
           <Button size="lg" className="self-start" asChild>
             <Link href="/ninjathons">Register a team</Link>
           </Button>
-        </div>
+        </WindowCard>
       </div>
     </section>
   );
@@ -805,9 +805,11 @@ export function Pricing({ proPrice }: { proPrice: string | null }) {
             </Button>
           }
         />
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           <PlanCard
             name="Free"
+            file="free.exe"
+            color="green"
             price="€0"
             per="forever"
             items={[
@@ -828,7 +830,8 @@ export function Pricing({ proPrice }: { proPrice: string | null }) {
             tag={<Tag pro>PRO</Tag>}
             price={proPrice ?? "Pro"}
             per={proPrice ? "/ month" : ""}
-            highlight
+            file="pro.exe"
+            color="pink"
             items={[
               "Every roadmap module",
               "Custom profile, all 10 themes, short URL",
@@ -844,6 +847,8 @@ export function Pricing({ proPrice }: { proPrice: string | null }) {
           />
           <PlanCard
             name="Organization"
+            file="organization.exe"
+            color="blue"
             tag={<Tag>COMING LATER</Tag>}
             price="Custom"
             per="per event or seat"
@@ -868,7 +873,8 @@ function PlanCard({
   per,
   items,
   action,
-  highlight,
+  file,
+  color,
 }: {
   name: string;
   tag?: ReactNode;
@@ -876,10 +882,11 @@ function PlanCard({
   per: string;
   items: string[];
   action?: ReactNode;
-  highlight?: boolean;
+  file: string;
+  color: WinColor;
 }) {
   return (
-    <div className={cn(card, "flex flex-col gap-4 p-6 sm:p-7", highlight && "border-foreground")}>
+    <WindowCard file={file} color={color} bodyClassName="gap-4 p-6 sm:p-7">
       <div className="flex justify-between">
         <span className="text-base font-medium">{name}</span>
         {tag}
@@ -896,7 +903,7 @@ function PlanCard({
         ))}
       </ul>
       {action && <div className="mt-auto flex pt-2 [&>*]:w-full">{action}</div>}
-    </div>
+    </WindowCard>
   );
 }
 
