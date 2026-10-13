@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { PlayTabs } from "@/components/play/play-tabs";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { FunctionReturnType } from "convex/server";
 
@@ -18,7 +19,7 @@ export function NinjathonList() {
   const user = useQuery(api.user.getCurrentUser);
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <PlayTabs />
       <header className="mt-6">
         <div className="flex items-center justify-between gap-4">
@@ -39,7 +40,7 @@ export function NinjathonList() {
       {events === undefined ? (
         <p className="mt-8 text-[13px] text-muted-foreground">Loading…</p>
       ) : events.running.length + events.upcoming.length + events.past.length === 0 ? (
-        <div className="mt-8 rounded-md border p-6 text-[13px] text-muted-foreground">
+        <div className="mt-8 border p-6 text-[13px] text-muted-foreground">
           No ninjathons yet. The first one will be announced here.
         </div>
       ) : (
@@ -58,12 +59,15 @@ function Section({ title, events }: { title: string; events: Event[] }) {
   return (
     <section>
       <h2 className="text-xl">{title}</h2>
-      <ul className="mt-4 grid gap-4 md:grid-cols-2">
+      <ul className="mt-4 grid gap-6 md:grid-cols-2">
         {events.map((event) => (
           <li key={event._id}>
-            <Link
+            <WindowCard
+              file={`${event.slug}.exe`}
+              color={title === "Past" ? "plain" : "blue"}
               href={`/ninjathons/${event.slug}`}
-              className="flex h-full flex-col rounded-md border p-6 transition-colors duration-150 ease-out-quad hover:border-border-strong hover:bg-bg-secondary"
+              className="h-full"
+              bodyClassName="p-6"
             >
               <StageTag stage={event.stage} />
               <h3 className="mt-3 text-lg font-medium">{event.title}</h3>
@@ -82,7 +86,7 @@ function Section({ title, events }: { title: string; events: Event[] }) {
                   {teamSize(event.minTeam, event.maxTeam)} · {event.teams} registered
                 </dd>
               </dl>
-            </Link>
+            </WindowCard>
           </li>
         ))}
       </ul>

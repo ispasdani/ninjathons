@@ -49,7 +49,7 @@ export function ProblemStatement({ title, difficulty, tags, mode, statement, exa
 
       <section className="space-y-3">
         {examples.map((example, i) => (
-          <div key={i} className="rounded-md border bg-bg-secondary p-4 font-mono text-[13px] leading-5">
+          <div key={i} className="border bg-bg-secondary p-4 font-mono text-[13px] leading-5">
             <p className="mb-2 font-sans text-xs font-medium text-muted-foreground">Example {i + 1}</p>
             <p className="break-all whitespace-pre-wrap">
               <span className="text-muted-foreground">Input: </span>
@@ -69,7 +69,7 @@ export function ProblemStatement({ title, difficulty, tags, mode, statement, exa
       {hints.length > 0 && (
         <section className="space-y-2">
           {hints.map((hint, i) => (
-            <details key={i} className="rounded-md border px-4 py-3 text-[13px]">
+            <details key={i} className="border px-4 py-3 text-[13px]">
               <summary className="cursor-pointer font-medium">Hint {i + 1}</summary>
               <div className="mt-2 text-muted-foreground [&_code]:font-mono">
                 <Markdown>{hint}</Markdown>

@@ -176,7 +176,7 @@ export function ChallengeLists({ language }: { language: Language }) {
           <p className={eyebrow}>Challenges for you</p>
           <ul className="mt-3 space-y-2">
             {challenges.incoming.map((c) => (
-              <li key={c._id} className="flex flex-wrap items-center gap-3 rounded-md border border-border-strong p-4">
+              <li key={c._id} className="flex flex-wrap items-center gap-3 border border-border-strong p-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] font-medium">@{c.from} challenges you</p>
                   <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -205,7 +205,7 @@ export function ChallengeLists({ language }: { language: Language }) {
           <p className={eyebrow}>Your challenges</p>
           <ul className="mt-3 space-y-2">
             {challenges.outgoing.map((c) => (
-              <li key={c._id} className="flex flex-wrap items-center gap-3 rounded-md border p-4">
+              <li key={c._id} className="flex flex-wrap items-center gap-3 border p-4">
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-2 text-[13px] font-medium">
                     <span className="size-2 animate-pulse rounded-full bg-brand" aria-hidden />

@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { Difficulty } from "@/components/problem/difficulty";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Language } from "@/convex/judge/types";
 import { errorMessage } from "@/lib/errors";
@@ -86,7 +87,7 @@ export function ChallengePage({ code }: { code: string }) {
       <h1 className="mt-2 text-3xl sm:text-4xl">
         {challenge.mine ? "Your challenge" : `@${challenge.from} challenges you`}
       </h1>
-      <div className="mt-6 space-y-2 rounded-md border bg-bg-secondary p-6 text-[13px]">
+      <WindowCard file="challenge.exe" color="pink" className="mt-6" bodyClassName="block space-y-2 p-6 text-[13px]">
         <p>
           <span className="font-medium">{challenge.ranked ? "Ranked" : "Unranked"}</span>
           <span className="text-muted-foreground">
@@ -98,7 +99,7 @@ export function ChallengePage({ code }: { code: string }) {
           <span className="text-muted-foreground">· first to pass every test wins</span>
         </p>
         {challenge.problem === null && <p className="text-muted-foreground">Expires in {minutes} min.</p>}
-      </div>
+      </WindowCard>
 
       {challenge.problem ? (
         <div className="mt-6 space-y-3 text-[13px]">

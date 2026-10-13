@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { Difficulty } from "@/components/problem/difficulty";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
@@ -131,14 +132,19 @@ export function DuelHud({ match, now, onForfeit }: { match: Match; now: number; 
 
 function PlayerCard({ match, player }: { match: Match; player: Player }) {
   return (
-    <div className="flex-1 rounded-md border p-4">
+    <WindowCard
+      file={player.you ? "you.exe" : "opponent.exe"}
+      color={player.you ? "ink" : "plain"}
+      className="flex-1"
+      bodyClassName="block p-4"
+    >
       <PlayerName player={player} side={player.you ? "you" : "opponent"} />
       {!player.you && <p className="sr-only">Opponent: {displayName(player)}</p>}
       <p className="mt-2 font-mono text-xs text-muted-foreground">
         {player.rating !== null ? `${player.rating} · ${player.tier}` : "Rating provisional"}
       </p>
       <p className="mt-1 text-[13px] text-muted-foreground">{languageLabel(match, player.language)}</p>
-    </div>
+    </WindowCard>
   );
 }
 
@@ -155,7 +161,7 @@ export function DuelCountdown({ match, now, onLeave }: { match: Match; now: numb
         <span className="text-center font-mono text-xs text-muted-foreground uppercase">vs</span>
         {them && <PlayerCard match={match} player={them} />}
       </div>
-      <div className="mt-8 flex items-center justify-between gap-4 rounded-md border bg-bg-secondary p-6">
+      <div className="mt-8 flex items-center justify-between gap-4 border bg-bg-secondary p-6">
         <div className="space-y-1 text-[13px]">
           <Difficulty level={match.difficulty} />
           <p className="text-muted-foreground">{MINUTES[match.difficulty]} minutes · first to pass every test wins</p>

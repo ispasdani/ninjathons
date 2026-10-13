@@ -6,7 +6,7 @@ import { HexMap, type MapPlayer, type PlayerColor } from "@/components/territory
 import { Button } from "@/components/ui/button";
 import { buildMap, neighbours, totalPoints, winningPoints } from "@/convex/lib/territoryMap";
 import { cn } from "@/lib/utils";
-import { WIN, WindowCard } from "./window-card";
+import { WIN, WindowCard } from "@/components/ui/window-card";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 // The panel sits inside a window (window-card.tsx), which draws the frame.
@@ -341,7 +341,7 @@ function TerritoryExample({ onTouch, running }: { onTouch: () => void; running: 
           <div
             key={p.userId}
             className={cn(
-              "flex items-center gap-2 rounded-[10px] border px-2.5 py-2",
+              "flex items-center gap-2 border px-2.5 py-2",
               p.userId === "you" && "border-duel-you/40 bg-duel-you/5",
             )}
           >

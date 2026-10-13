@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { LessonState } from "@/components/learn/lesson-state";
+import { WindowCard } from "@/components/ui/window-card";
 import type { api } from "@/convex/_generated/api";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
@@ -36,14 +37,17 @@ export function LearnHome({ preloaded }: { preloaded: Preloaded<typeof api.learn
         {roadmaps.length === 0 ? (
           <p className="mt-4 text-[13px] text-muted-foreground">No roadmaps yet.</p>
         ) : (
-          <ul className="mt-4 grid gap-4 md:grid-cols-3">
+          <ul className="mt-4 grid gap-6 md:grid-cols-3">
             {roadmaps.map((roadmap) => {
               const share = roadmap.lessons ? roadmap.finished / roadmap.lessons : 0;
               return (
                 <li key={roadmap.slug}>
-                  <Link
+                  <WindowCard
+                    file={`${roadmap.slug}.exe`}
+                    color="purple"
                     href={`/roadmaps/${roadmap.slug}`}
-                    className="flex h-full flex-col rounded-md border p-6 transition-colors hover:border-border-strong"
+                    className="h-full"
+                    bodyClassName="p-6"
                   >
                     <p className="text-xl">{roadmap.title}</p>
                     <p className="mt-2 flex-1 text-[13px] leading-relaxed text-muted-foreground">{roadmap.summary}</p>
@@ -56,7 +60,7 @@ export function LearnHome({ preloaded }: { preloaded: Preloaded<typeof api.learn
                         <div className="h-full bg-brand" style={{ width: `${share * 100}%` }} />
                       </div>
                     )}
-                  </Link>
+                  </WindowCard>
                 </li>
               );
             })}
@@ -71,26 +75,28 @@ export function LearnHome({ preloaded }: { preloaded: Preloaded<typeof api.learn
         {tutorials.length === 0 ? (
           <p className="mt-4 text-[13px] text-muted-foreground">No tutorials yet.</p>
         ) : (
-          <ul className="mt-4 divide-y rounded-md border">
-            {tutorials.map((tutorial) => (
-              <li key={tutorial.slug}>
-                <Link
-                  href={`/learn/${tutorial.slug}`}
-                  className="group flex items-center gap-4 px-4 py-4 transition-colors hover:bg-bg-secondary"
-                >
-                  <LessonState state={tutorial.state} />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{tutorial.title}</p>
-                    <p className="mt-0.5 truncate text-[13px] text-muted-foreground">{tutorial.summary}</p>
-                  </div>
-                  <span className="hidden font-mono text-xs text-muted-foreground tabular-nums sm:inline">
-                    {tutorial.exercises} {tutorial.exercises === 1 ? "exercise" : "exercises"}
-                  </span>
-                  <ArrowRight className="size-4 text-muted-foreground group-hover:text-foreground" aria-hidden />
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <WindowCard file="tutorials.exe" color="plain" className="mt-4" bodyClassName="block">
+            <ul className="divide-y">
+              {tutorials.map((tutorial) => (
+                <li key={tutorial.slug}>
+                  <Link
+                    href={`/learn/${tutorial.slug}`}
+                    className="group flex items-center gap-4 px-4 py-4 transition-colors hover:bg-bg-secondary"
+                  >
+                    <LessonState state={tutorial.state} />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium">{tutorial.title}</p>
+                      <p className="mt-0.5 truncate text-[13px] text-muted-foreground">{tutorial.summary}</p>
+                    </div>
+                    <span className="hidden font-mono text-xs text-muted-foreground tabular-nums sm:inline">
+                      {tutorial.exercises} {tutorial.exercises === 1 ? "exercise" : "exercises"}
+                    </span>
+                    <ArrowRight className="size-4 text-muted-foreground group-hover:text-foreground" aria-hidden />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </WindowCard>
         )}
       </section>
     </div>

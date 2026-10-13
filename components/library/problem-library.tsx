@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 
 import { Difficulty } from "@/components/problem/difficulty";
 import { Segmented } from "@/components/ui/segmented";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 
 type Row = NonNullable<ReturnType<typeof useLibrary>>[number];
@@ -146,64 +147,66 @@ export function ProblemLibrary() {
         )}
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-md border">
-        <table className="w-full text-[13px]">
-          <thead>
-            <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
-              <th className="w-10 py-3 pl-4 font-medium">
-                <span className="sr-only">Status</span>
-              </th>
-              <th className="py-3 pr-4 font-medium">Title</th>
-              <th className="hidden py-3 pr-4 font-medium md:table-cell">Topics</th>
-              <th className="hidden py-3 pr-4 font-medium sm:table-cell">Type</th>
-              <th className="py-3 pr-4 font-medium">Difficulty</th>
-            </tr>
-          </thead>
-          <tbody>
-            {problems === undefined ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-6 text-muted-foreground">
-                  Loading…
-                </td>
+      <WindowCard file="problems.exe" color="plain" className="mt-4" bodyClassName="block">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[13px]">
+            <thead>
+              <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
+                <th className="w-10 py-3 pl-4 font-medium">
+                  <span className="sr-only">Status</span>
+                </th>
+                <th className="py-3 pr-4 font-medium">Title</th>
+                <th className="hidden py-3 pr-4 font-medium md:table-cell">Topics</th>
+                <th className="hidden py-3 pr-4 font-medium sm:table-cell">Type</th>
+                <th className="py-3 pr-4 font-medium">Difficulty</th>
               </tr>
-            ) : rows.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-6 text-muted-foreground">
-                  No problems match these filters.
-                </td>
-              </tr>
-            ) : (
-              rows.map((p) => (
-                <tr key={p.slug} className="h-11 border-b last:border-b-0 hover:bg-bg-secondary">
-                  <td className="pl-4">
-                    <StatusIcon status={p.status} />
-                  </td>
-                  <td className="pr-4">
-                    <Link href={`/solve/${p.slug}`} className="font-medium hover:underline">
-                      {p.title}
-                    </Link>
-                  </td>
-                  <td className="hidden pr-4 md:table-cell">
-                    <span className="flex flex-wrap gap-1">
-                      {p.tags.slice(0, 3).map((t) => (
-                        <span key={t} className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs">
-                          {t}
-                        </span>
-                      ))}
-                    </span>
-                  </td>
-                  <td className="hidden pr-4 text-muted-foreground sm:table-cell">
-                    {p.mode === "function" ? "Function" : p.mode === "web" ? "HTML & CSS" : "Full program"}
-                  </td>
-                  <td className="pr-4">
-                    <Difficulty level={p.difficulty} />
+            </thead>
+            <tbody>
+              {problems === undefined ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-muted-foreground">
+                    Loading…
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : rows.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-muted-foreground">
+                    No problems match these filters.
+                  </td>
+                </tr>
+              ) : (
+                rows.map((p) => (
+                  <tr key={p.slug} className="h-11 border-b last:border-b-0 hover:bg-bg-secondary">
+                    <td className="pl-4">
+                      <StatusIcon status={p.status} />
+                    </td>
+                    <td className="pr-4">
+                      <Link href={`/solve/${p.slug}`} className="font-medium hover:underline">
+                        {p.title}
+                      </Link>
+                    </td>
+                    <td className="hidden pr-4 md:table-cell">
+                      <span className="flex flex-wrap gap-1">
+                        {p.tags.slice(0, 3).map((t) => (
+                          <span key={t} className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs">
+                            {t}
+                          </span>
+                        ))}
+                      </span>
+                    </td>
+                    <td className="hidden pr-4 text-muted-foreground sm:table-cell">
+                      {p.mode === "function" ? "Function" : p.mode === "web" ? "HTML & CSS" : "Full program"}
+                    </td>
+                    <td className="pr-4">
+                      <Difficulty level={p.difficulty} />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </WindowCard>
       {problems && (
         <p className="mt-3 font-mono text-xs text-muted-foreground tabular-nums">
           {filtered ? `${rows.length} of ${total} problems` : `${total} problems`}

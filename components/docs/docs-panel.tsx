@@ -93,7 +93,7 @@ export function DocsPanel({
       ) : results.length === 0 ? (
         <p className="text-[13px] text-muted-foreground">Nothing matches &ldquo;{debounced}&rdquo;.</p>
       ) : (
-        <ul className="divide-y rounded-md border">
+        <ul className="divide-y border">
           {results.map((r) => (
             <li key={r._id}>
               <button

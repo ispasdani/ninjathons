@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { LessonText } from "@/components/learn/lesson-text";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { timeLeft } from "@/lib/duration";
@@ -50,7 +51,7 @@ export function NinjathonPage({ preloaded, slug }: { preloaded: Preloaded<typeof
   }
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <Link href="/ninjathons" className="text-[13px] text-text-secondary hover:underline">
         ← All ninjathons
       </Link>
@@ -60,12 +61,12 @@ export function NinjathonPage({ preloaded, slug }: { preloaded: Preloaded<typeof
           <StageTag stage={event.stage} />
         </div>
         <h1 className="mt-2 text-3xl text-balance sm:text-4xl">{event.title}</h1>
-        {event.teaser && <p className="mt-2 text-base text-text-secondary">{event.teaser}</p>}
+        {event.teaser && <p className="mt-2 max-w-3xl text-base text-text-secondary">{event.teaser}</p>}
         {!event.cancelled && <Clock stage={event.stage} startsAt={event.startsAt} endsAt={event.endsAt} now={now} />}
       </header>
 
       {event.cancelled ? (
-        <p className="mt-8 rounded-md border p-6 text-[13px] text-muted-foreground">This ninjathon was cancelled.</p>
+        <p className="mt-8 border p-6 text-[13px] text-muted-foreground">This ninjathon was cancelled.</p>
       ) : (
         <Body event={event} />
       )}
@@ -99,7 +100,7 @@ function Body({ event }: { event: Live }) {
               <LessonText>{event.brief}</LessonText>
             </div>
           ) : (
-            <p className="mt-3 rounded-md border bg-bg-secondary p-6 text-[13px] text-muted-foreground">
+            <p className="mt-3 border bg-bg-secondary p-6 text-[13px] text-muted-foreground">
               The brief appears here at the start, <LocalTime at={event.startsAt} />, so everyone starts together.
             </p>
           )}
@@ -116,7 +117,7 @@ function Body({ event }: { event: Live }) {
 
 function Facts({ event }: { event: Live }) {
   return (
-    <div className="space-y-6 rounded-md border p-6 text-[13px]">
+    <WindowCard file="details.exe" color="plain" bodyClassName="block space-y-6 p-6 text-[13px]">
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
         <dt className="text-muted-foreground">Starts</dt>
         <dd>
@@ -161,7 +162,7 @@ function Facts({ event }: { event: Live }) {
       <p className="text-xs text-muted-foreground">
         XP: 200 for handing in a project, plus 1,000, 750 or 500 for the top three.
       </p>
-    </div>
+    </WindowCard>
   );
 }
 
@@ -200,21 +201,20 @@ function Alert({ error }: { error: string | null }) {
 
 function TeamPanel({ event }: { event: Live }) {
   if (event.me) return <TeamCard event={event} me={event.me} />;
-  const box = "rounded-md border p-6 text-[13px]";
   if (event.stage !== "upcoming") {
     return event.stage === "running" ? (
-      <p className={cn(box, "text-muted-foreground")}>Registration closed at the start.</p>
+      <p className="border p-6 text-[13px] text-muted-foreground">Registration closed at the start.</p>
     ) : null;
   }
   if (!event.signedIn) {
     return (
-      <div className={box}>
+      <WindowCard file="take_part.exe" color="blue" bodyClassName="block p-6 text-[13px]">
         <p className={eyebrow}>Take part</p>
         <p className="mt-2 text-muted-foreground">Sign in to create a team or join one with its code.</p>
         <Button variant="brand" className="mt-4" asChild>
           <Link href="/sign-in">Sign in</Link>
         </Button>
-      </div>
+      </WindowCard>
     );
   }
   return <Register event={event} />;
@@ -229,7 +229,7 @@ function Register({ event }: { event: Live }) {
   const solo = event.minTeam === 1;
 
   return (
-    <div className="rounded-md border p-6 text-[13px]">
+    <WindowCard file="take_part.exe" color="blue" bodyClassName="block p-6 text-[13px]">
       <p className={eyebrow}>Take part</p>
       <form
         className="mt-3 space-y-2"
@@ -278,7 +278,7 @@ function Register({ event }: { event: Live }) {
       </form>
       <Alert error={error} />
       <p className="mt-4 text-xs text-muted-foreground">Teams lock at the start: no joining, leaving or renaming after that.</p>
-    </div>
+    </WindowCard>
   );
 }
 
@@ -302,7 +302,7 @@ function TeamCard({ event, me }: { event: Live; me: Me }) {
   }
 
   return (
-    <div className="rounded-md border border-l-2 border-l-brand p-6 text-[13px]">
+    <WindowCard file="your_team.exe" color="blue" bodyClassName="block p-6 text-[13px]">
       <p className={eyebrow}>Your team</p>
       {editing ? (
         <form
@@ -406,7 +406,7 @@ function TeamCard({ event, me }: { event: Live; me: Me }) {
         </div>
       )}
       <Alert error={error} />
-    </div>
+    </WindowCard>
   );
 }
 
@@ -430,7 +430,7 @@ function SubmissionForm({ event, me }: { event: Live; me: Me }) {
   const short = me.members.length < event.minTeam;
 
   return (
-    <section className="rounded-md border p-6">
+    <WindowCard as="section" file="your_project.exe" color="blue" bodyClassName="block p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-xl">Your project</h2>
         <p className="text-xs text-muted-foreground">
@@ -477,7 +477,7 @@ function SubmissionForm({ event, me }: { event: Live; me: Me }) {
         </div>
       </form>
       <Alert error={error} />
-    </section>
+    </WindowCard>
   );
 }
 
@@ -498,7 +498,7 @@ function Field({ id, label, hint, children }: { id: string; label: string; hint?
 function OwnProject({ me }: { me: Me }) {
   const s = me.submission;
   return (
-    <section className="rounded-md border p-6 text-[13px]">
+    <WindowCard as="section" file="your_project.exe" color="plain" bodyClassName="block p-6 text-[13px]">
       <h2 className="text-xl">Your project</h2>
       {s ? (
         <div className="mt-3 space-y-2">
@@ -512,7 +512,7 @@ function OwnProject({ me }: { me: Me }) {
       ) : (
         <p className="mt-2 text-muted-foreground">Your team didn&apos;t hand in a project.</p>
       )}
-    </section>
+    </WindowCard>
   );
 }
 
@@ -526,11 +526,14 @@ function Results({ event }: { event: Live }) {
       {results.length === 0 ? (
         <p className="mt-3 text-[13px] text-muted-foreground">No projects were placed.</p>
       ) : (
-        <ol className="mt-4 space-y-3">
+        <ol className="mt-4 space-y-5">
           {results.map((r) => (
-            <li
+            <WindowCard
+              as="li"
               key={r.place}
-              className={cn("rounded-md border p-5 text-[13px]", r.place === 1 && "border-l-2 border-l-brand")}
+              file={`place_${r.place}.exe`}
+              color={r.place === 1 ? "yellow" : "plain"}
+              bodyClassName="block p-5 text-[13px]"
             >
               <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
                 <span className="flex items-center gap-1.5 font-mono text-base font-medium tabular-nums">
@@ -574,7 +577,7 @@ function Results({ event }: { event: Live }) {
                   </div>
                 ))}
               </dl>
-            </li>
+            </WindowCard>
           ))}
         </ol>
       )}

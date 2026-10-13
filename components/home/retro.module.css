@@ -16,7 +16,6 @@
 }
 
 .loop {
-  border-radius: 16px;
   padding: 28px;
   display: flex;
   flex-direction: column;
@@ -75,7 +74,6 @@
 }
 
 .score {
-  border-radius: 16px;
   padding: 28px;
   display: flex;
   flex-direction: column;

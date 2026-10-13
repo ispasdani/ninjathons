@@ -384,7 +384,7 @@ function Checks({
           )}
         </div>
       )}
-      <ul className="divide-y rounded-md border">
+      <ul className="divide-y border">
         {verdict.results.map((r, i) => (
           <li key={i} className="flex items-start gap-3 px-3 py-2">
             {r.ok ? (

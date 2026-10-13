@@ -26,6 +26,16 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 13 Oct 2026 · Window cards across the app
+- The square windows from the home page are now the app's cards. The component moved to `components/ui/window-card.tsx` and gained two colourless styles, `plain` and `ink`, and an `as` prop (section, article, list item, form, aside).
+- A mode keeps its home page colour (Daily orange, Weekly yellow, 1v1 pink, Territory green, Learn purple, Ninjathons blue, Pro pink, Groups green); everything else is colourless. Colour also carries state: a finished module or lesson turns green, the 1st-place ninjathon result is yellow, the match winner's window is ink.
+- Windows: the dashboard tiles, Daily, Weekly, both play pages, challenge links, the ninjathon list and page, roadmap cards and modules, the lesson's Pro and practice boxes, the Pro price box, groups, settings, the profile editor panels, match results, and every table and standalone list (leaderboards, the problem library, submissions, members, players, standings). The home page's remaining cards, the learning section (plain and ink) and profile previews too.
+- Square without a window: notices, empty states, status bars, code blocks, badge tiles, the solve screen's examples and test results, lists already inside a window, and the admin pages. Form fields, menus, toasts and segmented controls stay rounded; public profiles keep their theme's look.
+- Solid buttons are square and lift into a window on hover: a dark border and a hard offset shadow, pressed flat on click (no movement with reduced motion). Ghost and link buttons are unchanged.
+- Play, Daily, Weekly, the ninjathon pages, the dashboard, a group page and the admin ninjathon pages now use the full content width; long intro text keeps a reading width. Lessons, roadmaps and small form pages stay narrow.
+- Checked signed out in the browser at 1280–1440 px and 375 px: Daily, Weekly, Learn, a roadmap, a lesson, Pro, Problems, Badges, Leaderboards, Ninjathons and the home page; the hover on buttons; no new page overflow. Typecheck, lint and a production build pass.
+- Open: the signed-in screens (dashboard, both play pages, groups, settings, the profile editor, a ninjathon's page, a Territory game) haven't been seen in the browser, since the pane can't sign in. On phones `/leaderboards` scrolls sideways because of its board picker; that was already so and is left for a separate fix.
+
 ### 12 Oct 2026 · Home page window cards (redesign trial)
 - On the `redesign/window-cards` branch, the home page cards (modes, how it works, roadmap, research and coach, challenges, levels, titles and badges, the group card, the ninjathon example, pricing, and the level and leaderboard demos) are now square "windows" like the ones in "the web lost its colors": a coloured title bar with a file name and window controls, and a solid offset shadow in the same colour. They share one component, `components/home/window-card.tsx`, and the retro section's palette.
 - Checked in the browser at 1440 px and 375 px, light and dark: nothing wider than the page, no console errors. Typecheck and lint pass.

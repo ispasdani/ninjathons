@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { COUNTRIES } from "@/lib/countries";
 import { errorMessage } from "@/lib/errors";
@@ -47,7 +48,7 @@ export function CountryForm() {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-md border p-6">
+    <WindowCard as="form" file="country.exe" color="plain" bodyClassName="block p-6" onSubmit={submit}>
       <label htmlFor="country" className="text-[13px] font-medium">
         Country
       </label>
@@ -83,6 +84,6 @@ export function CountryForm() {
           {error}
         </p>
       )}
-    </form>
+    </WindowCard>
   );
 }

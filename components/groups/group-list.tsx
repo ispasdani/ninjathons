@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { errorMessage } from "@/lib/errors";
@@ -53,7 +54,7 @@ function InlineForm({
   }
 
   return (
-    <form onSubmit={submit} className="rounded-md border p-6">
+    <WindowCard as="form" file={`${button.toLowerCase()}_group.exe`} color="green" bodyClassName="block p-6" onSubmit={submit}>
       <label className="text-[13px] font-medium" htmlFor={label}>
         {label}
       </label>
@@ -76,7 +77,7 @@ function InlineForm({
           {error}
         </p>
       )}
-    </form>
+    </WindowCard>
   );
 }
 
@@ -115,7 +116,7 @@ export function GroupList() {
         </p>
       </header>
 
-      <div className="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
+      <div className="mt-8 grid max-w-3xl gap-6 sm:grid-cols-2">
         <InlineForm
           label="Create a group"
           placeholder="Group name"
@@ -145,24 +146,26 @@ export function GroupList() {
         ) : live.length === 0 ? (
           <p className="text-[13px] text-muted-foreground">You&apos;re not in any groups yet.</p>
         ) : (
-          <ul className="divide-y rounded-md border">
-            {live.map((g) => (
-              <li key={g._id}>
-                <Link
-                  href={`/groups/${g._id}`}
-                  className="flex h-14 items-center gap-3 px-4 text-[13px] hover:bg-bg-secondary"
-                >
-                  <span className="font-medium">{g.name}</span>
-                  {g.isOwner && (
-                    <span className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs text-muted-foreground">Owner</span>
-                  )}
-                  <span className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
-                    {g.memberCount} {g.memberCount === 1 ? "member" : "members"}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <WindowCard file="your_groups.exe" color="green" bodyClassName="block">
+            <ul className="divide-y">
+              {live.map((g) => (
+                <li key={g._id}>
+                  <Link
+                    href={`/groups/${g._id}`}
+                    className="flex h-14 items-center gap-3 px-4 text-[13px] hover:bg-bg-secondary"
+                  >
+                    <span className="font-medium">{g.name}</span>
+                    {g.isOwner && (
+                      <span className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs text-muted-foreground">Owner</span>
+                    )}
+                    <span className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
+                      {g.memberCount} {g.memberCount === 1 ? "member" : "members"}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </WindowCard>
         )}
 
         {deleted.length > 0 && (
@@ -170,22 +173,24 @@ export function GroupList() {
             <h2 className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
               Recently deleted
             </h2>
-            <ul className="mt-3 divide-y rounded-md border">
-              {deleted.map((g) => {
-                const daysLeft = Math.max(0, Math.ceil((g.deletedAt! + RESTORE_DAYS * DAY_MS - now) / DAY_MS));
-                return (
-                  <li key={g._id} className="flex h-14 items-center gap-3 px-4 text-[13px]">
-                    <span className="text-text-secondary">{g.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      Deleted for good in {daysLeft} {daysLeft === 1 ? "day" : "days"}
-                    </span>
-                    <Button variant="outline" size="sm" className="ml-auto" onClick={() => restoreGroup(g._id)}>
-                      Restore
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
+            <WindowCard file="recently_deleted.exe" color="plain" className="mt-3" bodyClassName="block">
+              <ul className="divide-y">
+                {deleted.map((g) => {
+                  const daysLeft = Math.max(0, Math.ceil((g.deletedAt! + RESTORE_DAYS * DAY_MS - now) / DAY_MS));
+                  return (
+                    <li key={g._id} className="flex h-14 items-center gap-3 px-4 text-[13px]">
+                      <span className="text-text-secondary">{g.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Deleted for good in {daysLeft} {daysLeft === 1 ? "day" : "days"}
+                      </span>
+                      <Button variant="outline" size="sm" className="ml-auto" onClick={() => restoreGroup(g._id)}>
+                        Restore
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </WindowCard>
             {restoreError && (
               <p role="alert" className="mt-2 text-[13px] text-destructive">
                 {restoreError}

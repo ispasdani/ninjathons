@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { levelProgress, TITLES } from "@/convex/lib/levels";
 import { useNow } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
-import { WindowCard } from "./window-card";
+import { WindowCard } from "@/components/ui/window-card";
 
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 
@@ -54,7 +54,7 @@ export function LevelDemo() {
   return (
     <WindowCard file="level_up.exe" color="orange" bodyClassName="gap-4.5 p-6 sm:p-7">
       <div className="flex items-center gap-4">
-        <span className="flex size-16 shrink-0 flex-col items-center justify-center rounded-lg bg-foreground text-background">
+        <span className="flex size-16 shrink-0 flex-col items-center justify-center bg-foreground text-background">
           <span className="font-mono text-[9px] tracking-widest opacity-70">LEVEL</span>
           <span className="font-mono text-2xl leading-[26px] font-medium tabular-nums">{p.level}</span>
         </span>
@@ -77,7 +77,7 @@ export function LevelDemo() {
         <div className="h-2.5 rounded-sm bg-brand transition-[width] duration-400 ease-out-cubic" style={{ width: `${pct}%` }} />
       </div>
       {toast && (
-        <div role="status" className="rounded-[10px] border border-success/40 bg-success/10 px-3.5 py-2.5 text-[13px]">
+        <div role="status" className="border border-success/40 bg-success/10 px-3.5 py-2.5 text-[13px]">
           {toast}
         </div>
       )}
@@ -109,7 +109,7 @@ export function TitleBands({ level = 14 }: { level?: number }) {
           <div
             key={band.title}
             className={cn(
-              "flex flex-col gap-0.5 rounded-[10px] border p-2.5",
+              "flex flex-col gap-0.5 border p-2.5",
               on && "border-foreground bg-foreground text-background",
             )}
           >
@@ -183,14 +183,14 @@ export function LeaderboardDemo() {
         ))}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5">
-        <div role="group" aria-label="Scope" className="flex gap-1 rounded-md bg-bg-secondary p-[3px]">
+        <div role="group" aria-label="Scope" className="flex gap-1 border bg-bg-secondary p-[3px]">
           {SCOPES.map((s) => (
             <button
               key={s.id}
               aria-pressed={s.id === scopeId}
               onClick={() => setScopeId(s.id)}
               className={cn(
-                "h-[30px] rounded-[9px] px-3 text-[13px] text-text-secondary",
+                "h-[30px] px-3 text-[13px] text-text-secondary",
                 s.id === scopeId && "bg-background font-medium text-foreground shadow-ring",
               )}
             >

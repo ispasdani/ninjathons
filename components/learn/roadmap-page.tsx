@@ -7,6 +7,7 @@ import Link from "next/link";
 import { LessonState } from "@/components/learn/lesson-state";
 import { LessonText } from "@/components/learn/lesson-text";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import type { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
@@ -86,7 +87,13 @@ export function RoadmapPage({ preloaded }: { preloaded: Preloaded<typeof api.lea
               >
                 {module.finished ? <Check className="size-4" strokeWidth={3} /> : i + 1}
               </span>
-              <section className="min-w-0 flex-1 rounded-md border p-5">
+              <WindowCard
+                as="section"
+                file={`module_${String(i + 1).padStart(2, "0")}.exe`}
+                color={module.finished ? "green" : "plain"}
+                className="flex-1"
+                bodyClassName="block p-5"
+              >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <h2 className="text-xl">{module.title}</h2>
                   {module.free ? (
@@ -134,7 +141,7 @@ export function RoadmapPage({ preloaded }: { preloaded: Preloaded<typeof api.lea
                     </li>
                   ))}
                 </ul>
-              </section>
+              </WindowCard>
             </li>
           );
         })}

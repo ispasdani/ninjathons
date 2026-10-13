@@ -109,7 +109,7 @@ function Stat({ label, value, detail }: { label: string; value: string; detail?:
 function StatsBlock({ stats }: { stats: Profile["stats"] }) {
   const record = stats.duel?.record;
   return (
-    <section aria-label="Stats" className="rounded-md border bg-bg-secondary p-6 text-foreground">
+    <section aria-label="Stats" className="border bg-bg-secondary p-6 text-foreground">
       <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
         <div className="col-span-2 sm:col-span-1 lg:col-span-1">
           <RatingTile label="1v1" rating={stats.duel} />

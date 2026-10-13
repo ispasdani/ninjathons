@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CopyCode, DailyCountdown, LevelDemo, LeaderboardDemo, TitleBands } from "./demos";
 import { HeroDemo } from "./hero-demo";
-import { WindowCard, type WinColor } from "./window-card";
+import { WindowCard, type WinColor } from "@/components/ui/window-card";
 
 // Section layout from the mockups canvas (Marketing homepage), on the design
 // tokens so it works in both themes and at phone width.
@@ -28,7 +28,7 @@ const container = "mx-auto w-full max-w-[84rem] px-4 sm:px-6 lg:px-8";
 const pad = "py-16 sm:py-24";
 const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase";
 const h2 = "text-[28px] leading-[1.12] sm:text-4xl sm:leading-10";
-const card = "rounded-md border bg-card";
+const card = "border bg-card";
 const muted = "border-y bg-bg-secondary/50";
 
 function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
@@ -144,7 +144,7 @@ export function Modes() {
           {MODES.map((m) => (
             <WindowCard key={m.name} file={m.file} color={m.color} href={m.href} bodyClassName="gap-3 p-6">
               <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-[10px] bg-bg-secondary">
+                <span className="flex size-9 items-center justify-center border bg-bg-secondary">
                   <m.icon className="size-[18px]" strokeWidth={1.8} aria-hidden />
                 </span>
                 <span className="flex gap-1.5">
@@ -222,8 +222,8 @@ export function Learning() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="flex min-w-0 flex-col gap-3.5 rounded-lg border bg-[#111111] p-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          <WindowCard file="ai_chat.txt" color="plain" className="bg-[#111111]" bodyClassName="gap-3.5 p-6">
             <div className="flex items-center justify-between gap-3">
               <Eyebrow className="text-[11px]">A typical AI chat</Eyebrow>
               <Tag>YOU LEARN LITTLE</Tag>
@@ -231,11 +231,11 @@ export function Learning() {
             <p className="text-sm leading-[21px] text-muted-foreground">
               &ldquo;Here is the complete solution. Paste it in and submit.&rdquo;
             </p>
-            <pre className="overflow-x-auto rounded-[10px] border bg-background px-3.5 py-3 font-mono text-xs leading-[19px] text-[#8a8a8a]">
+            <pre className="overflow-x-auto border bg-background px-3.5 py-3 font-mono text-xs leading-[19px] text-[#8a8a8a]">
               {"def merge(intervals):\n    intervals.sort()\n    ...  # 12 more lines you didn't write"}
             </pre>
-          </div>
-          <div className="flex min-w-0 flex-col gap-3.5 rounded-lg border border-border-strong bg-bg-secondary p-6">
+          </WindowCard>
+          <WindowCard file="hint.txt" color="ink" className="bg-bg-secondary" bodyClassName="gap-3.5 p-6">
             <div className="flex items-center justify-between gap-3">
               <Eyebrow className="text-[11px] text-foreground">A Ninjathons hint</Eyebrow>
               <span className="rounded-xs bg-foreground px-[7px] py-0.5 font-mono text-[11px] font-medium text-background">
@@ -250,7 +250,7 @@ export function Learning() {
               <span className="rounded-sm bg-bg-tertiary px-2 py-1 font-mono text-[11px] text-[#d4d4d4]">docs › sorting HOWTO</span>
               <span className="rounded-sm bg-bg-tertiary px-2 py-1 font-mono text-[11px] text-[#d4d4d4]">no code until you solve it</span>
             </div>
-          </div>
+          </WindowCard>
         </div>
 
         <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
@@ -349,7 +349,7 @@ export function Roadmaps() {
             <li
               key={name}
               className={cn(
-                "flex items-center gap-2.5 rounded-[10px] border bg-card px-3 py-2.5",
+                "flex items-center gap-2.5 border bg-card px-3 py-2.5",
                 state === "now" && "border-duel-you",
               )}
             >
@@ -394,7 +394,7 @@ export function ResearchAndCoach() {
           research is allowed and rankings stay honest.
         </p>
         <div className={cn(card, "flex flex-col gap-3 p-4")}>
-          <div className="flex h-9 items-center gap-2 rounded-md border px-3 text-[13px]">
+          <div className="flex h-9 items-center gap-2 border px-3 text-[13px]">
             <Search className="size-3.5 text-muted-foreground" aria-hidden />
             <span>sort key lambda</span>
             <span className="ml-auto font-mono text-[11px] text-muted-foreground">Python 3.14</span>
@@ -405,7 +405,7 @@ export function ResearchAndCoach() {
               ["sorted(iterable, /, *, key=None, reverse=False)", "python › library › functions"],
               ["list.sort(*, key=None, reverse=False)", "python › library › stdtypes"],
             ].map(([title, path], i) => (
-              <li key={path} className={cn("rounded-[8px] px-3 py-2.5", i === 0 && "bg-bg-secondary")}>
+              <li key={path} className={cn("px-3 py-2.5", i === 0 && "bg-bg-secondary")}>
                 <div className="truncate text-[13px] font-medium">{title}</div>
                 <div className="font-mono text-[11px] text-muted-foreground">{path}</div>
               </li>
@@ -570,8 +570,8 @@ export function Progression() {
               </div>
               <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {BADGES.map(([name, rare, Icon, held]) => (
-                  <li key={name} className={cn("flex items-center gap-2.5 rounded-[10px] border p-2.5", !held && "opacity-50")}>
-                    <span className="flex size-[30px] shrink-0 items-center justify-center rounded-[8px] bg-bg-secondary">
+                  <li key={name} className={cn("flex items-center gap-2.5 border p-2.5", !held && "opacity-50")}>
+                    <span className="flex size-[30px] shrink-0 items-center justify-center bg-bg-secondary">
                       <Icon className="size-[15px]" aria-hidden />
                     </span>
                     <span className="flex min-w-0 flex-col">
@@ -610,7 +610,7 @@ export function Leaderboards() {
               Create a free group, share the invite code, and your team gets its own leaderboards and one-click
               Territory lobbies. A good Friday afternoon.
             </p>
-            <div className="flex items-center gap-2.5 rounded-[10px] bg-bg-secondary px-3.5 py-3">
+            <div className="flex items-center gap-2.5 border bg-bg-secondary px-3.5 py-3">
               <span className="font-mono text-[11px] text-muted-foreground">INVITE CODE</span>
               <span className="font-mono text-base font-medium tracking-[0.08em]">7Q4KX2MP</span>
               <CopyCode code="7Q4KX2MP" />
@@ -671,10 +671,15 @@ export function Profiles() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2">
         <ProfileCard theme="default" />
         <ProfileCard theme="terminal" />
-        <div className="flex flex-col gap-4 rounded-md bg-[#0a0a0a] p-5 text-[#fafafa] sm:col-span-2 sm:flex-row sm:items-center sm:px-6 dark:border">
+        <WindowCard
+          file="share_card.png"
+          color="ink"
+          className="sm:col-span-2"
+          bodyClassName="gap-4 bg-[#0a0a0a] p-5 text-[#fafafa] sm:flex-row sm:items-center sm:px-6"
+        >
           <span className="flex grow flex-col gap-1.5">
             <span className="font-mono text-[10px] tracking-[0.12em] text-[#a1a1a1]">SHARE CARD · 1200 × 630</span>
             <span className="text-[22px] leading-7 tracking-tight">
@@ -686,7 +691,7 @@ export function Profiles() {
             <span className="font-mono text-[10px] text-[#a1a1a1]">POST TO</span>
             <span className="text-[13px]">X · LinkedIn · Discord</span>
           </span>
-        </div>
+        </WindowCard>
       </div>
     </section>
   );
@@ -695,7 +700,7 @@ export function Profiles() {
 function ProfileCard({ theme }: { theme: "default" | "terminal" }) {
   const terminal = theme === "terminal";
   return (
-    <div className={cn("flex flex-col overflow-hidden rounded-md border", terminal ? "border-[#1f2d22] bg-[#0b0f0c]" : "bg-card")}>
+    <WindowCard file={terminal ? "daniel · terminal" : "daniel · default"} color="plain" bodyClassName={cn(terminal && "bg-[#0b0f0c]")}>
       <div
         className="h-16"
         style={
@@ -721,12 +726,12 @@ function ProfileCard({ theme }: { theme: "default" | "terminal" }) {
           <span className={cn("text-base font-medium", terminal && "font-mono text-[#d1fae5]")}>{terminal ? "daniel" : "Daniel"}</span>
           <span className={cn("font-mono text-[11px]", terminal ? "text-[#86efac]" : "text-muted-foreground")}>LV 14 · DEBUGGER · DK</span>
         </span>
-        <div className={cn("grid grid-cols-2 gap-1.5", terminal && "rounded-[8px] bg-white p-1.5 text-[#0a0a0a]")}>
+        <div className={cn("grid grid-cols-2 gap-1.5", terminal && "bg-white p-1.5 text-[#0a0a0a]")}>
           {[
             ["1V1", "1642"],
             ["TERRITORY", "1588"],
           ].map(([label, value]) => (
-            <div key={label} className={cn("rounded-[8px] p-2", !terminal && "bg-bg-secondary")}>
+            <div key={label} className={cn("p-2", !terminal && "bg-bg-secondary")}>
               <div className={cn("font-mono text-[9px]", terminal ? "text-[#6b6b6b]" : "text-muted-foreground")}>{label}</div>
               <div className="font-mono text-base font-medium">{value}</div>
             </div>
@@ -736,7 +741,7 @@ function ProfileCard({ theme }: { theme: "default" | "terminal" }) {
           {terminal ? "TERMINAL THEME · PRO" : "DEFAULT THEME · FREE"}
         </span>
       </div>
-    </div>
+    </WindowCard>
   );
 }
 
@@ -777,7 +782,7 @@ export function Ninjathons() {
               ["DURATION", "48 h"],
               ["1ST PLACE", "+1,000 XP"],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-[10px] bg-bg-secondary p-3">
+              <div key={label} className="border bg-bg-secondary p-3">
                 <div className="font-mono text-[11px] text-muted-foreground">{label}</div>
                 <div className="font-mono text-sm font-medium">{value}</div>
               </div>

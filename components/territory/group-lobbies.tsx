@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 
@@ -13,7 +14,7 @@ const eyebrow = "font-mono text-xs font-medium tracking-[0.12em] text-muted-fore
 export function GroupLobbies({ groupId }: { groupId: Id<"groups"> }) {
   const lobbies = useQuery(api.territoryLobbies.ofGroup, { groupId });
   return (
-    <section className="mt-4 rounded-md border p-6">
+    <WindowCard as="section" file="territory_lobbies.exe" color="green" className="mt-8" bodyClassName="block p-6">
       <div className="flex flex-wrap items-center gap-3">
         <p className={eyebrow}>Territory</p>
         <Button variant="outline" size="sm" className="ml-auto" asChild>
@@ -21,7 +22,7 @@ export function GroupLobbies({ groupId }: { groupId: Id<"groups"> }) {
         </Button>
       </div>
       {lobbies && lobbies.length > 0 ? (
-        <ul className="mt-4 divide-y rounded-md border">
+        <ul className="mt-4 divide-y border">
           {lobbies.map((l) => (
             <li key={l.code} className="flex flex-wrap items-center gap-3 px-4 py-3 text-[13px]">
               <span className="font-medium">@{l.host}&apos;s lobby</span>
@@ -39,6 +40,6 @@ export function GroupLobbies({ groupId }: { groupId: Id<"groups"> }) {
           No open lobbies. Open one and members can join from here; you start it once 3 are in.
         </p>
       )}
-    </section>
+    </WindowCard>
   );
 }

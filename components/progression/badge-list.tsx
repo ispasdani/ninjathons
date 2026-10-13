@@ -60,7 +60,7 @@ export function BadgeList() {
                 .map((badge) => {
                   const has = badge.earnedAt !== null;
                   return (
-                    <li key={badge.id} className={cn("flex gap-3 rounded-md border p-4", has && "bg-bg-secondary")}>
+                    <li key={badge.id} className={cn("flex gap-3 border p-4", has && "bg-bg-secondary")}>
                       <span
                         className={cn(
                           "flex size-8 shrink-0 items-center justify-center rounded-full",

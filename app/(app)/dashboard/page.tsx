@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { LevelBar } from "@/components/progression/level-bar";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
@@ -44,12 +45,14 @@ export default function DashboardPage() {
       <h1 className="mt-2 text-3xl sm:text-4xl">Welcome, {user.name}</h1>
       {user.username && <p className="mt-1 font-mono text-[13px] text-muted-foreground">@{user.username}</p>}
 
-      <section className="mt-10 grid max-w-5xl gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-md border bg-bg-secondary p-6 md:col-span-2 lg:col-span-1">
+      {/* Windows (components/ui/window-card.tsx): a mode keeps its colour from the
+          home page, the rest are colourless. */}
+      <section className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <WindowCard file="level.exe" color="purple" className="md:col-span-2 lg:col-span-1" bodyClassName="p-6">
           <p className={eyebrow}>Level</p>
           <LevelBar progress={user.progress} className="mt-3" />
-        </div>
-        <div className="rounded-md border bg-bg-secondary p-6">
+        </WindowCard>
+        <WindowCard file="solved.exe" color="plain" bodyClassName="block p-6">
           <p className={eyebrow}>Solved</p>
           <p className="mt-3 font-mono text-4xl font-medium tabular-nums">
             {solved}
@@ -58,8 +61,8 @@ export default function DashboardPage() {
           <div className="mt-4 h-1.5 overflow-hidden rounded-sm bg-bg-tertiary">
             <div className="h-full bg-brand" style={{ width: `${total ? (solved / total) * 100 : 0}%` }} />
           </div>
-        </div>
-        <div className="flex flex-col justify-between rounded-md border p-6">
+        </WindowCard>
+        <WindowCard file="next_up.exe" color="ink" bodyClassName="justify-between p-6">
           <div>
             <p className={eyebrow}>{next?.status === "attempted" ? "Carry on" : "Next up"}</p>
             <p className="mt-3 text-xl">{next ? next.title : "All solved. Nice work."}</p>
@@ -74,9 +77,9 @@ export default function DashboardPage() {
               <Link href="/problems">All problems</Link>
             </Button>
           </div>
-        </div>
+        </WindowCard>
 
-        <Link href="/daily" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+        <WindowCard file="daily.exe" color="orange" href="/daily" bodyClassName="block p-6">
           <p className={eyebrow}>Daily challenge</p>
           <p className="mt-3 flex items-baseline gap-2">
             <Flame
@@ -93,8 +96,8 @@ export default function DashboardPage() {
                 ? `Solved today: ${daily.problem.title}`
                 : `Today: ${daily.problem.title}`}
           </p>
-        </Link>
-        <Link href="/weekly" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+        </WindowCard>
+        <WindowCard file="weekly.exe" color="yellow" href="/weekly" bodyClassName="block p-6">
           <p className={eyebrow}>Weekly challenge</p>
           <p className="mt-3 font-mono text-4xl font-medium tabular-nums">
             {weekly?.me?.points ?? 0}
@@ -103,8 +106,8 @@ export default function DashboardPage() {
           <p className="mt-2 truncate text-[13px] text-muted-foreground">
             {weekly?.set ? `This week: ${weekly.set.title}` : "No set this week. The next starts on Monday."}
           </p>
-        </Link>
-        <Link href="/leaderboards" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+        </WindowCard>
+        <WindowCard file="leaderboard.exe" color="blue" href="/leaderboards" bodyClassName="block p-6">
           <p className={eyebrow}>Leaderboard</p>
           <p className="mt-3 font-mono text-4xl font-medium tabular-nums">
             {rank ? `#${rank.toLocaleString("en")}` : "–"}
@@ -112,8 +115,8 @@ export default function DashboardPage() {
           <p className="mt-2 text-[13px] text-muted-foreground">
             {rank ? "Your place on the Level board." : "Solve a problem to get on the board."}
           </p>
-        </Link>
-        <Link href="/badges" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+        </WindowCard>
+        <WindowCard file="badges.exe" color="pink" href="/badges" bodyClassName="block p-6">
           <p className={eyebrow}>Badges</p>
           <p className="mt-3 font-mono text-4xl font-medium tabular-nums">
             {earned.length}
@@ -122,12 +125,12 @@ export default function DashboardPage() {
           <p className="mt-2 truncate text-[13px] text-muted-foreground">
             {latest.length ? `Latest: ${latest.map((b) => b.name).join(", ")}` : "None yet. Your first solve earns one."}
           </p>
-        </Link>
-        <Link href="/groups" className="rounded-md border p-6 transition-colors hover:border-border-strong">
+        </WindowCard>
+        <WindowCard file="groups.exe" color="green" href="/groups" bodyClassName="block p-6">
           <p className={eyebrow}>Groups</p>
           <p className="mt-3 text-xl">Compete with your team</p>
           <p className="mt-2 text-[13px] text-muted-foreground">Create a group or join one with an invite code.</p>
-        </Link>
+        </WindowCard>
       </section>
     </div>
   );
