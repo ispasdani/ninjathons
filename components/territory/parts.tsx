@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { MATCH_LANGUAGES } from "@/components/play/language-picker";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { DOT, type MapPlayer, PLAYER_COLORS, regionName } from "./hex-map";
@@ -110,19 +111,21 @@ export function GameCountdown({ game, now, onLeave }: { game: Game; now: number;
     <div className="mx-auto w-full max-w-xl px-4 py-12">
       <p className={eyebrow}>{game.ranked ? "Ranked" : "Unranked"} Territory</p>
       <h1 className="mt-2 text-3xl sm:text-4xl">Game found</h1>
-      <ul className="mt-8 divide-y rounded-md border">
-        {mapPlayers(game).map((p) => (
-          <li key={p.userId} className="flex items-center gap-3 px-4 py-3 text-[13px]">
-            <span aria-hidden className={cn("size-2 rounded-full", DOT[p.color])} />
-            <span className="font-medium">{p.player.you ? "You" : `@${p.player.username}`}</span>
-            <span className="font-mono text-xs text-muted-foreground">
-              {p.player.rating !== null ? `${p.player.rating} · ${p.player.tier}` : "Rating provisional"}
-            </span>
-            <span className="ml-auto text-muted-foreground">{LANGUAGE_LABELS[p.player.language]}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-8 flex items-center justify-between gap-4 rounded-md border bg-bg-secondary p-6">
+      <WindowCard file="players.exe" color="green" className="mt-8" bodyClassName="block">
+        <ul className="divide-y">
+          {mapPlayers(game).map((p) => (
+            <li key={p.userId} className="flex items-center gap-3 px-4 py-3 text-[13px]">
+              <span aria-hidden className={cn("size-2 rounded-full", DOT[p.color])} />
+              <span className="font-medium">{p.player.you ? "You" : `@${p.player.username}`}</span>
+              <span className="font-mono text-xs text-muted-foreground">
+                {p.player.rating !== null ? `${p.player.rating} · ${p.player.tier}` : "Rating provisional"}
+              </span>
+              <span className="ml-auto text-muted-foreground">{LANGUAGE_LABELS[p.player.language]}</span>
+            </li>
+          ))}
+        </ul>
+      </WindowCard>
+      <div className="mt-8 flex items-center justify-between gap-4 border bg-bg-secondary p-6">
         <div className="space-y-1 text-[13px]">
           <p className="font-medium">
             {game.regions.length} regions · {game.totalPoints} points
@@ -205,20 +208,22 @@ export function Standings({ game }: { game: Game }) {
   const colors = new Map(mapPlayers(game).map((p) => [p.userId, p.color]));
   const rows = [...game.players].sort((a, b) => (a.place ?? 99) - (b.place ?? 99) || b.points - a.points);
   return (
-    <ol className="divide-y rounded-md border text-[13px]">
-      {rows.map((p) => (
-        <li key={p.userId} className="flex items-center gap-3 px-4 py-2.5">
-          <span className="w-8 font-mono text-xs text-muted-foreground tabular-nums">{p.place ? ordinal(p.place) : ""}</span>
-          <span aria-hidden className={cn("size-2 rounded-full", DOT[colors.get(p.userId)!])} />
-          <span className={cn(p.you && "font-medium")}>{nameOf(p)}</span>
-          {p.left && <span className="text-muted-foreground">left</span>}
-          <span className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
-            {p.points} pts · {p.regions} regions
-            {p.ratingChange !== undefined && ` · ${p.ratingChange >= 0 ? "+" : ""}${p.ratingChange}`}
-          </span>
-        </li>
-      ))}
-    </ol>
+    <WindowCard file="standings.exe" color="green" bodyClassName="block">
+      <ol className="divide-y text-[13px]">
+        {rows.map((p) => (
+          <li key={p.userId} className="flex items-center gap-3 px-4 py-2.5">
+            <span className="w-8 font-mono text-xs text-muted-foreground tabular-nums">{p.place ? ordinal(p.place) : ""}</span>
+            <span aria-hidden className={cn("size-2 rounded-full", DOT[colors.get(p.userId)!])} />
+            <span className={cn(p.you && "font-medium")}>{nameOf(p)}</span>
+            {p.left && <span className="text-muted-foreground">left</span>}
+            <span className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
+              {p.points} pts · {p.regions} regions
+              {p.ratingChange !== undefined && ` · ${p.ratingChange >= 0 ? "+" : ""}${p.ratingChange}`}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </WindowCard>
   );
 }
 

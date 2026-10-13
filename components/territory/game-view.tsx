@@ -449,7 +449,7 @@ function CaptureOutcome({ submission }: { submission: ReturnType<typeof useQuery
   return (
     <p
       className={cn(
-        "rounded-md border px-3 py-2 text-[13px]",
+        "border px-3 py-2 text-[13px]",
         submission.territoryOutcome === "captured" && "border-duel-you text-foreground",
         submission.territoryOutcome !== "captured" && "text-muted-foreground",
       )}

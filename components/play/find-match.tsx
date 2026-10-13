@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Language } from "@/convex/judge/types";
 import { errorMessage } from "@/lib/errors";
@@ -87,7 +88,7 @@ export function FindMatch() {
     (queued ? now - queued.joinedAt >= GHOST_AFTER_MS : status.waiting === 0);
 
   return (
-    <div className="max-w-4xl">
+    <div>
       <h1 className="text-3xl sm:text-4xl">Play</h1>
       <div className="mt-4">
         <PlayTabs />
@@ -108,8 +109,8 @@ export function FindMatch() {
       </div>
 
       {/* Two choices of equal weight (plan, Play modes). */}
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <section className="flex flex-col rounded-md border p-6">
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <WindowCard as="section" file="find_match.exe" color="pink" bodyClassName="p-6">
           <h2 className="text-lg font-medium">Find a match</h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
             Ranked. You&apos;re matched by 1v1 rating, and the range widens the longer you wait.
@@ -157,16 +158,16 @@ export function FindMatch() {
               {error}
             </p>
           )}
-        </section>
-        <section className="rounded-md border p-6">
+        </WindowCard>
+        <WindowCard as="section" file="challenge.exe" color="pink" bodyClassName="block p-6">
           <h2 className="text-lg font-medium">Challenge someone</h2>
           <p className="mt-1 mb-4 text-[13px] text-muted-foreground">By username, or as a link to share.</p>
           <ChallengeForm language={language} />
-        </section>
+        </WindowCard>
       </div>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-md border bg-bg-secondary p-6">
+      <section className="mt-8 grid gap-6 sm:grid-cols-2">
+        <WindowCard file="rating.exe" color="plain" bodyClassName="block p-6">
           <p className={eyebrow}>Your 1v1 rating</p>
           {rating ? (
             <>
@@ -182,15 +183,15 @@ export function FindMatch() {
               No ranked games yet. Everyone starts at 1500; it shows to others after 10 games.
             </p>
           )}
-        </div>
-        <div className="rounded-md border p-6">
+        </WindowCard>
+        <WindowCard file="how_it_works.exe" color="plain" bodyClassName="block p-6">
           <p className={eyebrow}>How it works</p>
           <ul className="mt-3 space-y-1.5 text-[13px] text-muted-foreground">
             <li>Difficulty follows your ratings: easy 15 min, medium 25, hard 40.</li>
             <li>No penalty for a wrong Submit, but 10 s between Submits.</li>
             <li>At time up, the most tests passed wins.</li>
           </ul>
-        </div>
+        </WindowCard>
       </section>
     </div>
   );

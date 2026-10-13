@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Difficulty } from "@/components/problem/difficulty";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { duration, headline, LANGUAGE_NAMES, modeName, playerName, type ResultPlayer } from "@/lib/share";
 import { cn } from "@/lib/utils";
@@ -33,7 +34,12 @@ export async function generateMetadata({ params }: PageProps<"/m/[matchId]">): P
 function Side({ player, side }: { player: ResultPlayer; side: 0 | 1 }) {
   const total = player.total || player.bestPassed || 1;
   return (
-    <div className={cn("flex-1 rounded-md border p-6", player.result === "win" && "border-border-strong")}>
+    <WindowCard
+      file={`${playerName(player)}.exe`}
+      color={player.result === "win" ? "ink" : "plain"}
+      className="flex-1"
+      bodyClassName="block p-6"
+    >
       <p className="flex items-center gap-2 text-[15px] font-medium">
         <span aria-hidden className={cn("size-2 rounded-full", side === 0 ? "bg-duel-you" : "bg-duel-opponent")} />
         {capitalized(playerName(player))}
@@ -59,7 +65,7 @@ function Side({ player, side }: { player: ResultPlayer; side: 0 | 1 }) {
         · {player.submits} {player.submits === 1 ? "submit" : "submits"}
         {player.docPages > 0 ? ` · used ${player.docPages} doc ${player.docPages === 1 ? "page" : "pages"}` : ""}
       </p>
-    </div>
+    </WindowCard>
   );
 }
 
@@ -102,12 +108,12 @@ export default async function MatchResultPage({ params }: PageProps<"/m/[matchId
         </p>
       )}
 
-      <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+      <div className="mt-8 flex flex-col gap-6 sm:flex-row">
         {a && <Side player={a} side={0} />}
         {b && <Side player={b} side={1} />}
       </div>
 
-      <div className="mt-10 flex flex-wrap items-center gap-3 rounded-md border bg-bg-secondary p-6">
+      <div className="mt-10 flex flex-wrap items-center gap-3 border bg-bg-secondary p-6">
         <p className="text-[13px] text-muted-foreground">
           Same problem, first to pass every test wins. Think you&apos;re faster?
         </p>

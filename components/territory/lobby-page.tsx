@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 import { MATCH_LANGUAGES, saveLanguage, savedLanguage } from "@/components/play/language-picker";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Language } from "@/convex/judge/types";
 import { errorMessage } from "@/lib/errors";
@@ -131,7 +132,7 @@ export function LobbyPage({ code }: { code: string }) {
       </p>
 
       {open && (
-        <div className="mt-6 flex flex-wrap items-center gap-3 rounded-md border bg-bg-secondary p-4">
+        <div className="mt-6 flex flex-wrap items-center gap-3 border bg-bg-secondary p-4">
           <span className="font-mono text-[13px] break-all">/lobby/{lobby.code}</span>
           <Button variant="outline" size="sm" className="ml-auto" onClick={copy}>
             {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
@@ -144,18 +145,20 @@ export function LobbyPage({ code }: { code: string }) {
         <h2 className={eyebrow}>
           Players · {lobby.players.length} of {MAX_PLAYERS}
         </h2>
-        <ul className="mt-3 divide-y rounded-md border">
-          {lobby.players.map((p) => (
-            <li key={p.userId} className={cn("flex items-center gap-3 px-4 py-3 text-[13px]", p.away && "opacity-60")}>
-              <span className="font-medium">@{p.username}</span>
-              {p.host && <span className="text-muted-foreground">host</span>}
-              {p.you && <span className="text-muted-foreground">you</span>}
-              {p.away && <span className="text-muted-foreground">away</span>}
-              <span className="ml-auto font-mono text-xs text-muted-foreground">{LANGUAGE_LABELS[p.language]}</span>
-            </li>
-          ))}
-          {lobby.players.length === 0 && <li className="px-4 py-3 text-[13px] text-muted-foreground">Nobody yet.</li>}
-        </ul>
+        <WindowCard file="players.exe" color="green" className="mt-3" bodyClassName="block">
+          <ul className="divide-y">
+            {lobby.players.map((p) => (
+              <li key={p.userId} className={cn("flex items-center gap-3 px-4 py-3 text-[13px]", p.away && "opacity-60")}>
+                <span className="font-medium">@{p.username}</span>
+                {p.host && <span className="text-muted-foreground">host</span>}
+                {p.you && <span className="text-muted-foreground">you</span>}
+                {p.away && <span className="text-muted-foreground">away</span>}
+                <span className="ml-auto font-mono text-xs text-muted-foreground">{LANGUAGE_LABELS[p.language]}</span>
+              </li>
+            ))}
+            {lobby.players.length === 0 && <li className="px-4 py-3 text-[13px] text-muted-foreground">Nobody yet.</li>}
+          </ul>
+        </WindowCard>
       </section>
 
       {lobby.problem && !inLobby ? (

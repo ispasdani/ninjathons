@@ -22,7 +22,7 @@ export function CodeBlock({ children }: { children?: ReactNode }) {
   // Plain text (formulas, tables) needs no label.
   const name = language && language !== "text" ? (LANGUAGE_NAMES[language] ?? language) : null;
   return (
-    <div className="overflow-hidden rounded-md border bg-bg-secondary">
+    <div className="overflow-hidden border bg-bg-secondary">
       {name && (
         <p className="border-b px-4 py-1.5 font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
           {name}

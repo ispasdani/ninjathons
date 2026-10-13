@@ -40,7 +40,7 @@ export function AdminNinjathon({ eventId }: { eventId: string }) {
   const current = tab ?? (judging ? "judging" : "details");
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <Link href="/admin/ninjathons" className="text-[13px] text-text-secondary hover:underline">
         ← Ninjathons
       </Link>
@@ -157,7 +157,7 @@ function Judging({ event }: { event: Event }) {
 
   if (event.stage !== "judging" && event.stage !== "results") {
     return (
-      <p className="mt-6 rounded-md border p-6 text-[13px] text-muted-foreground">
+      <p className="mt-6 border p-6 text-[13px] text-muted-foreground">
         Judging opens at the end, <LocalTime at={event.endsAt} />.
       </p>
     );
@@ -169,7 +169,7 @@ function Judging({ event }: { event: Event }) {
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-md border bg-bg-secondary px-4 py-3 text-[13px]">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border bg-bg-secondary px-4 py-3 text-[13px]">
         <span className="font-mono tabular-nums">{submissions.length} projects</span>
         <span className="font-mono tabular-nums">{submissions.filter((s) => s.mine).length} scored by you</span>
         {waiting > 0 && <span className="text-muted-foreground">{waiting} with no score sheet yet</span>}
@@ -212,7 +212,7 @@ function Judging({ event }: { event: Event }) {
         </p>
       )}
       {submissions.length === 0 ? (
-        <p className="rounded-md border p-6 text-[13px] text-muted-foreground">No team handed in a project.</p>
+        <p className="border p-6 text-[13px] text-muted-foreground">No team handed in a project.</p>
       ) : (
         <ul className="space-y-4">
           {submissions.map((s) => (
@@ -250,7 +250,7 @@ function ScoreSheet({ event, submission: s, open }: { event: Event; submission: 
   }
 
   return (
-    <article className={cn("rounded-md border p-5 text-[13px]", s.disqualified && "opacity-70")}>
+    <article className={cn("border p-5 text-[13px]", s.disqualified && "opacity-70")}>
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
         <h3 className="text-base font-medium">{s.projectName}</h3>
         <span className="text-muted-foreground">

@@ -8,6 +8,7 @@ import { useState } from "react";
 import type { LookValues } from "@/components/profile/look";
 import { type About, ProfileView } from "@/components/profile/profile-page";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { accentFits, BANNERS, FONTS, THEMES, themeById } from "@/convex/lib/themes";
@@ -47,13 +48,18 @@ function ProTag() {
 
 function Panel({ title, pro, children }: { title: string; pro?: boolean; children: React.ReactNode }) {
   return (
-    <section className="rounded-md border p-5">
+    <WindowCard
+      as="section"
+      file={`${title.toLowerCase().replace(/\W+/g, "_")}.exe`}
+      color={pro ? "pink" : "plain"}
+      bodyClassName="block p-5"
+    >
       <h2 className={cn(eyebrow, "flex items-center gap-2")}>
         {title}
         {pro && <ProTag />}
       </h2>
       <div className="mt-4">{children}</div>
-    </section>
+    </WindowCard>
   );
 }
 
@@ -169,7 +175,7 @@ export function ProfileEditor() {
 
   return (
     <div className="grid gap-8 xl:grid-cols-[22rem_minmax(0,1fr)]">
-      <div className="space-y-5">
+      <div className="space-y-6">
         <Panel title="About">
           <label htmlFor="bio" className="text-[13px] font-medium">
             Bio
@@ -324,7 +330,7 @@ export function ProfileEditor() {
 
           <p className="mt-4 text-[13px] font-medium">Sections</p>
           <p className="text-[13px] text-muted-foreground">The header and stats always come first.</p>
-          <ul className="mt-2 divide-y rounded-md border">
+          <ul className="mt-2 divide-y border">
             {d.custom.sections.order.map((s, i) => {
               const shown = !d.custom.sections.hidden.includes(s);
               return (
@@ -388,7 +394,7 @@ export function ProfileEditor() {
           {data.candidates.length === 0 ? (
             <p className="mt-3 text-[13px] text-muted-foreground">Solve a problem to pin it here.</p>
           ) : (
-            <ul className="mt-3 max-h-80 divide-y overflow-y-auto rounded-md border">
+            <ul className="mt-3 max-h-80 divide-y overflow-y-auto border">
               {data.candidates.map((c) => {
                 const pinned = pinnedIds.has(c.problemId);
                 return (

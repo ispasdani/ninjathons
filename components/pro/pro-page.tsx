@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { errorMessage } from "@/lib/errors";
 import { cn } from "@/lib/utils";
@@ -142,12 +143,12 @@ function Returned() {
   const plan = useQuery(api.billing.plan, isAuthenticated ? {} : "skip");
   const outcome = params.get("checkout");
   if (outcome === "cancelled") {
-    return <p className="rounded-md border p-4 text-[13px]">Checkout cancelled. Nothing was charged.</p>;
+    return <p className="border p-4 text-[13px]">Checkout cancelled. Nothing was charged.</p>;
   }
   if (outcome !== "success") return null;
   const active = plan && plan.tier !== "free";
   return (
-    <p className={cn("rounded-md border p-4 text-[13px]", active && "bg-brand/10 shadow-[inset_2px_0_0_var(--brand)]")} role="status">
+    <p className={cn("border p-4 text-[13px]", active && "bg-brand/10 shadow-[inset_2px_0_0_var(--brand)]")} role="status">
       {active ? (
         <>
           <span className="font-medium">Welcome to Pro.</span> Every roadmap module is open, and your profile can use
@@ -188,46 +189,48 @@ export function ProPage({ prices }: { prices: Prices }) {
           <Features title="Free for everyone" items={FREE} />
         </div>
 
-        <aside className="order-first h-fit rounded-md border p-6 md:order-none" aria-label="Price">
-          <div role="radiogroup" aria-label="Billing" className="grid grid-cols-2 rounded-md border p-0.5 text-[13px]">
-            {(["month", "year"] as const).map((i) => (
-              <button
-                key={i}
-                type="button"
-                role="radio"
-                aria-checked={interval === i}
-                onClick={() => setBilling(i)}
-                className={cn("rounded-sm py-1.5", interval === i ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}
-              >
-                {i === "month" ? "Monthly" : "Yearly"}
-              </button>
-            ))}
-          </div>
-          {price ? (
-            <>
-              <p className="mt-6 flex items-baseline gap-1.5">
-                <span className="font-mono text-4xl font-medium tabular-nums">{money(price)}</span>
-                <span className="text-[13px] text-muted-foreground">/ {interval}</span>
-              </p>
-              <p className="mt-1 h-5 text-[13px] text-muted-foreground">
-                {interval === "year" && `${money(price, true)} a month`}
-                {interval === "year" && saving !== null && saving > 0 && ` · ${saving}% less than monthly`}
-              </p>
-            </>
-          ) : (
-            <p className="mt-6 text-[13px] text-muted-foreground">Prices are on their way.</p>
-          )}
-          <div className="mt-6">
-            <Plan interval={interval} />
-          </div>
-          <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-            Paid through Stripe. Cancel any time from Manage billing; Pro lasts to the end of the period you paid for.
-          </p>
-          {prices.testMode && (
-            <p className="mt-3 rounded-sm bg-bg-secondary px-2 py-1.5 font-mono text-[11px] text-muted-foreground">
-              Test mode: card 4242 4242 4242 4242, any future date, any CVC. Nothing is charged.
+        <aside className="order-first h-fit md:order-none" aria-label="Price">
+          <WindowCard file="pro.exe" color="pink" bodyClassName="block p-6">
+            <div role="radiogroup" aria-label="Billing" className="grid grid-cols-2 rounded-md border p-0.5 text-[13px]">
+              {(["month", "year"] as const).map((i) => (
+                <button
+                  key={i}
+                  type="button"
+                  role="radio"
+                  aria-checked={interval === i}
+                  onClick={() => setBilling(i)}
+                  className={cn("rounded-sm py-1.5", interval === i ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}
+                >
+                  {i === "month" ? "Monthly" : "Yearly"}
+                </button>
+              ))}
+            </div>
+            {price ? (
+              <>
+                <p className="mt-6 flex items-baseline gap-1.5">
+                  <span className="font-mono text-4xl font-medium tabular-nums">{money(price)}</span>
+                  <span className="text-[13px] text-muted-foreground">/ {interval}</span>
+                </p>
+                <p className="mt-1 h-5 text-[13px] text-muted-foreground">
+                  {interval === "year" && `${money(price, true)} a month`}
+                  {interval === "year" && saving !== null && saving > 0 && ` · ${saving}% less than monthly`}
+                </p>
+              </>
+            ) : (
+              <p className="mt-6 text-[13px] text-muted-foreground">Prices are on their way.</p>
+            )}
+            <div className="mt-6">
+              <Plan interval={interval} />
+            </div>
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              Paid through Stripe. Cancel any time from Manage billing; Pro lasts to the end of the period you paid for.
             </p>
-          )}
+            {prices.testMode && (
+              <p className="mt-3 rounded-sm bg-bg-secondary px-2 py-1.5 font-mono text-[11px] text-muted-foreground">
+                Test mode: card 4242 4242 4242 4242, any future date, any CVC. Nothing is charged.
+              </p>
+            )}
+          </WindowCard>
         </aside>
       </div>
     </div>

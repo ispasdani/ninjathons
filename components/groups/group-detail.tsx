@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { GroupLobbies } from "@/components/territory/group-lobbies";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { errorMessage } from "@/lib/errors";
@@ -68,7 +69,7 @@ export function GroupDetail({ groupId }: { groupId: string }) {
   const id = group._id;
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <Link href="/groups" className="text-[13px] text-text-secondary hover:underline">
         ← Your groups
       </Link>
@@ -127,8 +128,8 @@ export function GroupDetail({ groupId }: { groupId: string }) {
         </p>
       )}
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-md border bg-bg-secondary p-6">
+      <section className="mt-8 grid gap-6 sm:grid-cols-2">
+        <WindowCard file="invite_code.exe" color="green" bodyClassName="block p-6">
           <p className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">Invite code</p>
           <p className="mt-3 font-mono text-2xl font-medium tracking-[0.12em]">{group.inviteCode}</p>
           <div className="mt-4 flex gap-2">
@@ -143,8 +144,8 @@ export function GroupDetail({ groupId }: { groupId: string }) {
             )}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">Anyone with the code can join from the Groups page.</p>
-        </div>
-        <div className="flex flex-col justify-between rounded-md border p-6">
+        </WindowCard>
+        <WindowCard file="leaderboards.exe" color="plain" bodyClassName="justify-between p-6">
           <div>
             <p className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
               Leaderboards
@@ -154,48 +155,50 @@ export function GroupDetail({ groupId }: { groupId: string }) {
           <Button variant="outline" size="sm" className="mt-4 self-start" asChild>
             <Link href={`/leaderboards?scope=group&group=${id}`}>Group leaderboard</Link>
           </Button>
-        </div>
+        </WindowCard>
       </section>
 
       <GroupLobbies groupId={id} />
 
       <section className="mt-10">
         <h2 className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">Members</h2>
-        <ul className="mt-3 divide-y rounded-md border">
-          {group.members.map((m) => (
-            <li key={m.userId} className="flex min-h-11 flex-wrap items-center gap-3 px-4 py-2 text-[13px]">
-              {m.imageUrl ? (
-                // Clerk avatar URLs; next/image would need every Clerk host configured.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={m.imageUrl} alt="" className="size-6 rounded-full bg-bg-tertiary" />
-              ) : (
-                <span className="size-6 rounded-full bg-bg-tertiary" />
-              )}
-              <span className="font-medium">{m.username ? `@${m.username}` : m.name}</span>
-              {m.isOwner && (
-                <span className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs text-muted-foreground">Owner</span>
-              )}
-              {group.isOwner && !m.isOwner && (
-                <span className="ml-auto flex gap-2">
-                  {confirming === m.userId ? (
-                    <>
-                      <Button variant="destructive" size="xs" onClick={() => run(() => removeMember({ groupId: id, userId: m.userId }))}>
-                        Remove {m.username ? `@${m.username}` : m.name}
+        <WindowCard file="members.exe" color="plain" className="mt-3" bodyClassName="block">
+          <ul className="divide-y">
+            {group.members.map((m) => (
+              <li key={m.userId} className="flex min-h-11 flex-wrap items-center gap-3 px-4 py-2 text-[13px]">
+                {m.imageUrl ? (
+                  // Clerk avatar URLs; next/image would need every Clerk host configured.
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={m.imageUrl} alt="" className="size-6 rounded-full bg-bg-tertiary" />
+                ) : (
+                  <span className="size-6 rounded-full bg-bg-tertiary" />
+                )}
+                <span className="font-medium">{m.username ? `@${m.username}` : m.name}</span>
+                {m.isOwner && (
+                  <span className="rounded-sm bg-bg-secondary px-2 py-0.5 text-xs text-muted-foreground">Owner</span>
+                )}
+                {group.isOwner && !m.isOwner && (
+                  <span className="ml-auto flex gap-2">
+                    {confirming === m.userId ? (
+                      <>
+                        <Button variant="destructive" size="xs" onClick={() => run(() => removeMember({ groupId: id, userId: m.userId }))}>
+                          Remove {m.username ? `@${m.username}` : m.name}
+                        </Button>
+                        <Button variant="ghost" size="xs" onClick={() => setConfirming(null)}>
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <Button variant="ghost" size="xs" onClick={() => setConfirming(m.userId)}>
+                        Remove
                       </Button>
-                      <Button variant="ghost" size="xs" onClick={() => setConfirming(null)}>
-                        Cancel
-                      </Button>
-                    </>
-                  ) : (
-                    <Button variant="ghost" size="xs" onClick={() => setConfirming(m.userId)}>
-                      Remove
-                    </Button>
-                  )}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
+                    )}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </WindowCard>
       </section>
 
       <section className="mt-10 flex flex-wrap gap-2 border-t pt-6">

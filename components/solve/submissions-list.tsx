@@ -2,6 +2,7 @@
 
 import { useConvexAuth, useQuery } from "convex/react";
 
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import type { Language } from "@/convex/judge/types";
@@ -37,50 +38,52 @@ export function SubmissionsList({
   }
 
   return (
-    <div className="overflow-x-auto rounded-md border">
-      <table className="w-full text-[13px]">
-        <thead>
-          <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
-            <th className="py-2.5 pl-3 font-medium">Result</th>
-            <th className="py-2.5 font-medium">Kind</th>
-            <th className="py-2.5 font-medium">Language</th>
-            <th className="py-2.5 pr-3 text-right font-medium">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((s) => (
-            <tr key={s._id} className="h-11 border-b last:border-b-0 hover:bg-bg-secondary">
-              <td className="pl-3">
-                <button
-                  type="button"
-                  onClick={() => onOpen(s._id)}
-                  title="Load this code into the editor"
-                  className="flex items-center gap-2 text-left hover:underline"
-                >
-                  {s.verdict ? (
-                    <>
-                      <VerdictBadge status={s.verdict.status} />
-                      <span className="font-mono text-xs text-muted-foreground tabular-nums">
-                        {s.verdict.passed}/{s.verdict.total}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">
-                      {s.status === "error" ? "Failed to run" : "Judging…"}
-                    </span>
-                  )}
-                </button>
-              </td>
-              <td className="text-muted-foreground">{s.kind === "submit" ? "Submit" : "Run"}</td>
-              <td>{labels[s.language] ?? s.language}</td>
-              <td className="pr-3 text-right font-mono text-xs text-muted-foreground tabular-nums">
-                {s.verdict && `${s.verdict.timeMs} ms · `}
-                {ago(s._creationTime)}
-              </td>
+    <WindowCard file="submissions.exe" color="plain" bodyClassName="block">
+      <div className="overflow-x-auto">
+        <table className="w-full text-[13px]">
+          <thead>
+            <tr className="border-b text-left font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
+              <th className="py-2.5 pl-3 font-medium">Result</th>
+              <th className="py-2.5 font-medium">Kind</th>
+              <th className="py-2.5 font-medium">Language</th>
+              <th className="py-2.5 pr-3 text-right font-medium">Time</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {rows.map((s) => (
+              <tr key={s._id} className="h-11 border-b last:border-b-0 hover:bg-bg-secondary">
+                <td className="pl-3">
+                  <button
+                    type="button"
+                    onClick={() => onOpen(s._id)}
+                    title="Load this code into the editor"
+                    className="flex items-center gap-2 text-left hover:underline"
+                  >
+                    {s.verdict ? (
+                      <>
+                        <VerdictBadge status={s.verdict.status} />
+                        <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                          {s.verdict.passed}/{s.verdict.total}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        {s.status === "error" ? "Failed to run" : "Judging…"}
+                      </span>
+                    )}
+                  </button>
+                </td>
+                <td className="text-muted-foreground">{s.kind === "submit" ? "Submit" : "Run"}</td>
+                <td>{labels[s.language] ?? s.language}</td>
+                <td className="pr-3 text-right font-mono text-xs text-muted-foreground tabular-nums">
+                  {s.verdict && `${s.verdict.timeMs} ms · `}
+                  {ago(s._creationTime)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </WindowCard>
   );
 }

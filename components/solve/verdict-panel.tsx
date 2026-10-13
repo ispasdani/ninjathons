@@ -95,7 +95,7 @@ export function VerdictPanel({
       <ol className="space-y-3">
         {verdict.tests.map((test, i) =>
           test.visible ? (
-            <li key={i} className="space-y-2 rounded-md border p-3">
+            <li key={i} className="space-y-2 border p-3">
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <VerdictBadge status={test.status} /> Example {i + 1} · {test.timeMs} ms
               </p>
@@ -110,7 +110,7 @@ export function VerdictPanel({
             </li>
           ) : (
             test.status !== "accepted" && (
-              <li key={i} className="flex items-center gap-2 rounded-md border p-3 text-xs text-muted-foreground">
+              <li key={i} className="flex items-center gap-2 border p-3 text-xs text-muted-foreground">
                 <VerdictBadge status={test.status} /> Hidden test {i + 1} · {test.timeMs} ms · inputs of hidden tests stay hidden
               </li>
             )

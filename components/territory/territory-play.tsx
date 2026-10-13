@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { LanguagePicker, savedLanguage } from "@/components/play/language-picker";
 import { PlayTabs } from "@/components/play/play-tabs";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { Segmented } from "@/components/ui/segmented";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -97,18 +98,18 @@ export function TerritoryPlay({ groupId }: { groupId?: string }) {
   if (status === undefined) return <p className="text-[13px] text-muted-foreground">Loading…</p>;
 
   return (
-    <div className="max-w-4xl">
+    <div>
       <h1 className="text-3xl sm:text-4xl">Play</h1>
       <div className="mt-4">
         <PlayTabs />
       </div>
-      <p className="mt-4 text-[15px] text-muted-foreground">
+      <p className="mt-4 max-w-2xl text-[15px] text-muted-foreground">
         3 to 6 players on a hex map. Solve a problem to claim a region next to yours, or a harder one to take a
         rival&apos;s. More than half the points wins, or the most points after 30 minutes.
       </p>
 
       {lobby && (
-        <div role="status" className="mt-6 flex flex-wrap items-center gap-3 rounded-md border bg-bg-secondary px-4 py-3 text-[13px]">
+        <div role="status" className="mt-6 flex flex-wrap items-center gap-3 border bg-bg-secondary px-4 py-3 text-[13px]">
           <span className="size-2 rounded-full bg-brand" aria-hidden />
           <span>{lobby.isHost ? "Your lobby is open." : "You're in a lobby."}</span>
           <Link href={`/lobby/${lobby.code}`} className="ml-auto font-medium hover:underline">
@@ -125,8 +126,8 @@ export function TerritoryPlay({ groupId }: { groupId?: string }) {
       </section>
 
       {/* Two choices of equal weight (plan, Play modes). */}
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <section className="flex flex-col rounded-md border p-6">
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <WindowCard as="section" file="find_match.exe" color="green" bodyClassName="p-6">
           <h2 className="text-lg font-medium">Find a match</h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
             Ranked. A game starts with 6 players near your Territory rating, or with 3 or more after 30 seconds.
@@ -158,9 +159,9 @@ export function TerritoryPlay({ groupId }: { groupId?: string }) {
               </>
             )}
           </div>
-        </section>
+        </WindowCard>
 
-        <section className="flex flex-col rounded-md border p-6">
+        <WindowCard as="section" file="open_lobby.exe" color="green" bodyClassName="p-6">
           <h2 className="text-lg font-medium">Open a lobby</h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
             Share the link, or open it for a group so members can join from the group page. You start it once 3 are in.
@@ -203,7 +204,7 @@ export function TerritoryPlay({ groupId }: { groupId?: string }) {
               Open a lobby
             </Button>
           </div>
-        </section>
+        </WindowCard>
       </div>
       {error && (
         <p role="alert" className="mt-3 text-[13px] text-destructive">
@@ -211,8 +212,8 @@ export function TerritoryPlay({ groupId }: { groupId?: string }) {
         </p>
       )}
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-md border bg-bg-secondary p-6">
+      <section className="mt-8 grid gap-6 sm:grid-cols-2">
+        <WindowCard file="rating.exe" color="plain" bodyClassName="block p-6">
           <p className={eyebrow}>Your Territory rating</p>
           {rating ? (
             <>
@@ -228,15 +229,15 @@ export function TerritoryPlay({ groupId }: { groupId?: string }) {
               No ranked games yet. Everyone starts at 1500; it shows to others after 10 games.
             </p>
           )}
-        </div>
-        <div className="rounded-md border p-6">
+        </WindowCard>
+        <WindowCard file="how_it_works.exe" color="plain" bodyClassName="block p-6">
           <p className={eyebrow}>How it works</p>
           <ul className="mt-3 space-y-1.5 text-[13px] text-muted-foreground">
             <li>Edge regions are easy (+1), then medium (+2), hard (+3), and the Core (+5).</li>
             <li>Claim an empty region at its level; attack a rival&apos;s one level harder.</li>
             <li>New captures are shielded for 60 s; home bases can&apos;t be taken.</li>
           </ul>
-        </div>
+        </WindowCard>
       </section>
     </div>
   );

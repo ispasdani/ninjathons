@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 
 import { Difficulty } from "@/components/problem/difficulty";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { duration, timeLeft } from "@/lib/duration";
 import { useNow } from "@/lib/use-now";
@@ -29,7 +30,7 @@ export function WeeklyPage() {
   const { set, me } = current;
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <header className="flex flex-wrap items-end justify-between gap-6">
         <div>
           <p className={eyebrow}>Weekly challenge · {current.week}</p>
@@ -43,7 +44,7 @@ export function WeeklyPage() {
       </header>
 
       {!set ? (
-        <div className="mt-8 rounded-md border p-6 text-[13px]">
+        <div className="mt-8 border p-6 text-[13px]">
           <p className="text-muted-foreground">
             There&apos;s no weekly set this week. A new one starts on Monday at 00:00 UTC; the daily challenge runs every
             day in the meantime.
@@ -58,49 +59,51 @@ export function WeeklyPage() {
             <Markdown remarkPlugins={[remarkGfm]}>{set.theme}</Markdown>
           </div>
 
-          <section className="mt-8 grid gap-4 lg:grid-cols-3">
-            <ol className="divide-y rounded-md border lg:col-span-2" aria-label="Problems">
-              {set.problems.map((p, i) => {
-                const solved = p.solvedAt !== null;
-                return (
-                  <li
-                    key={p.slug}
-                    className={cn(
-                      "flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-4 sm:flex-nowrap",
-                      solved && "shadow-[inset_2px_0_0_var(--brand)]",
-                    )}
-                  >
-                    <span className="w-5 font-mono text-[13px] text-muted-foreground tabular-nums">{i + 1}</span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{p.title}</p>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-3 text-[13px]">
-                        <Difficulty level={p.difficulty} />
-                        <span className="font-mono text-xs text-muted-foreground tabular-nums">{p.points} points</span>
+          <section className="mt-8 grid gap-6 lg:grid-cols-3">
+            <WindowCard file="weekly_set.exe" color="yellow" className="lg:col-span-2" bodyClassName="block">
+              <ol className="divide-y" aria-label="Problems">
+                {set.problems.map((p, i) => {
+                  const solved = p.solvedAt !== null;
+                  return (
+                    <li
+                      key={p.slug}
+                      className={cn(
+                        "flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-4 sm:flex-nowrap",
+                        solved && "shadow-[inset_2px_0_0_var(--brand)]",
+                      )}
+                    >
+                      <span className="w-5 font-mono text-[13px] text-muted-foreground tabular-nums">{i + 1}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{p.title}</p>
+                        <div className="mt-1 flex flex-wrap items-center gap-x-3 text-[13px]">
+                          <Difficulty level={p.difficulty} />
+                          <span className="font-mono text-xs text-muted-foreground tabular-nums">{p.points} points</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="ml-9 flex items-center gap-3 sm:ml-0">
-                      {solved ? (
-                        <span className="flex items-center gap-1.5 font-mono text-[13px] tabular-nums">
-                          <Check className="size-4 text-brand-text" aria-label="Solved" />
-                          {duration(p.timeMs!)}
-                        </span>
-                      ) : (
-                        p.openedAt !== null && (
-                          <span className="font-mono text-[13px] text-muted-foreground tabular-nums">
-                            {duration(now - p.openedAt)}
+                      <div className="ml-9 flex items-center gap-3 sm:ml-0">
+                        {solved ? (
+                          <span className="flex items-center gap-1.5 font-mono text-[13px] tabular-nums">
+                            <Check className="size-4 text-brand-text" aria-label="Solved" />
+                            {duration(p.timeMs!)}
                           </span>
-                        )
-                      )}
-                      {isAuthenticated && (
-                        <Button variant={solved ? "outline" : "brand"} size="sm" asChild>
-                          <Link href={`/solve/${p.slug}`}>{solved ? "Open" : p.openedAt ? "Carry on" : "Solve"}</Link>
-                        </Button>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
+                        ) : (
+                          p.openedAt !== null && (
+                            <span className="font-mono text-[13px] text-muted-foreground tabular-nums">
+                              {duration(now - p.openedAt)}
+                            </span>
+                          )
+                        )}
+                        {isAuthenticated && (
+                          <Button variant={solved ? "outline" : "brand"} size="sm" asChild>
+                            <Link href={`/solve/${p.slug}`}>{solved ? "Open" : p.openedAt ? "Carry on" : "Solve"}</Link>
+                          </Button>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </WindowCard>
 
             <YourWeek
               me={me}
@@ -139,17 +142,17 @@ function YourWeek({
   const rewards = `${xp.perProblem} XP per problem, ${xp.fullSet} more for the full set. The top 10% earn a badge.`;
   if (!signedIn || !me) {
     return (
-      <div className="rounded-md border bg-bg-secondary p-6">
+      <WindowCard file="your_week.exe" color="plain" bodyClassName="block p-6">
         <p className={eyebrow}>Your week</p>
         <p className="mt-3 text-[13px] text-muted-foreground">{rewards}</p>
         <Button variant="brand" size="sm" className="mt-4" asChild>
           <Link href="/sign-in">Sign in to play</Link>
         </Button>
-      </div>
+      </WindowCard>
     );
   }
   return (
-    <div className="rounded-md border bg-bg-secondary p-6">
+    <WindowCard file="your_week.exe" color="plain" bodyClassName="block p-6">
       <p className={eyebrow}>Your week</p>
       <p className="mt-3 font-mono text-4xl font-medium tabular-nums">
         {me.points}
@@ -171,6 +174,6 @@ function YourWeek({
         </div>
       </dl>
       <p className="mt-5 text-[13px] text-muted-foreground">{rewards}</p>
-    </div>
+    </WindowCard>
   );
 }

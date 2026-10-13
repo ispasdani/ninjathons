@@ -118,7 +118,7 @@ export function NinjathonEditor({ eventId, event }: { eventId: string | null; ev
         </>
       )}
       {locked && (
-        <p className="mt-6 rounded-md border bg-bg-secondary p-4 text-[13px] text-text-secondary">
+        <p className="mt-6 border bg-bg-secondary p-4 text-[13px] text-text-secondary">
           This ninjathon has started, so its details are fixed.
         </p>
       )}
@@ -205,7 +205,7 @@ export function NinjathonEditor({ eventId, event }: { eventId: string | null; ev
               className={cn(field, "py-2 font-mono")}
             />
           ) : (
-            <div className="min-h-40 rounded-md border p-6">
+            <div className="min-h-40 border p-6">
               {draft.brief ? <LessonText>{draft.brief}</LessonText> : <p className="text-muted-foreground">Nothing yet.</p>}
             </div>
           )}

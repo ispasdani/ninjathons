@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { LessonText } from "@/components/learn/lesson-text";
 import { Difficulty } from "@/components/problem/difficulty";
 import { Button } from "@/components/ui/button";
+import { WindowCard } from "@/components/ui/window-card";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
@@ -72,7 +73,7 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
 
       <div className="mt-8">
         {lesson.body === null ? (
-          <section className="rounded-md border p-6" aria-labelledby="pro-lesson">
+          <WindowCard as="section" file="pro.exe" color="pink" bodyClassName="block p-6" aria-labelledby="pro-lesson">
             <p className={cn(eyebrow, "flex items-center gap-2")}>
               <Lock className="size-3.5" aria-hidden />
               Pro
@@ -88,15 +89,19 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
             <Button className="mt-4" size="sm" asChild>
               <Link href="/pro">See Pro</Link>
             </Button>
-          </section>
+          </WindowCard>
         ) : (
           <LessonText>{lesson.body}</LessonText>
         )}
       </div>
 
-      <section
+      <WindowCard
+        as="section"
+        file="practice.exe"
+        color={finished ? "green" : "plain"}
+        className="mt-12"
+        bodyClassName="block p-6"
         aria-labelledby="practice"
-        className={cn("mt-12 rounded-md border p-6", finished && "shadow-[inset_2px_0_0_var(--brand)]")}
       >
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="practice" className={eyebrow}>
@@ -145,7 +150,7 @@ export function LessonPage({ preloaded }: { preloaded: Preloaded<typeof api.lear
             `Solve every exercise, in any language, to finish the lesson: ${lesson.xp} XP. Problems you've already solved count.`
           )}
         </p>
-      </section>
+      </WindowCard>
 
       {place && (
         <nav className="mt-8 flex flex-wrap justify-between gap-3" aria-label="Lessons">
