@@ -11,7 +11,7 @@ The current run, started 13 Oct 2026. Tick boxes in the sections below as checks
 | Section | Status | Date | Problems found |
 |---|---|---|---|
 | 1. Sign-up, sign-in, onboarding | Passed | 14 Oct 2026 | 2, fixed: sign-up landed on `/` instead of `/onboarding`; no way to change a username (now in `/settings`) |
-| 2. Problems and the solve view | Not started | | |
+| 2. Problems and the solve view | Passed | 14 Oct 2026 | None |
 | 3. XP, levels, badges, leaderboards, groups, settings | Not started | | |
 | 4. 1v1 matches | Not started | | |
 | 5. Daily and weekly | Not started | | |
@@ -146,39 +146,39 @@ Use player **B**'s window (fresh account).
 Use **A**. Note: every Run and Submit uses the real Vercel Sandbox (Hobby: about 40 judgings a minute, 5,000 sandboxes a month), so don't spam.
 
 ### 2.1 Problem library (`/problems`)
-- [ ] All problems listed (88 minus the weekly sets not yet started).
-- [ ] Search by name works (`two sum`).
-- [ ] Filters: difficulty, type (function / stdio / HTML & CSS), topic.
-- [ ] Signed in: the status filter (solved, attempted) and your solved progress count.
-- [ ] Problems from weekly sets 2 to 6 (e.g. "Integer Square Root", "House Robber") are **not** listed.
-- [ ] Phone width: the list and filters fit.
+- [x] All problems listed (88 minus the weekly sets not yet started).
+- [x] Search by name works (`two sum`).
+- [x] Filters: difficulty, type (function / stdio / HTML & CSS), topic.
+- [x] Signed in: the status filter (solved, attempted) and your solved progress count.
+- [x] Problems from weekly sets 2 to 6 (e.g. "Integer Square Root", "House Robber") are **not** listed.
+- [x] Phone width: the list and filters fit.
 
 ### 2.2 Solve view (`/solve/two-sum`)
-- [ ] Description tab: statement, examples, constraints, hints.
-- [ ] The split between description and editor drags; arrow keys move it when focused; the size is remembered after reload.
-- [ ] Editor theme follows light/dark.
-- [ ] Language picker: all 7 (JavaScript, TypeScript, Python, Java, C#, C++, Rust), each with its own starter code.
-- [ ] Type something, reload: your draft is still there (per problem and language).
+- [x] Description tab: statement, examples, constraints, hints.
+- [x] The split between description and editor drags; arrow keys move it when focused; the size is remembered after reload.
+- [x] Editor theme follows light/dark.
+- [x] Language picker: all 7 (JavaScript, TypeScript, Python, Java, C#, C++, Rust), each with its own starter code.
+- [x] Type something, reload: your draft is still there (per problem and language).
 
 ### 2.3 Verdicts (JavaScript or Python is fastest)
 For each, check the verdict text and that the error only points at **your** code (e.g. `solution.js:2`), no driver files or temp paths.
-- [ ] **Run** with a correct solution: examples pass.
-- [ ] **Submit** correct: **Accepted**, with tests passed and time.
-- [ ] **Wrong answer**: shows which test, expected vs got (for visible examples).
-- [ ] **Runtime error**: `throw new Error("x")` → error with your line number.
-- [ ] **Time limit**: `while(true){}` → Time limit exceeded.
-- [ ] **Memory limit**: allocate a huge array in a loop → Memory limit exceeded.
-- [ ] **Compile error** (Java, C++ or Rust): a syntax error shows the compiler message on your line.
-- [ ] **Misnamed function**: rename `twoSum` to `twosum` → a compile error saying the function must be named `twoSum`, with the starter code.
-- [ ] Run stops at the first crash instead of repeating it for every example.
+- [x] **Run** with a correct solution: examples pass.
+- [x] **Submit** correct: **Accepted**, with tests passed and time.
+- [x] **Wrong answer**: shows which test, expected vs got (for visible examples).
+- [x] **Runtime error**: `throw new Error("x")` → error with your line number.
+- [x] **Time limit**: `while(true){}` → Time limit exceeded.
+- [x] **Memory limit**: allocate a huge array in a loop → Memory limit exceeded.
+- [x] **Compile error** (Java, C++ or Rust): a syntax error shows the compiler message on your line.
+- [x] **Misnamed function**: rename `twoSum` to `twosum` → a compile error saying the function must be named `twoSum`, with the starter code.
+- [x] Run stops at the first crash instead of repeating it for every example.
 
 ### 2.4 Other languages
-- [ ] Submit an accepted Two Sum in at least one compiled language (C++ or Java). It's slower (about 4 s); you should see "Judging…".
-- [ ] A **stdio** problem (`/solve/sum-of-a-list`): the starter is a full program reading input; Submit a correct one.
+- [x] Submit an accepted Two Sum in at least one compiled language (C++ or Java). It's slower (about 4 s); you should see "Judging…".
+- [x] A **stdio** problem (`/solve/sum-of-a-list`): the starter is a full program reading input; Submit a correct one.
 
 ### 2.5 Submissions tab
-- [ ] Lists your Runs/Submits with verdicts.
-- [ ] Opening one loads its code into the editor.
+- [x] Lists your Runs/Submits with verdicts.
+- [x] Opening one loads its code into the editor.
 
 ---
 
