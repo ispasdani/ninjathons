@@ -12,7 +12,7 @@ The current run, started 13 Oct 2026. Tick boxes in the sections below as checks
 |---|---|---|---|
 | 1. Sign-up, sign-in, onboarding | Passed | 14 Oct 2026 | 2, fixed: sign-up landed on `/` instead of `/onboarding`; no way to change a username (now in `/settings`) |
 | 2. Problems and the solve view | Passed | 14 Oct 2026 | None |
-| 3. XP, levels, badges, leaderboards, groups, settings | Not started | | |
+| 3. XP, levels, badges, leaderboards, groups, settings | Passed | 14 Oct 2026 | None |
 | 4. 1v1 matches | Not started | | |
 | 5. Daily and weekly | Not started | | |
 | 6. Territory | Not started | | |
@@ -185,44 +185,44 @@ For each, check the verdict text and that the error only points at **your** code
 ## 3. Phase 3: XP, levels, badges, leaderboards, groups, settings
 
 ### 3.1 XP and badges from solving (use **B**, fresh account)
-- [ ] First accepted Submit on an Easy problem: **+10 XP** and the **First solve** badge shown in the solve view.
-- [ ] Submit the same problem again in the same language: no XP, and it says why (already solved).
-- [ ] Same problem in a **different** language: +10 XP again.
-- [ ] A Medium gives +20, a Hard +40.
-- [ ] A failed Submit or a Run gives nothing.
-- [ ] Reaching 100 XP shows **level 2** in the solve view.
+- [x] First accepted Submit on an Easy problem: **+10 XP** and the **First solve** badge shown in the solve view.
+- [x] Submit the same problem again in the same language: no XP, and it says why (already solved).
+- [x] Same problem in a **different** language: +10 XP again.
+- [x] A Medium gives +20, a Hard +40.
+- [x] A failed Submit or a Run gives nothing.
+- [x] Reaching 100 XP shows **level 2** in the solve view.
 
 ### 3.2 Dashboard (`/dashboard`)
-- [ ] Level card: level, title, XP bar that matches your XP.
-- [ ] Badges earned, groups, Daily and Weekly cards, progress and "carry on".
+- [x] Level card: level, title, XP bar that matches your XP.
+- [x] Badges earned, groups, Daily and Weekly cards, progress and "carry on".
 
 ### 3.3 Badges page (`/badges`)
-- [ ] Every badge grouped by area, with rarity.
-- [ ] Your earned ones are marked with the date.
-- [ ] Signed out: still loads, nothing marked.
+- [x] Every badge grouped by area, with rarity.
+- [x] Your earned ones are marked with the date.
+- [x] Signed out: still loads, nothing marked.
 
 ### 3.4 Settings (`/settings`)
-- [ ] Set a country; clear it again (no country).
-- [ ] Links to Profile, Plan (Pro), Groups.
+- [x] Set a country; clear it again (no country).
+- [x] Links to Profile, Plan (Pro), Groups.
 
 ### 3.5 Leaderboards (`/leaderboards`)
 Run `npx convex run leaderboards:rebuildAll` after solving, then reload.
-- [ ] Tabs: Level, This month, 1v1, Territory, Daily, Weekly, Learning, Learning this month, Ninjathons.
-- [ ] Scopes: Global, Country (only once you've set a country), Group.
-- [ ] Your row is pinned; "Jump to me" scrolls to it; paging works.
-- [ ] B shows up on Level after the rebuild, with the right XP.
-- [ ] 1v1 and Territory boards only show players with 10+ ranked games (likely empty).
+- [x] Tabs: Level, This month, 1v1, Territory, Daily, Weekly, Learning, Learning this month, Ninjathons.
+- [x] Scopes: Global, Country (only once you've set a country), Group.
+- [x] Your row is pinned; "Jump to me" scrolls to it; paging works.
+- [x] B shows up on Level after the rebuild, with the right XP.
+- [x] 1v1 and Territory boards only show players with 10+ ranked games (likely empty).
 
 ### 3.6 Groups (`/groups`) with **A** and **B**
-- [ ] A creates a group; its page shows the 8-character invite code.
-- [ ] B joins with the code (try it lower-case too: codes ignore case).
-- [ ] A wrong code is refused clearly.
-- [ ] The group's board lists both members, 0 XP included.
-- [ ] A renames the group; B sees the new name.
-- [ ] A makes a new code: the old one stops working (try joining with it as C).
-- [ ] A removes B; B no longer sees the group.
-- [ ] A deletes the group, then **Restore** brings it back.
-- [ ] B (re-joined) leaves; if A leaves, ownership passes to the earliest member.
+- [x] A creates a group; its page shows the 8-character invite code.
+- [x] B joins with the code (try it lower-case too: codes ignore case).
+- [x] A wrong code is refused clearly.
+- [x] The group's board lists both members, 0 XP included.
+- [x] A renames the group; B sees the new name.
+- [x] A makes a new code: the old one stops working (try joining with it as C).
+- [x] A removes B; B no longer sees the group.
+- [x] A deletes the group, then **Restore** brings it back.
+- [x] B (re-joined) leaves; if A leaves, ownership passes to the earliest member.
 
 ---
 
