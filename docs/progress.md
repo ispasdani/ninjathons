@@ -26,6 +26,11 @@ Content track: 88 of 150–200 problems (5 of them HTML and CSS), 20 of ~20 tuto
 
 Each entry: date, phase, what was done, and anything left open. One entry per piece of work, not per commit.
 
+### 14 Oct 2026 · Onboarding after sign-up, username change in Settings
+- Found in the manual test pass (1.2, 1.3). A new sign-up landed on `/` instead of `/onboarding`, since the home page has no username check and Clerk had no sign-up redirect. Clerk now falls back to `/onboarding` after sign-up; a sign-up that started from a page still goes back there, and the app layouts send it on to onboarding.
+- There was no way to change a username: the onboarding form sends anyone who has one on to the dashboard. `/settings` now has a Username section: it checks the name as you type, the same way onboarding does (the check and the error messages are shared), and gives the date of the next allowed change during the 30-day cooldown. The rules stay in `setUsername`: letter case any time, a real change once every 30 days, and the old name held and redirecting for 90 days. XP, badges and games are keyed to the account, so a rename moves nothing.
+- Typecheck and lint pass. Open: not yet seen signed in (the browser pane can't sign in); it's covered by the manual test plan's 1.2 and 1.3.
+
 ### 13 Oct 2026 · Window cards across the app
 - The square windows from the home page are now the app's cards. The component moved to `components/ui/window-card.tsx` and gained two colourless styles, `plain` and `ink`, and an `as` prop (section, article, list item, form, aside).
 - A mode keeps its home page colour (Daily orange, Weekly yellow, 1v1 pink, Territory green, Learn purple, Ninjathons blue, Pro pink, Groups green); everything else is colourless. Colour also carries state: a finished module or lesson turns green, the 1st-place ninjathon result is yellow, the match winner's window is ink.

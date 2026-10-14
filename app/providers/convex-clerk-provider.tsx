@@ -18,6 +18,10 @@ const ConvexClerkProvider = ({ children }: { children: ReactNode }) => (
     publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     signInUrl="/sign-in"
     signUpUrl="/sign-up"
+    // A new account picks its username first. A sign-up that started from a
+    // page (?redirect_url=) goes back there, and the app layouts send it on
+    // to onboarding.
+    signUpFallbackRedirectUrl="/onboarding"
   >
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
       <EnsureUser />

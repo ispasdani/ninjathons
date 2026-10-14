@@ -24,6 +24,36 @@ function useDebounced<T>(value: T, ms: number): T {
 }
 
 /**
+ * Checks a typed username: the rules at once, then whether the server lets
+ * the caller take it. `enabled` is false until the account row exists (the
+ * check needs a signed-in user). Shared by onboarding and Settings.
+ */
+export function useUsernameCheck(value: string, enabled: boolean) {
+  const name = value.trim();
+  const rules = name ? checkUsernameRules(name) : null;
+  const debounced = useDebounced(name, 300);
+  const check = useQuery(
+    api.user.checkUsername,
+    enabled && debounced && !checkUsernameRules(debounced) ? { username: debounced } : "skip",
+  );
+
+  const checked = check !== undefined && debounced === name;
+  const message = rules
+    ? USERNAME_MESSAGES[rules]
+    : checked && !check.ok
+      ? USERNAME_MESSAGES[check.refusal]
+      : null;
+  return { name, message, available: !rules && checked && check.ok };
+}
+
+/** setUsername's ConvexError("USERNAME_<REASON>") in words. */
+export function usernameErrorMessage(e: unknown): string {
+  const code = e instanceof ConvexError && typeof e.data === "string" ? e.data : "";
+  const reason = code.replace(/^USERNAME_/, "").toLowerCase() as keyof typeof USERNAME_MESSAGES;
+  return USERNAME_MESSAGES[reason] ?? "Something went wrong. Please try again.";
+}
+
+/**
  * Picks the username right after sign-up (docs/notes/decisions.md §1). The
  * rules are checked as you type, here and again on the server; whether the
  * name is free comes from the server. `next` is where to go afterwards.
@@ -37,14 +67,7 @@ export function UsernameForm({ next }: { next: string }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const name = value.trim();
-  const rules = name ? checkUsernameRules(name) : null;
-  const debounced = useDebounced(name, 300);
-  const check = useQuery(
-    api.user.checkUsername,
-    // Only once the account row exists: the check needs a signed-in user.
-    user && !user.username && debounced && !checkUsernameRules(debounced) ? { username: debounced } : "skip",
-  );
+  const { name, message, available } = useUsernameCheck(value, !!user && !user.username);
 
   // Already has one (another tab, or came back here): carry on.
   useEffect(() => {
@@ -58,14 +81,6 @@ export function UsernameForm({ next }: { next: string }) {
     return <p className="text-[13px] text-muted-foreground">Setting up your account…</p>;
   }
 
-  const checked = check !== undefined && debounced === name;
-  const message = rules
-    ? USERNAME_MESSAGES[rules]
-    : checked && !check.ok
-      ? USERNAME_MESSAGES[check.refusal]
-      : null;
-  const available = !rules && checked && check.ok;
-
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!available || saving) return;
@@ -75,9 +90,7 @@ export function UsernameForm({ next }: { next: string }) {
       await setUsername({ username: name });
       router.replace(next);
     } catch (e) {
-      const code = e instanceof ConvexError && typeof e.data === "string" ? e.data : "";
-      const reason = code.replace(/^USERNAME_/, "").toLowerCase() as keyof typeof USERNAME_MESSAGES;
-      setError(USERNAME_MESSAGES[reason] ?? "Something went wrong. Please try again.");
+      setError(usernameErrorMessage(e));
       setSaving(false);
     }
   }

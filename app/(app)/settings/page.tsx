@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CountryForm } from "@/components/settings/country-form";
+import { UsernameSettingsForm } from "@/components/settings/username-form";
 import { WindowCard } from "@/components/ui/window-card";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -12,6 +13,10 @@ export default function SettingsPage() {
     <div className="max-w-2xl">
       <p className="font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">Account</p>
       <h1 className="mt-2 text-3xl sm:text-4xl">Settings</h1>
+      <section className="mt-8">
+        <h2 className="mb-3 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">Username</h2>
+        <UsernameSettingsForm />
+      </section>
       <section className="mt-8">
         <h2 className="mb-3 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">Plan</h2>
         <WindowCard file="plan.exe" color="plain" bodyClassName="flex-row flex-wrap items-center justify-between gap-3 p-6">

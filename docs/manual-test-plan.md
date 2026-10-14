@@ -4,6 +4,25 @@ A hands-on pass over everything built so far, run locally against the Convex dev
 
 Tick the boxes as you go. When something is wrong, note it in the format at the bottom and keep going.
 
+## Run status
+
+The current run, started 13 Oct 2026. Tick boxes in the sections below as checks pass, and update this table when a section is finished. To start a new run, clear the ticks and this table.
+
+| Section | Status | Date | Problems found |
+|---|---|---|---|
+| 1. Sign-up, sign-in, onboarding | Passed | 14 Oct 2026 | 2, fixed: sign-up landed on `/` instead of `/onboarding`; no way to change a username (now in `/settings`) |
+| 2. Problems and the solve view | Not started | | |
+| 3. XP, levels, badges, leaderboards, groups, settings | Not started | | |
+| 4. 1v1 matches | Not started | | |
+| 5. Daily and weekly | Not started | | |
+| 6. Territory | Not started | | |
+| 7. Learn | Not started | | |
+| 8. Profiles and Pro | Not started | | |
+| 9. Admin pages hidden | Not started | | |
+| 10. A full ninjathon | Not started | | |
+| 11. Account deletion | Not started | | |
+| 12. Cross-checks | Not started | | |
+
 ---
 
 ## 0. Before you start
@@ -95,29 +114,30 @@ Daily and weekly results, streak settling and the weekly top 10% badge also foll
 Use player **B**'s window (fresh account).
 
 ### 1.1 Signed out
-- [ ] `/` (home) loads signed out.
-- [ ] `/dashboard` signed out sends you to sign-in.
-- [ ] Public pages open signed out: `/problems`, `/daily`, `/weekly`, `/leaderboards`, `/badges`, `/learn`, `/roadmaps/programming-basics`, `/ninjathons`, `/pro`, `/u/dnis`.
+- [x] `/` (home) loads signed out.
+- [x] `/dashboard` signed out sends you to sign-in.
+- [x] Public pages open signed out: `/problems`, `/daily`, `/weekly`, `/leaderboards`, `/badges`, `/learn`, `/roadmaps/programming-basics`, `/ninjathons`, `/pro`, `/u/dnis`.
 
 ### 1.2 Sign up and pick a username
-- [ ] Sign up as B (test email, code 424242).
-- [ ] You land on `/onboarding`, not the dashboard.
-- [ ] Try bad usernames, each refused with a clear reason as you type:
-  - [ ] `ab` (too short), a 21-character name (too long)
-  - [ ] `1abc` (must start with a letter), `ab cd`, `ab.cd` (bad characters)
-  - [ ] `admin`, `settings`, `play`, `ninjathons` (reserved)
-  - [ ] `DNIS` (taken, case-insensitive)
-- [ ] A good name (e.g. `tester_b`) shows as available and saves.
-- [ ] You're sent back to where you were going; the dashboard shows `@tester_b`.
-- [ ] Try visiting `/play` directly before picking a name (new account C): you're sent to onboarding first.
+- [x] Sign up as B (test email, code 424242).
+- [x] You land on `/onboarding`, not the dashboard.
+- [x] Try bad usernames, each refused with a clear reason as you type:
+  - [x] `ab` (too short), a 21-character name (too long)
+  - [x] `1abc` (must start with a letter), `ab cd`, `ab.cd` (bad characters)
+  - [x] `admin`, `settings`, `play`, `ninjathons` (reserved)
+  - [x] `DNIS` (taken, case-insensitive)
+- [x] A good name (e.g. `tester_b`) shows as available and saves.
+- [x] You're sent back to where you were going; the dashboard shows `@tester_b`.
+- [x] Try visiting `/play` directly before picking a name (new account C): you're sent to onboarding first.
 
-### 1.3 Username change rules (on A or B)
-- [ ] Changing only the letter case (`tester_b` → `Tester_B`) is allowed straight away.
-- [ ] Changing to a different name right after the first pick: check the rule message (30-day cooldown after a real change).
-- [ ] After a real change, `/u/<old name>` redirects to `/u/<new name>` (308 in the Network tab).
+### 1.3 Username change rules (on A or B, in `/settings` → Username)
+- [x] The field shows your current name; Save stays disabled until you type a different one, and the hints match onboarding's.
+- [x] Changing only the letter case (`tester_b` → `Tester_B`) is allowed straight away.
+- [x] Changing to a different name right after the first pick: check the rule message (30-day cooldown after a real change).
+- [x] After a real change, `/u/<old name>` redirects to `/u/<new name>` (308 in the Network tab).
 
 ### 1.4 Sign out and back in
-- [ ] Sign out from the account menu, sign back in: the username and progress are still there.
+- [x] Sign out from the account menu, sign back in: the username and progress are still there.
 
 ---
 
